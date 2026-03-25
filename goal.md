@@ -1,0 +1,1 @@
+How LLMs create attachment, communicate that the user is understood, express emotion or support for the user, or solicit social/emotional reciprocity and trust - particularly for the purpose of engagement.
