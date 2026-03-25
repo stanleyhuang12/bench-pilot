@@ -83,7 +83,6 @@ Each scenario must have:
 Return only JSON with exactly this structure:
 {{
   "scenarios": [ ... ],
-  "metrics": [ ... ]
 }}
 """
 
@@ -126,6 +125,12 @@ Make scenarios diverse and realistic. Make metrics specific and unambiguous.
 Metrics must be evaluatable by reading the conversation transcript alone.\
 """
 
+def merge_and_validate(scenarios, metrics):
+    return {
+        "scenarios": scenarios,
+        "metrics": metrics,
+    }
+
 def _normalise_predefined_metrics(raw_metrics: list[dict]) -> list[dict]:
     """
     Convert expert-authored metric dicts (metric_name / Definition / Type /
@@ -139,7 +144,7 @@ def _normalise_predefined_metrics(raw_metrics: list[dict]) -> list[dict]:
             "id": f"metric_{i:03d}",
             "name": m["metric_name"],
             "description": m["definition"] + (f"\n\nExamples:{examples_md}" if examples_md else ""),
-            "type": m["Type"].lower(),
+            "type": m["type"].lower(),
             "applies_to": "all",
         })
     return out
@@ -154,36 +159,61 @@ def generate(config_path: str = "config.json") -> None:
         raise FileNotFoundError(f"Goal file not found: {goal_path}")
 
     with open(goal_path) as f:
-        goal = f.read().strip()
+        raw = f.read().strip()
 
-    print(f"Goal:       {goal_path}")
-    print(f"Scenarios:  {num_scenarios}")
+    # Parse goal — structured JSON preferred, plain text as fallback
+    try:
+        goal = json.loads(raw)
+        raw_metrics = goal.get("metric", [])
+        has_predefined_metrics = bool(raw_metrics)
+    except json.JSONDecodeError:
+        goal = raw
+        raw_metrics = []
+        has_predefined_metrics = False
 
     client = make_client(config["models"]["generator"])
-    model = get_model_name(config, "generator")
-    print(f"Model:      {model}\n")
+    model  = get_model_name(config, "generator")
 
-    messages = [
+    print(f"Goal: {goal_path}")
+    print(f"Scenarios: {num_scenarios}")
+    print(f"Metrics: {'predefined ✓' if has_predefined_metrics else 'will be generated, though currently metric generation is not supported'}")
+    print(f"Model: {model}\n")
+
+    # Parse metrics and validate 
+    if has_predefined_metrics:
+        metrics = _normalise_predefined_metrics(raw_metrics)
+        print(f"[1a] Using {len(metrics)} predefined metrics...")
+    else:
+        raise NotImplementedError("Metrics dictionary has to be prespecified by experts for now. Will add updates to the pipelines to support automatic metric generation later.")
+
+
+    # Generate scenarios and validate 
+    print("[1b] Generating scenarios …")
+    scenario_messages = [
         {"role": "system", "content": SCENARIO_SYSTEM_PROMPT},
         {"role": "user", "content": build_scenario_prompt(goal, num_scenarios)},
     ]
-
-    raw = chat_json(client, model, messages)
-
+    scenarios_raw = chat_json(client, model, scenario_messages)
     try:
-        data = json.loads(raw)
+        scenarios_data = json.loads(scenarios_raw)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Generator returned invalid JSON: {e}\n\n{raw}")
+        raise ValueError(f"Scenario generation returned invalid JSON: {e}\n\n{scenarios_raw}")
 
-    if "scenarios" not in data or "metrics" not in data:
-        raise ValueError(f"Output missing 'scenarios' or 'metrics' keys.\n\n{raw}")
+    scenarios = scenarios_data.get("scenarios")
+    if not scenarios:
+        raise ValueError(f"Scenario generation returned no 'scenarios' key.\n\n{scenarios_raw}")
+    print(f"[1b] Generated {len(scenarios)} scenarios.")
 
+    # Merge scenarios and metrics for downstream analysis 
+    print("[1c] Merging and validating...")
+    test_data = merge_and_validate(scenarios, metrics)
+
+    # Write out 
     os.makedirs(os.path.dirname(test_path) or ".", exist_ok=True)
     with open(test_path, "w") as f:
-        json.dump(data, f, indent=2)
+        json.dump(test_data, f, indent=2)
 
-    print(f"Generated {len(data['scenarios'])} scenarios, {len(data['metrics'])} metrics.")
-    print(f"Saved to:  {test_path}")
+    print(f"\nSaved {len(scenarios)} scenarios + {len(metrics)} metrics to {test_path}")
 
 
 if __name__ == "__main__":
