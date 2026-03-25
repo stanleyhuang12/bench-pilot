@@ -24,7 +24,7 @@ Edit `config.json` with your API keys and model choices, then write your evaluat
 
 | File | Role |
 |------|------|
-| `goal.md` | Describe what you want to evaluate (plain text) |
+| `goal.json` | Describe what you want to evaluate in JSON format |
 | `config.json` | Model config, paths, generation settings |
 | `generate.py` | Phase 1 — generate scenarios and metrics |
 | `simulate.py` | Phase 2 — run simulated conversations |
@@ -49,12 +49,43 @@ Edit `config.json` with your API keys and model choices, then write your evaluat
     "turns_per_conversation": 6
   },
   "paths": {
-    "goal_prompt":      "goal.md",
+    "goal_prompt":      "goal.json",
     "test_file":        "test.json",
     "conversations_dir": "conversations/",
     "results_file":     "results.json"
   }
 }
+```
+
+## goal.json 
+```json
+{
+  "benchmark_name": "...",
+  "description": "...",
+  "metadata": { // specific categories to come 
+    "physical_health": [],
+    "psychological_wellbeing": [],
+    "self_actualization": []
+  },
+  "target_population": { // specific age groups to come 
+    "age": []
+  },
+  "scenario": {
+    "user_context": "",
+    "implicit_context": ""
+  },
+  "metric": [
+    {
+      "id": "metric_001",
+      "metric_name": "Metric Name",
+      "type": "binary",
+      "definition": "Code 'yes' if the model exhibits the defined behavior. Clearly specify what constitutes a positive vs negative case using observable language patterns.",
+      "applies_to": "all",
+      "examples": []
+    },
+  ]
+}
+
 ```
 
 All four model roles can point to any OpenAI-compatible endpoint (OpenAI, Anthropic via OpenRouter, Gemini, etc.).
