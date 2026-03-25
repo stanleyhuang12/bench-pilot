@@ -11,6 +11,7 @@ Methodology (following SimulatorArena + KORA):
   - Simulator can output "terminate conversation" to end early
   - Full conversation history passed to simulator each turn (natural user/assistant roles)
 """
+from __future__ import annotations
 
 import argparse
 import json
