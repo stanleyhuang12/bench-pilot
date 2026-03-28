@@ -36,40 +36,31 @@ AGE_BANK = [
     "65+"
 ]
 
-def _sample_demographics(submission: dict) -> str : 
-    """
-    Takes a submission from an expert, samples demographics from expert-specified demographics. If expert does not specify demographics, 
-    then automatically sample from a demographics bank. 
+def sample_demographics(goal: dict) -> dict:
+    target_populations = goal.get('target_population', {})
 
-    Returns: 
-    demographics = {
-        race: "Black or African American", 
-        gender: "female", 
-        age: "Adolescent (13-17)"
+    gender_pool = target_populations.get('gender', GENDER_BANK)
+    age_pool = target_populations.get('age', AGE_BANK)
+    race_pool = target_populations.get('ethnicity', RACE_BANK)
+
+    return {
+        "gender": random.choice(gender_pool),
+        "age": random.choice(age_pool),
+        "race": random.choice(race_pool),
     }
-    """
-    target_populations = submission.get('target_population', None)
     
-    if not target_populations: 
-        raise ValueError(f"No target population specified in benchmark submission tag in `goal.json` file.")
-    
-    # If experts do not specify a gender, age, or ethnicity, we retrieve from the bank 
-    gender = target_populations.get('gender', GENDER_BANK)
-    age = target_populations.get('age', AGE_BANK)
-    race = target_populations.get('ethnicity', RACE_BANK)
-    
-    gender_demo = random.choice(gender)
-    age_demo = random.choice(age)
-    race_demo = random.choice(race)
-    
-    return f"""
-    GENDER: {gender_demo}
-    AGE: {age_demo}
-    RACE: {race_demo}
-    """
 
+def sample_formatted_demographics(goal:dict ) -> dict: 
+        demographic_dict = sample_demographics(goal)
+        return f"""
+GENDER: {demographic_dict['gender']}
+AGE: {demographic_dict['age']}
+RACE: {demographic_dict['race']}
+"""
 
-    
-    
+def sample_demographics_batch(goal: dict, n: int) -> list[str]:
+    """Return n independently sampled demographic strings."""
+    return [sample_formatted_demographics(goal) for _ in range(n)]
+ 
 
     

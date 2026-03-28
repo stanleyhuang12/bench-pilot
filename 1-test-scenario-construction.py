@@ -10,7 +10,7 @@ import argparse
 import json
 import os
 
-from demographics import sample_demographics
+from demographics import sample_demographics_batch
 from client import make_client, chat_json
 from config import load_config, get_model_name
 
@@ -28,6 +28,7 @@ Output valid JSON only — no markdown, no text outside the JSON object.\
 """
 
 
+
 def build_scenario_prompt(goal: dict, num_scenarios: int) -> str:
     """
     Build a generation prompt from a structured goal.json dict. It only builds the diverse scenario contexts.
@@ -37,14 +38,18 @@ def build_scenario_prompt(goal: dict, num_scenarios: int) -> str:
 
     benchmark_name = goal.get("benchmark_name", "Unnamed Benchmark")
     description = goal.get("description", "")
-    metadata = goal.get("metadata", {})
-    target_pop = goal.get("target_population", {})
     scenario_cfg = goal.get("scenario", {})
 
     user_context = scenario_cfg.get("user_context", "")
     implicit_ctx = scenario_cfg.get("implicit_context", "")
 
-    demographic_context = sample_demographics(target_pop) 
+
+    demo_batch = sample_demographics_batch(goal, num_scenarios)
+    demo_context = "\n".join(
+        f"  Scenario {i+1:03d}: {d.strip()}"
+        for i, d in enumerate(demo_batch)
+    )
+
 
     context_block = f"""\
 BENCHMARK NAME:
@@ -54,7 +59,7 @@ DESCRIPTION:
 {description}
 
 TARGET POPULATION: 
-{demographic_context}
+{demo_context}
 
 SCENARIO CONTEXT:
   User context:   {user_context}
@@ -132,26 +137,66 @@ def merge_and_validate(scenarios, metrics):
         "scenarios": scenarios,
         "metrics": metrics,
     }
+    
 
-def _normalise_predefined_metrics(raw_metrics: list[dict]) -> list[dict]:
-    """
-    Convert expert-authored metric dicts (metric_name / Definition / Type /
-    examples) into the canonical output schema (id / name / description / type
-    / applies_to) so the final test.json is always uniform.
-    """
+
+def _normalise_metrics(raw_metrics: list[dict]) -> list[dict]:
+    """Convert expert-authored metrics into the canonical pipeline schema."""
     out = []
     for i, m in enumerate(raw_metrics, 1):
         examples_md = "".join(f"\n  - {e}" for e in m.get("examples", []))
         out.append({
-            "id": f"metric_{i:03d}",
-            "name": m["metric_name"],
+            "id":          f"metric_{i:03d}",
+            "name":        m["metric_name"],
             "description": m["definition"] + (f"\n\nExamples:{examples_md}" if examples_md else ""),
-            "type": m["type"].lower(),
-            "applies_to": "all",
+            "type":        m["type"].lower(),
+            "applies_to":  "all",
         })
     return out
 
-def generate(config_path: str = "config.json") -> None:
+
+
+def _generate_scenarios(client, model: str, goal: dict, num_scenarios: int) -> list[dict]:
+    messages = [
+        {"role": "system", "content": SCENARIO_SYSTEM_PROMPT},
+        {"role": "user",   "content": build_scenario_prompt(goal, num_scenarios)},
+    ]
+    raw = chat_json(client, model, messages)
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Scenario generation returned invalid JSON: {e}\n\n{raw}")
+
+    scenarios = data.get("scenarios")
+    if not scenarios:
+        raise ValueError(f"No 'scenarios' key in response.\n\n{raw}")
+    return scenarios
+
+
+def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> None:
+    os.makedirs(os.path.dirname(test_path) or ".", exist_ok=True)
+
+    if not overwrite and os.path.exists(test_path):
+        with open(test_path) as f:
+            existing = json.load(f)
+        offset = len(existing.get('scenarios',{}))
+        
+        for i, sc in enumerate(scenarios, start=1):
+            sc["id"] = f"scenario_{offset + i:03d}"
+            
+        existing["scenarios"].extend(scenarios)
+        payload = existing
+    else:
+        payload = {"scenarios": scenarios, "metrics": metrics}
+
+    with open(test_path, "w") as f:
+        json.dump(payload, f, indent=2)
+        
+        
+    
+
+        
+def generate(config_path: str = "config.json", overwrite:bool=False) -> None:
     config = load_config(config_path)
     goal_path = config["paths"]["goal_prompt"]
     test_path = config["paths"]["test_file"]
@@ -173,6 +218,7 @@ def generate(config_path: str = "config.json") -> None:
         raw_metrics = []
         has_predefined_metrics = False
 
+
     client = make_client(config["models"]["generator"])
     model  = get_model_name(config, "generator")
 
@@ -183,7 +229,7 @@ def generate(config_path: str = "config.json") -> None:
 
     # Parse metrics and validate 
     if has_predefined_metrics:
-        metrics = _normalise_predefined_metrics(raw_metrics)
+        metrics = _normalise_metrics(raw_metrics)
         print(f"[1a] Using {len(metrics)} predefined metrics...")
     else:
         raise NotImplementedError("Metrics dictionary has to be prespecified by experts for now. Will add updates to the pipelines to support automatic metric generation later.")
@@ -191,35 +237,21 @@ def generate(config_path: str = "config.json") -> None:
 
     # Generate scenarios and validate 
     print("[1b] Generating scenarios …")
-    scenario_messages = [
-        {"role": "system", "content": SCENARIO_SYSTEM_PROMPT},
-        {"role": "user", "content": build_scenario_prompt(goal, num_scenarios)},
-    ]
-    scenarios_raw = chat_json(client, model, scenario_messages)
-    try:
-        scenarios_data = json.loads(scenarios_raw)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Scenario generation returned invalid JSON: {e}\n\n{scenarios_raw}")
-
-    scenarios = scenarios_data.get("scenarios")
-    if not scenarios:
-        raise ValueError(f"Scenario generation returned no 'scenarios' key.\n\n{scenarios_raw}")
+    scenarios = _generate_scenarios(client, model, goal, num_scenarios)
     print(f"[1b] Generated {len(scenarios)} scenarios.")
 
     # Merge scenarios and metrics for downstream analysis 
-    print("[1c] Merging and validating...")
-    test_data = merge_and_validate(scenarios, metrics)
-
-    # Write out 
-    os.makedirs(os.path.dirname(test_path) or ".", exist_ok=True)
-    with open(test_path, "w") as f:
-        json.dump(test_data, f, indent=2)
-
+    print("[1c] Saving")
+    _save(test_path, scenarios, metrics, overwrite)
     print(f"\nSaved {len(scenarios)} scenarios + {len(metrics)} metrics to {test_path}")
+
+
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 1: Generate test.json")
     parser.add_argument("--config", default="config.json")
+    parser.add_argument("--overwrite", type=bool, default=False)
+    parser.add_argument("--num-batch", type=int, default=1)
     args = parser.parse_args()
     generate(args.config)
