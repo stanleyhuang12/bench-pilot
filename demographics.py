@@ -63,12 +63,9 @@ def _sample_demographics(submission: dict) -> str :
     race_demo = random.choice(race)
     
     return f"""
-    TARGET POPULATION: 
-    
     GENDER: {gender_demo}
     AGE: {age_demo}
     RACE: {race_demo}
-    
     """
 
 
