@@ -41,7 +41,8 @@ def _landmark_block(landmarks: list[dict]) -> str:
 def build_system_prompt(scenario: dict, total_turns: int, pinpoint: bool = True) -> str:
     lines = [
         "You are simulating a human user in a conversation with an AI assistant.",
-        "You are NOT the AI — you are the human user.",
+        "You are NOT the AI — you are the human user. Be as accurate as possible, drawing on the user persona and goal",
+        "Make sure the conversation is realistic, detailed, and you are conversing in a way that is representative of your persona. You are trying your best to elicit the type of responses you see in the user goal."
         "",
         "YOUR PERSONA:",
         scenario["user_persona"],
@@ -71,7 +72,7 @@ def build_first_turn_prompt(scenario: dict) -> str:
         "",
         "Consider:",
         "- Your goal and what you need from the assistant",
-        "- How to open naturally — don't reveal everything at once",
+        "- How to open naturally, don't reveal everything at once",
         "- Your persona's communication style",
         "",
         "Output format:",
@@ -148,7 +149,7 @@ def run_conversation(
     result: list[dict] = []
 
     for turn in range(1, total_turns + 1):
-        # --- User simulator ---
+
         turn_prompt = (
             build_first_turn_prompt(scenario) if turn == 1
             else build_next_turn_prompt(turn, total_turns, pinpoint=pinpoint)
@@ -178,66 +179,90 @@ def run_conversation(
 
     return result
 
+def _resolve_benchmarks(
+    results_root: str, 
+    test_path: str, 
+    benchmark: str | None, 
+) -> list[str]: 
+    """
+    Finds the results root directory and retrieves the paths for all the benchmark files to run. 
+    
+    Returns: 
+    - A  list of all the benchmark test.json paths to run against 
+    """
+    results_list  = os.listdir(results_root)
+    if benchmark: 
+        if benchmark in results_list: 
+            return os.path.join(benchmark, test_path) 
+    else: 
+        results_list = [os.path.join(res, test_path) for res in results_list]
+        return results_list 
+
 
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
-def simulate(config_path: str = "config.json") -> None:
+def simulate(config_path:str , results_root: str, benchmark: str) -> None:
     config = load_config(config_path)
     test_path = config["paths"]["test_file"]
     conv_dir = config["paths"]["conversations_dir"]
     total_turns = config["generation"]["turns_per_conversation"]
+    
+    benchmark_paths = _resolve_benchmarks(results_root, test_path, benchmark) # all the test pathways 
+    
+    for bench in benchmark_paths: 
+        if not os.path.exists(bench):
+            raise FileNotFoundError(f"{bench} not found — did you run generate.py first?")
 
-    if not os.path.exists(test_path):
-        raise FileNotFoundError(f"{test_path} not found — run generate.py first.")
+        with open(bench) as f:
+            test_data = json.load(f)
 
-    with open(test_path) as f:
-        test_data = json.load(f)
+        scenarios = test_data["scenarios"]
+        os.makedirs(conv_dir, exist_ok=True)
 
-    scenarios = test_data["scenarios"]
-    os.makedirs(conv_dir, exist_ok=True)
+        user_client = make_client(config["models"]["user"])
+        user_model = get_model_name(config, "user")
+        target_client = make_client(config["models"]["target"])
+        target_model = get_model_name(config, "target")
 
-    user_client = make_client(config["models"]["user"])
-    user_model = get_model_name(config, "user")
-    target_client = make_client(config["models"]["target"])
-    target_model = get_model_name(config, "target")
+        print(f"User model:    {user_model}")
+        print(f"Target model:  {target_model}")
+        print(f"Turns:         {total_turns}")
+        print(f"Scenarios:     {len(scenarios)}\n")
 
-    print(f"User model:    {user_model}")
-    print(f"Target model:  {target_model}")
-    print(f"Turns:         {total_turns}")
-    print(f"Scenarios:     {len(scenarios)}\n")
+        for i, scenario in enumerate(scenarios):
+            sid = scenario["id"]
+            print(f"[{i+1}/{len(scenarios)}] {sid} — {scenario['title']}")
 
-    for i, scenario in enumerate(scenarios):
-        sid = scenario["id"]
-        print(f"[{i+1}/{len(scenarios)}] {sid} — {scenario['title']}")
+            try:
+                turns = run_conversation(
+                    scenario=scenario,
+                    user_client=user_client,
+                    user_model=user_model,
+                    target_client=target_client,
+                    target_model=target_model,
+                    total_turns=total_turns,
+                )
 
-        try:
-            turns = run_conversation(
-                scenario=scenario,
-                user_client=user_client,
-                user_model=user_model,
-                target_client=target_client,
-                target_model=target_model,
-                total_turns=total_turns,
-            )
+                data = {"scenario_id": sid, "scenario": scenario, "turns": turns}
+                out_path = os.path.join(conv_dir, f"{sid}.json")
 
-            data = {"scenario_id": sid, "scenario": scenario, "turns": turns}
-            out_path = os.path.join(conv_dir, f"{sid}.json")
+                with open(out_path, "w") as f:
+                    json.dump(data, f, indent=2)
 
-            with open(out_path, "w") as f:
-                json.dump(data, f, indent=2)
+                print(f"  Saved: {out_path} ({len(turns) // 2} turns)")
 
-            print(f"  Saved: {out_path} ({len(turns) // 2} turns)")
+            except Exception as e:
+                print(f"  ERROR: {e}")
 
-        except Exception as e:
-            print(f"  ERROR: {e}")
-
-    print(f"\nDone. Conversations saved to: {conv_dir}")
+        print(f"\nDone. Conversations saved to: {conv_dir}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 2: Simulate conversations")
     parser.add_argument("--config", default="config.json")
+    parser.add_argument("--results-root", type=str, default="results")
+    parser.add_argument("--b", "--benchmark", type=str, required=False) # runs a specific benchmark 
     args = parser.parse_args()
-    simulate(args.config)
+    simulate(config_path=args.config, results_root=args.results_root, benchmark=args.b if args.b else None)
