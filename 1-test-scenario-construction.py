@@ -220,6 +220,8 @@ async def _generate_scenarios(client, model: str, goal: dict, num_scenarios: int
     
     # Flatten results
     all_scenarios = [sc for batch in batch_results for sc in batch]
+    for i, sc in enumerate(all_scenarios, start=1):
+        sc["id"] = f"scenario_{i:03d}"
     return all_scenarios
 
 def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> None:
