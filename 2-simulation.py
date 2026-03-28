@@ -17,6 +17,7 @@ import argparse
 import json
 import os
 import re
+import asyncio 
 
 from client import make_client, chat
 from config import load_config, get_model_name
@@ -126,7 +127,7 @@ def parse_message(raw: str) -> str | None:
 # Conversation runner
 # ---------------------------------------------------------------------------
 
-def run_conversation(
+async def run_conversation(
     scenario: dict,
     user_client,
     user_model: str,
@@ -160,7 +161,7 @@ def run_conversation(
             + [{"role": "user", "content": turn_prompt}]
         )
 
-        raw = chat(user_client, user_model, user_messages)
+        raw = await chat(user_client, user_model, user_messages)
         user_content = parse_message(raw)
 
         if user_content is None:
@@ -172,12 +173,34 @@ def run_conversation(
 
         # --- Target model ---
         target_messages = [{"role": "system", "content": target_sys}] + history
-        target_content = chat(target_client, target_model, target_messages)
+        target_content = await chat(target_client, target_model, target_messages)
 
         history.append({"role": "assistant", "content": target_content})
         result.append({"role": "assistant", "content": target_content})
 
     return result
+
+async def run_many_conversations(
+    scenarios: list[dict],
+    user_client,
+    user_model: str,
+    target_client,
+    target_model: str,
+    total_turns: int,
+    pinpoint: bool = True,
+    semaphore: int = 5,
+) -> list:
+    sem = asyncio.Semaphore(semaphore) 
+
+    async def run_with_limit(scenario: dict):
+        async with sem:
+            return await run_conversation(
+                scenario, user_client, user_model,
+                target_client, target_model, total_turns, pinpoint,
+            )
+
+    tasks = [run_with_limit(s) for s in scenarios]
+    return await asyncio.gather(*tasks, return_exceptions=True)
 
 def _resolve_benchmarks(
     results_root: str, 
@@ -203,7 +226,7 @@ def _resolve_benchmarks(
 # Main
 # ---------------------------------------------------------------------------
 
-def simulate(config_path:str , results_root: str, benchmark: str) -> None:
+def simulate(config_path:str , results_root: str, benchmark: str, concurrent_threads:int=5) -> None:
     config = load_config(config_path)
     test_path = config["paths"]["test_file"]
     conv_dir = config["paths"]["conversations_dir"]
@@ -231,33 +254,33 @@ def simulate(config_path:str , results_root: str, benchmark: str) -> None:
         print(f"Turns:         {total_turns}")
         print(f"Scenarios:     {len(scenarios)}\n")
 
-        for i, scenario in enumerate(scenarios):
+        results = asyncio.run(run_many_conversations(
+            scenarios=scenarios, 
+            user_client=user_client, 
+            user_model=user_model,
+            target_client=target_client, 
+            target_model=target_model,
+            total_turns=total_turns,
+            semaphore=concurrent_threads, 
+        ))
+        
+        for i, (scenario, result) in enumerate(zip(scenarios, results)):
             sid = scenario["id"]
             print(f"[{i+1}/{len(scenarios)}] {sid} — {scenario['title']}")
 
-            try:
-                turns = run_conversation(
-                    scenario=scenario,
-                    user_client=user_client,
-                    user_model=user_model,
-                    target_client=target_client,
-                    target_model=target_model,
-                    total_turns=total_turns,
-                )
+            if isinstance(result, Exception):
+                print(f"  ERROR: {result}")
+                continue
 
-                data = {"scenario_id": sid, "scenario": scenario, "turns": turns}
-                out_path = os.path.join(conv_dir, f"{sid}.json")
+            data = {"scenario_id": sid, "scenario": scenario, "turns": result}
+            out_path = os.path.join(conv_dir, f"{sid}.json")
 
-                with open(out_path, "w") as f:
-                    json.dump(data, f, indent=2)
+            with open(out_path, "w") as f:
+                json.dump(data, f, indent=2)
 
-                print(f"  Saved: {out_path} ({len(turns) // 2} turns)")
-
-            except Exception as e:
-                print(f"  ERROR: {e}")
+            print(f"  Saved: {out_path} ({len(result) // 2} turns)")
 
         print(f"\nDone. Conversations saved to: {conv_dir}")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 2: Simulate conversations")
