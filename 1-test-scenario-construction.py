@@ -5,11 +5,13 @@ Usage:
     python generate.py
     python generate.py --config path/to/config.json
 """
+from __future__ import annotations
 
 import argparse
 import asyncio
 import json
 import os
+import re
 
 from demographics import sample_demographics_batch
 from client import make_client, chat_json
@@ -133,6 +135,45 @@ Make scenarios diverse and realistic. Make metrics specific and unambiguous.
 Metrics must be evaluatable by reading the conversation transcript alone.\
 """
 
+def slugify_benchmark_names(name): 
+    # This converts names like "emotional bench" to "emotional-bench"
+    return re.sub("[^a-z0-9+]", "-", name.strip().lower())
+
+def _resolve_results_layout(
+    base_test_path: str,
+    goal: dict | str,
+    results_root: str,
+    scaffold_results: bool ,
+    benchmark_slug: str | None = None,
+) -> tuple[str, str | None]:
+    """
+    This should take the results-root parameter, a boolean on whether to scaffold results into a 
+    nested folder, and the
+    
+    Returns:
+      - resolved test_path
+      - benchmark_dir (or None if no benchmark-specific layout is used)
+    """
+    
+    if not scaffold_results: 
+        return base_test_path, None 
+    
+    if benchmark_slug is None: 
+        goal_name = goal.get('benchmark_name', "") if isinstance(goal, dict) else ""
+        goal_name = slugify_benchmark_names(goal_name)
+    else: 
+        goal_name = benchmark_slug 
+        
+    benchmark_dir = os.path.join(results_root, goal_name)
+    
+    os.makedirs(benchmark_dir, exist_ok=True)
+    for dirname in ("conversations", "runs", "stats"):
+        os.makedirs(os.path.join(benchmark_dir, dirname), exist_ok=True)
+    
+    return os.path.join(benchmark_dir, "test.json"), benchmark_dir
+    
+    
+    
 def merge_and_validate(scenarios, metrics):
     return {
         "scenarios": scenarios,
@@ -204,7 +245,7 @@ def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> No
     
 
         
-def generate(config_path: str = "config.json", num_batch:int=1, overwrite:bool=False,) -> None:
+def generate(config_path: str = "config.json", num_batch:int=1, overwrite:bool=False, results_root: str = "results", scaffold_results=True) -> None:
     config = load_config(config_path)
     goal_path = config["paths"]["goal_prompt"]
     test_path = config["paths"]["test_file"]
@@ -215,6 +256,7 @@ def generate(config_path: str = "config.json", num_batch:int=1, overwrite:bool=F
 
     with open(goal_path) as f:
         raw = f.read().strip()
+        
 
     # Parse goal — structured JSON preferred, plain text as fallback
     try:
@@ -225,13 +267,16 @@ def generate(config_path: str = "config.json", num_batch:int=1, overwrite:bool=F
         goal = raw
         raw_metrics = []
         has_predefined_metrics = False
-
+    
+    resolved_test_path, benchmark_dir = _resolve_results_layout(base_test_path=test_path, goal=goal, results_root=results_root, scaffold_results=scaffold_results)
 
     client = make_client(config["models"]["generator"])
     model  = get_model_name(config, "generator")
 
     print(f"Goal: {goal_path}")
-    print(f"Scenarios: {num_scenarios}")
+    if benchmark_dir: 
+        print(f"Benchmark directory: {benchmark_dir}")
+    print(f"Scenarios: {num_scenarios} x {num_batch} batch(es)")
     print(f"Metrics: {'predefined ✓' if has_predefined_metrics else 'will be generated, though currently metric generation is not supported'}")
     print(f"Model: {model}\n")
 
@@ -248,9 +293,11 @@ def generate(config_path: str = "config.json", num_batch:int=1, overwrite:bool=F
     scenarios = asyncio.run(_generate_scenarios(client, model, goal, num_scenarios, num_batch))
     print(f"[1b] Generated {len(scenarios)} scenarios.")
 
+    # Create custom test.json folder 
+    
     # Merge scenarios and metrics for downstream analysis 
     print("[1c] Saving")
-    _save(test_path, scenarios, metrics, overwrite)
+    _save(resolved_test_path, scenarios, metrics, overwrite)
     print(f"\nSaved {len(scenarios)} scenarios + {len(metrics)} metrics to {test_path}")
 
 
@@ -261,5 +308,7 @@ if __name__ == "__main__":
     parser.add_argument("--config", default="config.json")
     parser.add_argument("--overwrite", action='store_true', default=False)
     parser.add_argument("--num-batch", type=int, default=1)
+    parser.add_argument("--results-root", type=str, default="results")
     args = parser.parse_args()
-    generate(args.config, num_batch=args.num_batch, overwrite=args.overwrite)
+    # note: we can add a scaffold_results param but right now this is default true
+    generate(args.config, num_batch=args.num_batch, overwrite=args.overwrite, results_root=args.results_root)
