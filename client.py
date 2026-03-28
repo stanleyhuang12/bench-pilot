@@ -7,6 +7,9 @@ via OpenRouter or direct provider endpoints.
 
 import time
 import litellm
+import asyncio 
+
+from typing import Coroutine
 
 import logging
 from dataclasses import dataclass
@@ -40,11 +43,11 @@ def make_client(model_config: dict) -> LiteLLMClient:
     )
 
 
-def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
+async def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
     """Call litellm.completion with retries on 5xx errors."""
     for attempt in range(_MAX_RETRIES):
         try:
-            return litellm.completion(
+            return await litellm.acompletion(
                 api_base=client.base_url,
                 api_key=client.api_key,
                 **kwargs,
@@ -52,19 +55,18 @@ def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
         except Exception as e:
             is_server_error = "500" in str(e) or "502" in str(e) or "503" in str(e)
             if is_server_error and attempt < _MAX_RETRIES - 1:
-                time.sleep(_RETRY_DELAY * (attempt + 1))
+                await asyncio.sleep(_RETRY_DELAY * (attempt + 1))
             else:
                 raise
 
 
-def chat(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> str:
-    response = _create_with_retry(client, model=model, messages=messages, **kwargs)
+async def chat(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> str:
+    response = await _create_with_retry(client, model=model, messages=messages, **kwargs)
     return response.choices[0].message.content
 
-
-def chat_json(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> str:
+async def chat_json(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> str:
     """Send a chat request in JSON mode. Caller is responsible for json.loads()."""
-    response = _create_with_retry(
+    response = await _create_with_retry(
         client,
         model=model,
         messages=messages,

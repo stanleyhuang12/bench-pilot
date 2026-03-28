@@ -7,6 +7,7 @@ Usage:
 """
 
 import argparse
+import asyncio
 import json
 import os
 
@@ -156,22 +157,29 @@ def _normalise_metrics(raw_metrics: list[dict]) -> list[dict]:
 
 
 
-def _generate_scenarios(client, model: str, goal: dict, num_scenarios: int) -> list[dict]:
-    messages = [
-        {"role": "system", "content": SCENARIO_SYSTEM_PROMPT},
-        {"role": "user",   "content": build_scenario_prompt(goal, num_scenarios)},
-    ]
-    raw = chat_json(client, model, messages)
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Scenario generation returned invalid JSON: {e}\n\n{raw}")
+async def _generate_scenarios(client, model: str, goal: dict, num_scenarios: int, num_batch: int) -> list[dict]:
+    """Generate multiple batches concurrently."""
+    async def generate_one_batch():
+        messages = [
+            {"role": "system", "content": SCENARIO_SYSTEM_PROMPT},
+            {"role": "user", "content": build_scenario_prompt(goal, num_scenarios)},
+        ]
+        raw = await chat_json(client, model, messages)
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Scenario generation returned invalid JSON: {e}\n\n{raw}")
 
-    scenarios = data.get("scenarios")
-    if not scenarios:
-        raise ValueError(f"No 'scenarios' key in response.\n\n{raw}")
-    return scenarios
+        scenarios = data.get("scenarios")
+        if not scenarios:
+            raise ValueError(f"No 'scenarios' key in response.\n\n{raw}")
+        return scenarios
 
+    batch_results = await asyncio.gather(*(generate_one_batch() for _ in range(num_batch)))
+    
+    # Flatten results
+    all_scenarios = [sc for batch in batch_results for sc in batch]
+    return all_scenarios
 
 def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> None:
     os.makedirs(os.path.dirname(test_path) or ".", exist_ok=True)
@@ -196,7 +204,7 @@ def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> No
     
 
         
-def generate(config_path: str = "config.json", overwrite:bool=False) -> None:
+def generate(config_path: str = "config.json", num_batch:int=1, overwrite:bool=False,) -> None:
     config = load_config(config_path)
     goal_path = config["paths"]["goal_prompt"]
     test_path = config["paths"]["test_file"]
@@ -237,7 +245,7 @@ def generate(config_path: str = "config.json", overwrite:bool=False) -> None:
 
     # Generate scenarios and validate 
     print("[1b] Generating scenarios …")
-    scenarios = _generate_scenarios(client, model, goal, num_scenarios)
+    scenarios = asyncio.run(_generate_scenarios(client, model, goal, num_scenarios, num_batch))
     print(f"[1b] Generated {len(scenarios)} scenarios.")
 
     # Merge scenarios and metrics for downstream analysis 
@@ -251,7 +259,7 @@ def generate(config_path: str = "config.json", overwrite:bool=False) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 1: Generate test.json")
     parser.add_argument("--config", default="config.json")
-    parser.add_argument("--overwrite", type=bool, default=False)
+    parser.add_argument("--overwrite", action='store_true', default=False)
     parser.add_argument("--num-batch", type=int, default=1)
     args = parser.parse_args()
-    generate(args.config)
+    generate(args.config, num_batch=args.num_batch, overwrite=args.overwrite)
