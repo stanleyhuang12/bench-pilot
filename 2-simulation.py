@@ -223,9 +223,31 @@ def _resolve_benchmarks(
         results_list = [os.path.join(results_root, res, test_path) for res in results_list]
         return results_list 
 
+def _write_out_sample_scenario_simulation(
+    out_path : str, 
+    scenario: dict, 
+    new_sample: list
+): 
+    """
+    Takes in the configurations and write out a skeleton scenario.json
+    """
+    if os.path.exists(out_path):
+        with open(out_path) as f:
+            data = json.load(f)
+    else:
+        data = {
+            "scenario_id": scenario["id"],
+            "scenario": scenario,
+            "samples": []
+        }
 
+    data["samples"].append(new_sample)
 
-def simulate(config_path:str , results_root: str, benchmark: str, concurrent_threads:int=5) -> None:
+    with open(out_path, "w") as f:
+        json.dump(data, f, indent=2)
+    
+
+def simulate(config_path:str , results_root: str, benchmark: str, num_samples: int, concurrent_threads:int=5) -> None:
     config = load_config(config_path)
     test_path = config["paths"]["test_file"]
     conv_dir = config["paths"]["conversations_dir"]
@@ -246,6 +268,7 @@ def simulate(config_path:str , results_root: str, benchmark: str, concurrent_thr
 
         scenarios = test_data["scenarios"]
         os.makedirs(conv_dir, exist_ok=True)
+        
 
         user_client = make_client(config["models"]["user"])
         user_model = get_model_name(config, "user")
@@ -254,48 +277,57 @@ def simulate(config_path:str , results_root: str, benchmark: str, concurrent_thr
 
         print(f"\n{'='*60}")
         print(f"  Benchmark:     {bench_name}")
+        print(f"  Number of resampling: {num_samples}")
         print(f"  User model:    {user_model}")
         print(f"  Target model:  {target_model}")
         print(f"  Turns:         {total_turns}  |  Scenarios: {len(scenarios)}  |  Concurrency: {concurrent_threads}")
         print(f"  Output:        {out_dir}")
         print(f"{'='*60}\n")
         
-        results = asyncio.run(run_many_conversations(
-            scenarios=scenarios, 
-            user_client=user_client, 
-            user_model=user_model,
-            target_client=target_client, 
-            target_model=target_model,
-            total_turns=total_turns,
-            semaphore=concurrent_threads, 
-        ))
+        for num in range(1, num_samples+1): 
+            # iterates through the first sample 
+            print(f" Multiple resampling: Sampling #{num:03} of {num_samples:03}")
+            
+            n = len(scenarios)
+            saved, failed = 0, 0
+            
+            results = asyncio.run(run_many_conversations(
+                scenarios=scenarios, 
+                user_client=user_client, 
+                user_model=user_model,
+                target_client=target_client, 
+                target_model=target_model,
+                total_turns=total_turns,
+                semaphore=concurrent_threads, 
+            ))
+            
+            # results is a list of dictionaries like this: [{"role": role, "content": content}] 
+           
+            for i, (scenario, result) in enumerate(zip(scenarios, results), start=1):
+                sid   = scenario["id"]
+                title = scenario["title"]
+                prefix = f"  [{i}/{n}] {sid} — {title}"
 
-        n = len(scenarios)
-        saved, failed = 0, 0
+                if isinstance(result, Exception):
+                    print(f"{prefix}")
+                    print(f"✗ ERROR: {result}")
+                    failed += 1
+                    continue
 
-        for i, (scenario, result) in enumerate(zip(scenarios, results), start=1):
-            sid   = scenario["id"]
-            title = scenario["title"]
-            prefix = f"  [{i}/{n}] {sid} — {title}"
+                # actual_turns = len(result) // 2
+                # early = actual_turns < total_turns
+                # turn_note = f"{actual_turns} turns" + (" (early termination)" if early else "")
 
-            if isinstance(result, Exception):
-                print(f"{prefix}")
-                print(f"    ✗ ERROR: {result}")
-                failed += 1
-                continue
+                out_path = os.path.join(out_dir, f"{sid}.json")
+                _write_out_sample_scenario_simulation(
+                    out_path=out_path, 
+                    scenario=scenario, 
+                    new_sample=result
+                )
+                
+                print(f"{prefix} -- saved")
+                saved += 1
 
-            # actual_turns = len(result) // 2
-            # early = actual_turns < total_turns
-            # turn_note = f"{actual_turns} turns" + (" (early termination)" if early else "")
-
-            out_path = os.path.join(out_dir, f"{sid}.json")
-            with open(out_path, "w") as f:
-                json.dump({"scenario_id": sid, "scenario": scenario, "turns": result}, f, indent=2)
-
-            print(f"{prefix} -- saved")
-            saved += 1
-
-        # ── Benchmark summary ─────────────────────────────────────────────
         print(f"\n  Results: {saved} saved, {failed} failed → {out_dir}\n")
 
 if __name__ == "__main__":
@@ -303,5 +335,13 @@ if __name__ == "__main__":
     parser.add_argument("--config", default="config.json")
     parser.add_argument("--results-root", type=str, default="results")
     parser.add_argument("--b", "--benchmark", type=str, required=False) # runs a specific benchmark 
+    parser.add_argument("--semaphore", type=int, default=5)
+    parser.add_argument("--ns", "--num-samples", type=int, default=1, help="Support resampling the same scenario multiple times")
     args = parser.parse_args()
-    simulate(config_path=args.config, results_root=args.results_root, benchmark=args.b if args.b else None)
+    simulate(
+        config_path=args.config, 
+        results_root=args.results_root, 
+        benchmark=args.b if args.b else None, 
+        concurrent_threads=args.semaphore, 
+        num_samples=args.ns
+    )
