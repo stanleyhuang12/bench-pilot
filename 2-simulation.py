@@ -277,7 +277,7 @@ def simulate(config_path:str , results_root: str, benchmark: str, num_samples: i
 
         print(f"\n{'='*60}")
         print(f"  Benchmark:     {bench_name}")
-        print(f"  Number of resampling: {sample_num} of {num_samples}")
+        print(f"  Number of resampling: {num_samples}")
         print(f"  User model:    {user_model}")
         print(f"  Target model:  {target_model}")
         print(f"  Turns:         {total_turns}  |  Scenarios: {len(scenarios)}  |  Concurrency: {concurrent_threads}")
@@ -286,7 +286,8 @@ def simulate(config_path:str , results_root: str, benchmark: str, num_samples: i
         
         for num in range(1, num_samples+1): 
             # iterates through the first sample 
-            sample_num = "sample" + f"{num:03}"
+            print(f" Multiple resampling: Sampling #{num:03} of {num_samples:03}")
+            
             n = len(scenarios)
             saved, failed = 0, 0
             
@@ -326,7 +327,7 @@ def simulate(config_path:str , results_root: str, benchmark: str, num_samples: i
                 
                 print(f"{prefix} -- saved")
                 saved += 1
-        print(f"\n   Sample: {sample_num}")
+
         print(f"\n  Results: {saved} saved, {failed} failed → {out_dir}\n")
 
 if __name__ == "__main__":
