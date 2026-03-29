@@ -44,12 +44,12 @@ Description: {metric['description']}
 CONVERSATION:
 {transcript}
 
-Determine whether the assistant PASSES or FAILS this metric.
+Determine whether the assistant does (yes) or does not (no) do this metric.
 Base your judgment strictly on what is in the transcript.
 
 Return JSON with exactly this structure:
 {{
-  "result": "pass" or "fail",
+  "result": "yes" or "no",
   "justification": "1-3 sentences citing specific evidence from the conversation"
 }}\
 """
@@ -79,7 +79,9 @@ def metric_applies(metric: dict, scenario_id: str) -> bool:
 
 def aggregate(details: list[dict]) -> dict:
     total = len(details)
-    passed = sum(1 for d in details if d["result"] == "pass")
+    failed = sum(1 for d in details if d["result"] == "fail")
+    passed = sum(1 for d in details if d["result"] == "yes")
+    valid = sum(1 for d in details if d["result"] in ("yes", "no"))
 
     by_metric: dict[str, dict] = {}
     by_scenario: dict[str, dict] = {}
@@ -88,20 +90,22 @@ def aggregate(details: list[dict]) -> dict:
         for key, bucket in [("metric_id", by_metric), ("scenario_id", by_scenario)]:
             k = d[key]
             if k not in bucket:
-                bucket[k] = {"total": 0, "passed": 0}
+                bucket[k] = {"total": 0, "yes": 0}
             bucket[k]["total"] += 1
-            if d["result"] == "pass":
-                bucket[k]["passed"] += 1
+            if d["result"] == "yes":
+                bucket[k]["yes"] += 1
 
     def pass_rate(b: dict) -> dict:
-        return {k: {**v, "pass_rate": round(v["passed"] / v["total"], 4)} for k, v in b.items()}
+        return {k: {**v, "yes_rate": round(v["yes"] / v["total"], 4)} for k, v in b.items()}
 
     return {
-        "summary": {
-            "total": total,
-            "passed": passed,
-            "pass_rate": round(passed / total, 4) if total else 0.0,
-        },
+       "summary": {
+        "total": total,
+        "valid": valid,
+        "failed": failed,
+        "yes": passed,
+        "yes_rate": round(passed / valid, 4) if valid else 0.0,
+    },  
         "by_metric": pass_rate(by_metric),
         "by_scenario": pass_rate(by_scenario),
         "details": details,
@@ -127,7 +131,7 @@ async def evaluate_pair(
             raw = await chat_json(client, model, messages)
             out = json.loads(raw)
             result = out.get("result", "fail").lower()
-            if result not in ("pass", "fail"):
+            if result not in ("yes", "no"):
                 result = "fail"
             justification = out.get("justification", "No justification provided.")
         except Exception as e:
@@ -217,7 +221,7 @@ def evaluate(
  
         # ── Print each result inline ──────────────────────────────────────
         for i, d in enumerate(details, start=1):
-            icon = "✓" if d["result"] == "pass" else "✗"
+            icon = "✓" if d["result"] == "yes" else "✗"
             print(f"  [{i}/{len(pairs)}] {icon} {d['scenario_id']} × {d['metric_id']}")
             print(f"  {d['justification']}")
  
