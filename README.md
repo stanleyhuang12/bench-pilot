@@ -94,6 +94,7 @@ All four model roles can point to any OpenAI-compatible endpoint (OpenAI, Anthro
 
 ## Phase 1 — Generate (`generate.py`)
 
+
 Reads `goal.md` and calls the generator model to produce `test.json` containing:
 
 - **Scenarios** — each with a user persona, user goal, target system prompt, and optional landmarks
@@ -105,6 +106,14 @@ Reads `goal.md` and calls the generator model to produce `test.json` containing:
 "landmarks": [
   { "turn": 4, "instruction": "Express frustration and say the issue is urgent" }
 ]
+```
+
+You can also run concurrent number of batches, but be careful of rate-limiting by model providers. 
+
+For example, for a given benchmark, the code below will run 5 batches of N scenario generations (specified in `config.json`) for a single run and append them all to the `results` directiory. 
+
+```bash 
+python generate.py --num-batch 5 --results-root results
 ```
 
 ---
