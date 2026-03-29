@@ -233,7 +233,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 3: Evaluate conversations")
     parser.add_argument("--config",       default="config.json")
     parser.add_argument("--results-root", default="results")
-    parser.add_argument("--benchmark",    type=str, required=False)
+    parser.add_argument("b", "--benchmark",    type=str, required=False)
     parser.add_argument("--concurrency",  type=int, default=5)
     args = parser.parse_args()
  

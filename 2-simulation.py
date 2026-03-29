@@ -303,5 +303,6 @@ if __name__ == "__main__":
     parser.add_argument("--config", default="config.json")
     parser.add_argument("--results-root", type=str, default="results")
     parser.add_argument("--b", "--benchmark", type=str, required=False) # runs a specific benchmark 
+    parser.add_argument("--semaphore", type=int, default=5)
     args = parser.parse_args()
-    simulate(config_path=args.config, results_root=args.results_root, benchmark=args.b if args.b else None)
+    simulate(config_path=args.config, results_root=args.results_root, benchmark=args.b if args.b else None, concurrent_threads=args.semaphore)
