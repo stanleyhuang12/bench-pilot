@@ -165,7 +165,6 @@ async def run_conversation(
         user_content = parse_message(raw)
 
         if user_content is None:
-            print(f"  Simulator ended conversation at turn {turn}.")
             break
 
         history.append({"role": "user", "content": user_content})
@@ -177,7 +176,8 @@ async def run_conversation(
 
         history.append({"role": "assistant", "content": target_content})
         result.append({"role": "assistant", "content": target_content})
-
+    print(f"Completed scenario simulation for: {scenario['id']}: {scenario['title']}")
+    
     return result
 
 async def run_many_conversations(
@@ -216,15 +216,14 @@ def _resolve_benchmarks(
     results_list  = os.listdir(results_root)
     if benchmark: 
         if benchmark in results_list: 
-            return os.path.join(benchmark, test_path) 
+            return [os.path.join(results_root, benchmark, test_path)] 
+        else: 
+            raise FileNotFoundError(f"Benchmark '{benchmark}' not found in {results_root}")
     else: 
-        results_list = [os.path.join(res, test_path) for res in results_list]
+        results_list = [os.path.join(results_root, res, test_path) for res in results_list]
         return results_list 
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def simulate(config_path:str , results_root: str, benchmark: str, concurrent_threads:int=5) -> None:
     config = load_config(config_path)
@@ -238,6 +237,10 @@ def simulate(config_path:str , results_root: str, benchmark: str, concurrent_thr
         if not os.path.exists(bench):
             raise FileNotFoundError(f"{bench} not found — did you run generate.py first?")
 
+        bench_dir = os.path.dirname(bench) # e.g. "results/emotional-dependency/test.json" -> "results/emotional-dependency/"
+        out_dir = os.path.join(bench_dir, conv_dir) # e.g., "results/emotional-dependency/conversations"
+        os.makedirs(out_dir, exist_ok=True) 
+        bench_name = os.path.basename(bench_dir)
         with open(bench) as f:
             test_data = json.load(f)
 
@@ -249,11 +252,14 @@ def simulate(config_path:str , results_root: str, benchmark: str, concurrent_thr
         target_client = make_client(config["models"]["target"])
         target_model = get_model_name(config, "target")
 
-        print(f"User model:    {user_model}")
-        print(f"Target model:  {target_model}")
-        print(f"Turns:         {total_turns}")
-        print(f"Scenarios:     {len(scenarios)}\n")
-
+        print(f"\n{'='*60}")
+        print(f"  Benchmark:     {bench_name}")
+        print(f"  User model:    {user_model}")
+        print(f"  Target model:  {target_model}")
+        print(f"  Turns:         {total_turns}  |  Scenarios: {len(scenarios)}  |  Concurrency: {concurrent_threads}")
+        print(f"  Output:        {out_dir}")
+        print(f"{'='*60}\n")
+        
         results = asyncio.run(run_many_conversations(
             scenarios=scenarios, 
             user_client=user_client, 
@@ -263,24 +269,34 @@ def simulate(config_path:str , results_root: str, benchmark: str, concurrent_thr
             total_turns=total_turns,
             semaphore=concurrent_threads, 
         ))
-        
-        for i, (scenario, result) in enumerate(zip(scenarios, results)):
-            sid = scenario["id"]
-            print(f"[{i+1}/{len(scenarios)}] {sid} — {scenario['title']}")
+
+        n = len(scenarios)
+        saved, failed = 0, 0
+
+        for i, (scenario, result) in enumerate(zip(scenarios, results), start=1):
+            sid   = scenario["id"]
+            title = scenario["title"]
+            prefix = f"  [{i}/{n}] {sid} — {title}"
 
             if isinstance(result, Exception):
-                print(f"  ERROR: {result}")
+                print(f"{prefix}")
+                print(f"    ✗ ERROR: {result}")
+                failed += 1
                 continue
 
-            data = {"scenario_id": sid, "scenario": scenario, "turns": result}
-            out_path = os.path.join(conv_dir, f"{sid}.json")
+            # actual_turns = len(result) // 2
+            # early = actual_turns < total_turns
+            # turn_note = f"{actual_turns} turns" + (" (early termination)" if early else "")
 
+            out_path = os.path.join(out_dir, f"{sid}.json")
             with open(out_path, "w") as f:
-                json.dump(data, f, indent=2)
+                json.dump({"scenario_id": sid, "scenario": scenario, "turns": result}, f, indent=2)
 
-            print(f"  Saved: {out_path} ({len(result) // 2} turns)")
+            print(f"{prefix} -- saved")
+            saved += 1
 
-        print(f"\nDone. Conversations saved to: {conv_dir}")
+        # ── Benchmark summary ─────────────────────────────────────────────
+        print(f"\n  Results: {saved} saved, {failed} failed → {out_dir}\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 2: Simulate conversations")
