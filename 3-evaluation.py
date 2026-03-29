@@ -5,6 +5,7 @@ Usage:
     python evaluate.py
     python evaluate.py --config path/to/config.json
 """
+from __future__ import annotations
 
 import argparse
 import json
@@ -132,6 +133,7 @@ async def evaluate_pair(
         except Exception as e:
             result = "fail"
             justification = f"Evaluation error: {e}"
+        
  
     return {
         "scenario_id":   sid,
@@ -217,7 +219,7 @@ def evaluate(
         for i, d in enumerate(details, start=1):
             icon = "✓" if d["result"] == "pass" else "✗"
             print(f"  [{i}/{len(pairs)}] {icon} {d['scenario_id']} × {d['metric_id']}")
-            print(f"        {d['justification']}")
+            print(f"  {d['justification']}")
  
         results = aggregate(details)
  
