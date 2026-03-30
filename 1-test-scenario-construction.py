@@ -181,7 +181,6 @@ def merge_and_validate(scenarios, metrics):
     }
     
 
-
 def _normalise_metrics(raw_metrics: list[dict]) -> list[dict]:
     """Convert expert-authored metrics into the canonical pipeline schema."""
     out = []
@@ -247,13 +246,17 @@ def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> No
     
 
         
-def generate(config_path: str = "config.json", num_batch:int=1, overwrite:bool=False, results_root: str = "results", scaffold_results=True) -> None:
+def generate(benchmark: str, config_path: str = "config.json", num_batch:int=1, overwrite:bool=False, results_root: str = "results", scaffold_results=True) -> None:
     config = load_config(config_path)
-    goal_path = config["paths"]["goal_prompt"]
+    if benchmark: 
+        goal_path = os.path.join(results_root, benchmark, config["paths"]["goal_prompt"])
+    else: 
+        raise NotImplementedError(f"Please specify a benchmark as the pipeline does not support iterating through on all available benchmarks. Use the flag --benchmark. ")
     test_path = config["paths"]["test_file"]
     num_scenarios = config["generation"]["num_scenarios"]
-
+    
     if not os.path.exists(goal_path):
+        
         raise FileNotFoundError(f"Goal file not found: {goal_path}")
 
     with open(goal_path) as f:
@@ -311,6 +314,7 @@ if __name__ == "__main__":
     parser.add_argument("--overwrite", action='store_true', default=False)
     parser.add_argument("--num-batch", type=int, default=1)
     parser.add_argument("--results-root", type=str, default="results")
+    parser.add_argument("--benchmark", type=str)
     args = parser.parse_args()
     # note: we can add a scaffold_results param but right now this is default true
-    generate(args.config, num_batch=args.num_batch, overwrite=args.overwrite, results_root=args.results_root)
+    generate(config_path=args.config, num_batch=args.num_batch, overwrite=args.overwrite, results_root=args.results_root, benchmark=args.benchmark)
