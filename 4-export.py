@@ -606,9 +606,8 @@ def export(
 
     for bench_path in bench_paths:
         bench = _load_benchmark(bench_path, conv_dir_name, results_file)
-        bench_dir = os.path.dirname(bench_path)
         out = (
-            os.path.join(bench_dir, "report.docx")
+            os.path.join(results_root, benchmark, "report.docx")
             if len(bench_paths) > 1 or output_path == "report.docx"
             else output_path
         )
