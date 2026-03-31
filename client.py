@@ -53,6 +53,13 @@ class LiteLLMCostTracker:
         self.cost += other.cost
         self.input_tokens += other.input_tokens
         self.output_tokens += other.output_tokens
+    
+    def to_json(self): 
+        return { 
+            "cost": self.cost,
+            "input_tokens": self.input_tokens,
+            "output_tokens": self.output_tokens
+        }
         
 def make_client(model_config: dict) -> LiteLLMClient:
     return LiteLLMClient(
