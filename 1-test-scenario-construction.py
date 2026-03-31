@@ -13,8 +13,8 @@ import json
 import os
 import re
 
-from demographics import sample_demographics, sample_demographics_batch
-from client import make_client, chat_json
+from demographics import sample_demographics
+from client import make_client, chat_json, LiteLLMCostTracker
 from config import load_config, get_model_name
 
 
@@ -233,12 +233,12 @@ async def _generate_base_scenarios(
     num_scenarios: int,
     num_batch: int,
     metrics: list[dict] | None = None,
-) -> list[dict]:
+) -> tuple[list[dict], "LiteLLMCostTracker"]:
     """
     Generate `num_batch` batches of `num_scenarios` base scenarios concurrently.
     Demographics are absent at this stage.
     """
-    async def _one_batch() -> list[dict]:
+    async def _one_batch() -> tuple[list[dict], "LiteLLMCostTracker"]:
         messages = [
             {"role": "system", "content": SCENARIO_SYSTEM_PROMPT},
             {"role": "user",   "content": build_base_scenario_prompt(goal, num_scenarios, metrics)},
@@ -251,19 +251,27 @@ async def _generate_base_scenarios(
                 f"Scenario generation returned invalid JSON: {exc}\n\n{raw}"
             )
         scenarios = data.get("scenarios")
-        if not scenarios:
+        if scenarios is None :
             raise ValueError(f"No 'scenarios' key in response.\n\n{raw}")
-        return scenarios
- 
-    batch_results = await asyncio.gather(*(_one_batch() for _ in range(num_batch)))
- 
+        return scenarios, costs
+  
     # Flatten and re-index
-    all_scenarios = [sc for batch in batch_results for sc in batch]
-    for i, sc in enumerate(all_scenarios, start=1):
+    batch_results = await asyncio.gather(*(_one_batch() for _ in range(num_batch)))
+
+    all_costs = LiteLLMCostTracker()
+    flat_scenarios = []
+
+    for batch_scenarios, batch_costs in batch_results:
+        all_costs.merge(batch_costs)
+        for sc in batch_scenarios:
+            flat_scenarios.append(sc)
+
+    for i, sc in enumerate(flat_scenarios, start=1):
         sc["id"] = f"scenario_{i:03d}"
-    return all_scenarios
- 
- 
+        sc["usage"] = all_costs.to_json()
+
+    return flat_scenarios, all_costs
+    
 async def _expand_one_scenario(
     client,
     model: str,
@@ -271,15 +279,15 @@ async def _expand_one_scenario(
     goal: dict | str,
     demographics_per_scenario: int,
     metrics: list[dict] | None = None,
-) -> list[dict]:
+) -> tuple[list[dict], "LiteLLMCostTracker"]:
     """
     Expand one abstract base scenario into `demographics_per_scenario` variants,
     each with a distinct demographic profile drawn from demographics.py.
     """
     goal_dict = goal if isinstance(goal, dict) else {}
     demographics = [sample_demographics(goal_dict) for _ in range(demographics_per_scenario)]
- 
-    async def _one_variant(demo: dict, idx: int) -> dict:
+    ##TODO: need to rewrite sample demographics to give a list of permutations... when all factored out (exclude age for now and support some gender x ethnicity scenario generation)
+    async def _one_variant(demo: dict, idx: int) -> tuple[dict, "LiteLLMCostTracker"]:
         messages = [
             {"role": "system", "content": DEMOGRAPHIC_EXPANSION_SYSTEM_PROMPT},
             {
@@ -299,12 +307,18 @@ async def _expand_one_scenario(
         # Tag: scenario_001_v1, scenario_001_v2, …
         variant["id"] = f"{base_scenario['id']}_v{idx + 1}"
         variant["base_scenario_id"] = base_scenario["id"]
-        return variant
+        return variant, costs
  
     variants = await asyncio.gather(
         *(_one_variant(demo, i) for i, demo in enumerate(demographics))
     )
-    return list(variants)
+    total_cost_tracker = LiteLLMCostTracker()
+    all_variants = []
+    for variant, tracker in variants: 
+        all_variants.append(variant)
+        total_cost_tracker.merge(tracker)
+        
+    return all_variants, total_cost_tracker
 
  
 async def _expand_all_scenarios(
@@ -314,7 +328,7 @@ async def _expand_all_scenarios(
     goal: dict | str,
     demographics_per_scenario: int,
     metrics: list[dict] | None = None,
-) -> list[dict]:
+) -> tuple[list[dict], "LiteLLMCostTracker"]:
     """
     Expand every base scenario concurrently.
     Returns a flat list: base_scenarios × demographics_per_scenario entries.
@@ -324,8 +338,14 @@ async def _expand_all_scenarios(
         for sc in base_scenarios
     ]
     results = await asyncio.gather(*tasks)
-    return [variant for group in results for variant in group]
- 
+    
+    total_cost_tracker = LiteLLMCostTracker()
+    all_scenarios = []
+    for scenario_exp, tracker in results: 
+        all_scenarios.extend(scenario_exp)
+        total_cost_tracker.merge(tracker)
+        
+    return all_scenarios, total_cost_tracker
  
 def slugify_benchmark_names(name): 
     # This converts names like "emotional bench" to "emotional-bench"
@@ -365,13 +385,6 @@ def _resolve_results_layout(
     return os.path.join(benchmark_dir, "test.json"), benchmark_dir
     
     
-    
-def merge_and_validate(scenarios, metrics):
-    return {
-        "scenarios": scenarios,
-        "metrics": metrics,
-    }
-    
 
 def _normalise_metrics(raw_metrics: list[dict]) -> list[dict]:
     """Convert expert-authored metrics into the canonical pipeline schema."""
@@ -379,41 +392,14 @@ def _normalise_metrics(raw_metrics: list[dict]) -> list[dict]:
     for i, m in enumerate(raw_metrics, 1):
         examples_md = "".join(f"\n  - {e}" for e in m.get("examples", []))
         out.append({
-            "id":          f"metric_{i:03d}",
-            "name":        m["metric_name"],
+            "id": f"metric_{i:03d}",
+            "name":  m["metric_name"],
             "description": m["definition"] + (f"\n\nExamples:{examples_md}" if examples_md else ""),
-            "type":        m["type"].lower(),
+            "type":  m["type"].lower(),
             "applies_to":  "all",
         })
     return out
 
-
-
-async def _generate_scenarios(client, model: str, goal: dict, num_scenarios: int, num_batch: int) -> list[dict]:
-    """Generate multiple batches concurrently."""
-    async def generate_one_batch():
-        messages = [
-            {"role": "system", "content": SCENARIO_SYSTEM_PROMPT},
-            {"role": "user", "content": build_base_scenario_prompt(goal, num_scenarios)},
-        ]
-        raw, costs = await chat_json(client, model, messages)
-        try:
-            data = json.loads(raw)
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Scenario generation returned invalid JSON: {e}\n\n{raw}")
-
-        scenarios = data.get("scenarios")
-        if not scenarios:
-            raise ValueError(f"No 'scenarios' key in response.\n\n{raw}")
-        return scenarios
-
-    batch_results = await asyncio.gather(*(generate_one_batch() for _ in range(num_batch)))
-    
-    # Flatten results
-    all_scenarios = [sc for batch in batch_results for sc in batch]
-    for i, sc in enumerate(all_scenarios, start=1):
-        sc["id"] = f"scenario_{i:03d}"
-    return all_scenarios
 
 def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> None:
     os.makedirs(os.path.dirname(test_path) or ".", exist_ok=True)
@@ -448,13 +434,7 @@ def generate(
     demographics_per_scenario: int = 0,
 ) -> None:
     """
-    Full Phase-1 pipeline.
- 
-    overspecification : bool
-        If True, normalised metric definitions are injected into every
-        generation and expansion prompt so the model constructs scenarios
-        that explicitly probe each metric dimension.
- 
+    A note on demographics per scenario: 
     demographics_per_scenario : int
         If > 0, each abstract base scenario is expanded into this many
         demographic variants (different gender × ethnicity × age combos).
@@ -469,10 +449,10 @@ def generate(
  
     if not benchmark:
         raise NotImplementedError(
-            "Please specify a benchmark with --benchmark. "
-            "Iterating over all benchmarks is not supported."
+            "Please specify a benchmark with --b flag. "
+            "Iterating over all benchmarks is not yet supported."
         )
- 
+
     goal_path = os.path.join(results_root, benchmark, config["paths"]["goal_prompt"])
     test_path = config["paths"]["test_file"]
     num_scenarios = config["generation"]["num_scenarios"]
@@ -482,7 +462,6 @@ def generate(
  
     with open(goal_path) as f:
         raw = f.read().strip()
- 
     try:
         goal = json.loads(raw)
         raw_metrics = goal.get("metric", [])
@@ -503,11 +482,8 @@ def generate(
     client = make_client(config["models"]["generator"])
     model  = get_model_name(config, "generator")
  
-    # ------------------------------------------------------------------
-    # Logging summary
-    # ------------------------------------------------------------------
-    base_total    = num_scenarios * num_batch
-    final_total   = base_total * demographics_per_scenario if demographics_per_scenario > 0 else base_total
+    base_total = num_scenarios * num_batch
+    final_total = base_total * demographics_per_scenario if demographics_per_scenario > 0 else base_total
  
     print(f"Goal: {goal_path}")
     if benchmark_dir:
@@ -524,9 +500,7 @@ def generate(
     print(f"Metrics:{'predefined metrics expert has found' if has_predefined_metrics else 'Did not find any metrics, so aborting'}")
     print(f"Model: {model}\n")
  
-    # ------------------------------------------------------------------
-    # Step 1a — Metrics
-    # ------------------------------------------------------------------
+
     if not has_predefined_metrics:
         raise NotImplementedError(
             "A 'metric' list must be pre-specified in goal.json. "
@@ -539,26 +513,22 @@ def generate(
     # Pass metrics into prompts only when --overspecification is active
     metrics_for_prompt: list[dict] | None = metrics if overspecification else None
  
-    # ------------------------------------------------------------------
-    # Step 1b — Base scenario generation (no demographics)
-    # ------------------------------------------------------------------
-    print("[1b] Generating base scenarios …")
-    base_scenarios = asyncio.run(
+    print("[1b] Generating base scenarios ...")
+    base_scenarios, base_scenarios_costs  = asyncio.run(
         _generate_base_scenarios(
             client, model, goal, num_scenarios, num_batch, metrics_for_prompt
         )
     )
+    base_scenarios_costs.write_out_costs(step_name="base_scenario_construction", abs_path_file=benchmark_dir)
+    
     print(f"[1b] Generated {len(base_scenarios)} base scenarios.")
  
-    # ------------------------------------------------------------------
-    # Step 1c — Demographic expansion (optional)
-    # ------------------------------------------------------------------
     if demographics_per_scenario > 0:
         print(
             f"[1c] Expanding {len(base_scenarios)} base scenario(s) × "
             f"{demographics_per_scenario} demographic variant(s) …"
         )
-        final_scenarios = asyncio.run(
+        final_scenarios, final_costs = asyncio.run(
             _expand_all_scenarios(
                 client,
                 model,
@@ -571,10 +541,10 @@ def generate(
         print(f"[1c] Expansion complete — {len(final_scenarios)} total scenarios.")
     else:
         final_scenarios = base_scenarios
+        final_costs = LiteLLMCostTracker()
+    
+    final_costs.write_out_costs(step_name="demographic_scenario_construction", abs_path_file=benchmark_dir)
  
-    # ------------------------------------------------------------------
-    # Step 1d — Save
-    # ------------------------------------------------------------------
     print("[1d] Saving …")
     _save(resolved_test_path, final_scenarios, metrics, overwrite)
     print(
@@ -582,10 +552,6 @@ def generate(
         f"saved to {resolved_test_path}"
     )
  
- 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
  
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 1: Generate test.json")
