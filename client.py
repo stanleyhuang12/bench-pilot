@@ -8,17 +8,17 @@ via OpenRouter or direct provider endpoints.
 import litellm
 import asyncio 
 
-from typing import Coroutine
-import warnings
 
+import json
+import os
 import logging
 from dataclasses import dataclass
+
 
 litellm_logger = logging.getLogger("LiteLLM")
 litellm_logger.setLevel(logging.WARNING)
 
 # Models that require max_completion_tokens instead of max_tokens
-_COMPLETION_TOKENS_MODELS = {"gpt-5.2", "o3", "o3-mini", "o4-mini", "o1", "o1-mini"}
 
 _MAX_RETRIES = 5
 _RETRY_DELAY = 10  # seconds, multiplied by attempt number
@@ -36,12 +36,11 @@ class LiteLLMClient:
     api_key: str
 
 
-
 @dataclass 
 class LiteLLMCostTracker: 
-    cost: int 
-    input_tokens: int 
-    output_tokens: int 
+    cost: float = 0
+    input_tokens: int = 0 
+    output_tokens: int = 0 
     
     def add(self, c:dict): 
         if not c: return
@@ -61,6 +60,26 @@ class LiteLLMCostTracker:
             "output_tokens": self.output_tokens
         }
         
+    def write_out_costs(self, step_name, abs_path_file): 
+        os.makedirs(abs_path_file, exist_ok=True)
+        cost_path = os.path.join(abs_path_file, "cost.json")
+        
+        if os.path.exists(cost_path): 
+            try:    
+                with open(cost_path, "r") as f: 
+                    data = json.load(f)
+            except json.JSONDecodeError:
+                data = {}
+        else: 
+            data = {}
+        
+        data[step_name] = self.to_json()
+        
+        with open(cost_path, "w") as f: 
+            json.dump(data, f, indent=4)
+        
+        print(f"Wrote out costs for {step_name} step to {cost_path}")
+
 def make_client(model_config: dict) -> LiteLLMClient:
     return LiteLLMClient(
         base_url=model_config["base_url"],
@@ -87,17 +106,18 @@ async def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
                 raise
 
 
-async def chat(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> tuple[str, dict]:
+async def chat(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> tuple[str, "LiteLLMCostTracker"]:
     response = await _create_with_retry(client, model=model, messages=messages, **kwargs)
+    usage = response.usage
     tracker = {
-            "cost": litellm.completion_cost(response), 
-            "input_tokens": response.get('usage', {}).get('prompt_tokens', 0), 
-            "output_tokens": response.get('usage', {}).get('completion_tokens', 0)
+        "cost": litellm.completion_cost(response),
+        "input_tokens": usage.prompt_tokens if usage else 0,
+        "output_tokens": usage.completion_tokens if usage else 0,
     }
     
     return response.choices[0].message.content, LiteLLMCostTracker(**tracker)
 
-async def chat_json(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> tuple[str, dict]:
+async def chat_json(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> tuple[str, "LiteLLMCostTracker"]:
     """Send a chat request in JSON mode. Caller is responsible for json.loads()."""
     response = await _create_with_retry(
         client,
@@ -107,10 +127,11 @@ async def chat_json(client: LiteLLMClient, model: str, messages: list[dict], **k
         **kwargs,
     )
     
+    usage = response.usage
     tracker = {
-            "cost": litellm.completion_cost(response), 
-            "input_tokens": response.get('usage', {}).get('prompt_tokens', 0), 
-            "output_tokens": response.get('usage', {}).get('completion_tokens', 0)
+        "cost": litellm.completion_cost(response),
+        "input_tokens": usage.prompt_tokens if usage else 0,
+        "output_tokens": usage.completion_tokens if usage else 0,
     }
     
     return response.choices[0].message.content, LiteLLMCostTracker(**tracker)
