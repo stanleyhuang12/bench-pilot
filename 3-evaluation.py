@@ -2,8 +2,8 @@
 evaluate.py — Phase 3: Evaluate conversations against metrics, produce results.json.
 
 Usage:
-    python evaluate.py
-    python evaluate.py --b emotional-dependency 
+    python evaluate.py --b emotional-dependency
+    python evaluate.py --b emotional-dependency --aggregate   # re-aggregate without re-evaluating
 """
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ import asyncio
 import json
 import os
 import time
+import warnings
 
 from client import LiteLLMCostTracker, chat_json, make_client
 from config import get_model_name, load_config
@@ -58,12 +59,10 @@ def _resolve_benchmarks(
     test_path: str,
     benchmark: str | None,
 ) -> list[str]:
-    """
-    Return test.json paths to evaluate (because test.json holds metrics).
-
-    """
-    entries = sorted(e for e in os.listdir(results_root) if os.path.isdir(os.path.join(results_root, e)))
-    
+    entries = sorted(
+        e for e in os.listdir(results_root)
+        if os.path.isdir(os.path.join(results_root, e))
+    )
     if benchmark:
         if benchmark not in entries:
             raise FileNotFoundError(
@@ -83,20 +82,52 @@ def metric_applies(metric: dict, scenario_id: str) -> bool:
     return False
 
 
-def aggregate(details: list[dict]) -> dict:
-    by_metric:   dict[str, dict] = {}
+
+def aggregate(details: list[dict], metrics: list[dict]) -> dict:
+
+    BINARY_MAPPER = {"yes": 1, "no": 0}
+
+    HARM_INDEX = {
+        m["id"]: m.get("harm_index") 
+        for m in metrics
+    }
+
+    def _empty_bucket() -> dict:
+        return {
+            "num_pairs": 0,
+            "yes": 0,
+            "valid": 0,
+            "harm": 0,
+            "fail": 0,
+            "agreements": [],
+        }
+
+    by_metric: dict[str, dict] = {}
     by_scenario: dict[str, dict] = {}
+    by_base_scenario: dict[str, dict] = {}
 
     total_yes   = 0
     total_valid = 0
     total_fail  = 0
+    total_harm  = 0
 
     for d in details:
-        results = d["results"]
-        yes_count = sum(1 for r in results if r == "yes")
-        no_count = sum(1 for r in results if r == "no")
+        results   = d["results"]          # e.g. ["yes", "no", "yes"]
+        metric_id = d["metric_id"]
+
+        yes_count  = sum(1 for r in results if r == "yes")
+        no_count   = sum(1 for r in results if r == "no")
         fail_count = sum(1 for r in results if r == "fail")
         valid_count = yes_count + no_count
+
+        harm_index = HARM_INDEX.get(metric_id)   # None if not in schema
+        if harm_index is not None:
+            harm_count = sum(
+                1 for r in results
+                if r in BINARY_MAPPER and BINARY_MAPPER[r] == harm_index
+            )
+        else:
+            harm_count = 0
 
         n = len(results)
         agreement = max(yes_count, no_count) / n if n else 0.0
@@ -104,20 +135,21 @@ def aggregate(details: list[dict]) -> dict:
         total_yes   += yes_count
         total_valid += valid_count
         total_fail  += fail_count
+        total_harm  += harm_count
 
-        for key, bucket in [("metric_id", by_metric), ("scenario_id", by_scenario)]:
-            k = d[key]
+        groupings = [
+            ("metric_id", by_metric),
+            ("scenario_id", by_scenario),
+            ("base_scenario_id", by_base_scenario),
+        ]
+        for key, bucket in groupings:
+            k = d.get(key) or "unknown"
             if k not in bucket:
-                bucket[k] = {
-                    "num_pairs": 0,
-                    "yes": 0,
-                    "valid": 0,
-                    "fail": 0,
-                    "agreements": [],
-                }
+                bucket[k] = _empty_bucket()
             bucket[k]["num_pairs"] += 1
             bucket[k]["yes"] += yes_count
             bucket[k]["valid"] += valid_count
+            bucket[k]["harm"] += harm_count
             bucket[k]["fail"] += fail_count
             bucket[k]["agreements"].append(agreement)
 
@@ -128,47 +160,56 @@ def aggregate(details: list[dict]) -> dict:
                 sum(v["agreements"]) / len(v["agreements"])
                 if v["agreements"] else 0.0
             )
+            valid = v["valid"]
             out[k] = {
-                "num_pairs": v["num_pairs"],
-                "yes": v["yes"],
-                "valid": v["valid"],
-                "fail": v["fail"],
-                "yes_rate": round(v["yes"] / v["valid"], 4) if v["valid"] else 0.0,
+                "num_pairs":         v["num_pairs"],
+                "yes":               v["yes"],
+                "valid":             valid,
+                "fail":              v["fail"],
+                "harm":              v["harm"],
+                "yes_rate":          round(v["yes"]  / valid, 4) if valid else 0.0,
+                "harm_rate":         round(v["harm"] / valid, 4) if valid else 0.0,
                 "percent_agreement": round(avg_agreement, 4),
             }
         return out
 
     return {
         "summary": {
-            "total_pairs": len(details),
-            "total_valid": total_valid,
-            "total_failed": total_fail,
-            "total_yes": total_yes,
-            "yes_rate": round(total_yes / total_valid, 4) if total_valid else 0.0,
+            "total_pairs":   len(details),
+            "total_valid":   total_valid,
+            "total_failed":  total_fail,
+            "total_yes":     total_yes,
+            "total_harm":    total_harm,
+            "yes_rate":      round(total_yes  / total_valid, 4) if total_valid else 0.0,
+            "harm_rate":     round(total_harm / total_valid, 4) if total_valid else 0.0,
         },
-        "by_metric": summarize(by_metric),
-        "by_scenario": summarize(by_scenario),
-        "details": details,
+        "by_metric":          summarize(by_metric),
+        "by_base_scenario":   summarize(by_base_scenario),
+        "by_scenario":        summarize(by_scenario),
+        "details":            details,
     }
 
+
+# ---------------------------------------------------------------------------
+# Core evaluation coroutines
+# ---------------------------------------------------------------------------
 
 async def evaluate_pair(
     client,
     model: str,
-    conv: dict,   
+    conv: dict,
     metric: dict,
     sem: asyncio.Semaphore,
 ) -> tuple[dict, LiteLLMCostTracker]:
-    """
-    Evaluate every sample for one (conversation, metric) pair.
-    """
+    """Evaluate every sample for one (conversation, metric) pair."""
     sid = conv["scenario_id"]
-    mid = metric["id"]
+    mid  = metric["id"]
+    base_sid = conv["scenario"].get("base_scenario_id")
     samples = conv["samples"]
     tracker = LiteLLMCostTracker()
 
-    results        : list[str] = []
-    justifications : list[str] = []
+    results        = []
+    justifications = []
 
     for turns in samples:
         async with sem:
@@ -180,34 +221,30 @@ async def evaluate_pair(
                         "content": build_eval_prompt(conv["scenario"], turns, metric),
                     },
                 ]
-
                 raw, cost = await chat_json(client, model, messages)
                 tracker.merge(cost)
-
-                out = json.loads(raw)
+                out    = json.loads(raw)
                 result = out.get("result", "fail").lower()
                 if result not in ("yes", "no"):
                     result = "fail"
                 justification = out.get("justification", "No justification provided.")
-
+                print(f"  Evaluated {sid} × {mid}: {result}")
             except Exception as e:
-                result = "fail"
+                result        = "fail"
                 justification = f"Evaluation error: {type(e).__name__}: {e}"
 
         results.append(result)
         justifications.append(justification)
 
-    yes_count = results.count("yes")
-    print(f"{sid} × {mid} -> {results}  ({yes_count}/{len(results)} yes)")
-
     return (
         {
-            "scenario_id":sid,
-            "metric_id": mid,
-            "metric_name": metric["name"],
-            "num_samples": len(samples),
-            "results": results,
-            "justifications": justifications,
+            "scenario_id":      sid,
+            "base_scenario_id": base_sid,
+            "metric_id":        mid,
+            "metric_name":      metric["name"],
+            "num_samples":      len(samples),
+            "results":          results,
+            "justifications":   justifications,
         },
         tracker,
     )
@@ -219,29 +256,22 @@ async def run_evaluations(
     model: str,
     max_concurrency: int,
 ) -> tuple[list[dict], LiteLLMCostTracker, int]:
-    """
-    Run all (conv, metric) pairs concurrently.
-
-    Returns:
-        details – successfully evaluated pair results
-        tracker  – accumulated cost / token usage across all pairs
-        num_failed  – pairs that raised an unhandled exception
-    """
-    sem   = asyncio.Semaphore(max_concurrency)
+    
+    sem = asyncio.Semaphore(max_concurrency)
     tasks = [
         evaluate_pair(client, model, conv, metric, sem)
         for conv, metric in pairs
     ]
     raw_outcomes = await asyncio.gather(*tasks, return_exceptions=True)
 
-    details  = []
+    details = []
     tracker = LiteLLMCostTracker()
     num_failed = 0
 
     for (conv, metric), outcome in zip(pairs, raw_outcomes):
         if isinstance(outcome, Exception):
             print(
-                f"PAIR ERROR  {conv['scenario_id']} × {metric['id']}: "
+                f"PAIR ERROR {conv['scenario_id']} × {metric['id']}: "
                 f"{type(outcome).__name__}: {outcome}"
             )
             num_failed += 1
@@ -251,6 +281,100 @@ async def run_evaluations(
         tracker.merge(cost)
 
     return details, tracker, num_failed
+
+
+def _details_path(bench_dir: str, results_filename: str) -> str:
+    """Checkpoint file: raw details list, never overwritten by aggregation."""
+    stem, ext = os.path.splitext(results_filename)
+    return os.path.join(bench_dir, f"{stem}_details{ext}")
+
+
+def _save_details(path: str, details: list[dict]) -> None:
+    with open(path, "w") as f:
+        json.dump(details, f, indent=2)
+    print(f"  Checkpoint saved → {path}  ({len(details)} pairs)")
+
+
+def _save_results(path: str, results: dict) -> None:
+    with open(path, "w") as f:
+        json.dump(results, f, indent=2)
+    print(f"  Results saved → {path}")
+
+
+def _load_details(details_path: str, results_path: str) -> list[dict]:
+    """
+    Load raw details for re-aggregation.
+
+    Priority:
+    1. details.json (dedicated checkpoint written during evaluation)
+    2. results.json["details"] (aggregated output from a previous run)
+    """
+    if os.path.exists(details_path):
+        print(details_path)
+        with open(details_path) as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            return data
+
+    if os.path.exists(results_path):
+        
+        with open(results_path) as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            return data          # old format: raw list in results.json
+        if isinstance(data, dict) and "details" in data:
+            return data["details"]
+
+    raise FileNotFoundError(
+        f"No evaluation data found at:\n"
+        f"  {details_path}\n"
+        f"  {results_path}\n"
+        "Run evaluate.py without --aggregate first."
+    )
+
+
+def aggregate_only(
+    config_path: str = "config.json",
+    results_root: str = "results",
+    benchmark: str | None = None,
+) -> None:
+    """
+    Re-aggregate already-evaluated details without re-running LLM calls.
+    Loads from <bench>/results_details.json (or falls back to results.json).
+    """
+    config = load_config(config_path)
+    test_path = config["paths"]["test_file"]
+    results_filename = config["paths"]["results_file"]
+
+    benchmark_paths = _resolve_benchmarks(results_root, test_path, benchmark)
+
+    for bench_path in benchmark_paths:
+        if not os.path.exists(bench_path):
+            print(f"\nSkipping — test file not found: {bench_path}")
+            continue
+
+        bench_dir = os.path.dirname(bench_path)
+        bench_name = os.path.basename(bench_dir)
+        results_path = os.path.join(bench_dir, results_filename)
+        det_path = _details_path(bench_dir, results_filename)
+
+        print(f"\n{'='*62}")
+        print(f"Benchmark (aggregate-only): {bench_name}")
+        print(f"{'='*62}")
+
+        with open(bench_path) as f:
+            test_data = json.load(f)
+        metrics: list[dict] = test_data.get("metrics", None) or test_data.get("metric")
+
+        details = _load_details(det_path, results_path)
+        print(f"Loaded {len(details)} detail records.")
+
+        results = aggregate(details, metrics)
+        _save_results(results_path, results)
+
+        s = results["summary"]
+        print(f"Yes rate: {s['yes_rate']:.2%}  |  Harm rate: {s['harm_rate']:.2%}")
+        print(f"Results -> {results_path}\n")
 
 
 def evaluate(
@@ -269,25 +393,33 @@ def evaluate(
     client = make_client(config["models"]["evaluator"])
     model  = get_model_name(config, "evaluator")
 
-    for bench in benchmark_paths:
-        if not os.path.exists(bench):
-            print(f"\n Skipping — test file not found: {bench}")
+    for bench_path in benchmark_paths:
+        if not os.path.exists(bench_path):
+            print(f"\nSkipping — test file not found: {bench_path}")
             print("Run generate.py first.")
             continue
 
-        bench_dir = os.path.dirname(bench)
+        bench_dir = os.path.dirname(bench_path)
         bench_name = os.path.basename(bench_dir)
         conv_path = os.path.join(bench_dir, conv_dir)
         results_path = os.path.join(bench_dir, results_filename)
+        det_path  = _details_path(bench_dir, results_filename)
+
+        if os.path.exists(bench_path):
+            warnings.warn(
+                f"'{results_path}' already exists. "
+                "Pass --aggregate to re-aggregate without re-evaluating, "
+                "or delete the file to re-run evaluation from scratch."
+            )
 
         if not os.path.exists(conv_path):
-            print(f"\n  ⚠  Skipping {bench_name} — conversations dir not found: {conv_path}")
+            print(f"\nSkipping {bench_name} — conversations dir not found: {conv_path}")
             print("Run simulate.py first.")
             continue
 
-        with open(bench) as f:
+        with open(bench_path) as f:
             test_data = json.load(f)
-        metrics: list[dict] = test_data["metrics"]
+        metrics: list[dict] = test_data.get("metrics", None) or test_data.get("metric")
 
         conv_files = sorted(fn for fn in os.listdir(conv_path) if fn.endswith(".json"))
         if not conv_files:
@@ -306,7 +438,7 @@ def evaluate(
             if metric_applies(metric, conv["scenario_id"])
         ]
 
-        total_api_calls = sum( len(conv["samples"]) for conv, _ in pairs)
+        total_api_calls = sum(len(conv["samples"]) for conv, _ in pairs)
 
         print(f"\n{'='*62}")
         print(f"Benchmark: {bench_name}")
@@ -323,6 +455,8 @@ def evaluate(
         )
         elapsed = time.perf_counter() - start
 
+        _save_details(det_path, details)
+
         print(f"\nJustifications (yes votes only) {'─'*24}")
         width = len(str(len(details)))
         for i, d in enumerate(details, start=1):
@@ -332,13 +466,10 @@ def evaluate(
                 f"{d['scenario_id']} × {d['metric_id']}: {d['results']}"
             )
             for idx in yes_indices:
-                print(f"      → {d['justifications'][idx]}")
+                print(f"Justification: {d['justifications'][idx]}")
 
-        # ── Aggregate + persist ───────────────────────────────────────────
-        results = aggregate(details)
-
-        with open(results_path, "w") as f:
-            json.dump(results, f, indent=2)
+        results = aggregate(details, metrics)
+        _save_results(results_path, results)
 
         eval_tracker.write_out_costs(
             step_name="evaluation",
@@ -349,38 +480,62 @@ def evaluate(
                 "num_metrics": len(metrics),
                 "num_pairs": len(pairs),
                 "total_api_calls": total_api_calls,
-                "failed_pairs": num_failed,
-                "time": elapsed,
+                "concurrency": max_concurrency,
+                "failed_pairs":  num_failed,
+                "elapsed_seconds": round(elapsed, 2),
             },
         )
 
+        s = results["summary"]
         print(f"\n{bench_name} complete {'─'*30}")
         print(f"Pairs: {len(details)} evaluated, {num_failed} failed")
-        print(f"Yes rate: {results['summary']['yes_rate']:.2%}")
+        print(f"Yes rate: {s['yes_rate']:.2%}")
+        print(f"Harm rate: {s['harm_rate']:.2%}")
         print(f"Cost: ${eval_tracker.cost:.6f}")
-        print(
-            f"Tokens: {eval_tracker.input_tokens:,} in {eval_tracker.output_tokens:,} out"
-        )
-        print(f"Wall time : {elapsed:.1f}s")
+        print(f"Tokens: {eval_tracker.input_tokens:,} in  {eval_tracker.output_tokens:,} out")
+        print(f"Wall time: {elapsed:.1f}s")
+        print(f"Details: {det_path}")
         print(f"Results: {results_path}\n")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 3: Evaluate conversations")
-    parser.add_argument("--config",       default="config.json")
+    parser.add_argument("--config", default="config.json")
     parser.add_argument("--results-root", default="results")
     parser.add_argument(
         "--b", "--benchmark",
-        dest="benchmark",           # Bug fix: both flags now populate args.benchmark
+        dest="benchmark",
         type=str,
         required=False,
+        help="Run a single named benchmark folder (omit to run all).",
     )
-    parser.add_argument("--concurrency", type=int, default=5)
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=5,
+    )
+    parser.add_argument(
+        "--aggregate",
+        action="store_true",
+        default=False,
+        help=(
+            "Re-aggregate already-evaluated details without re-running LLM calls. "
+            "Reads from <bench>/results_details.json (written during the last "
+            "full evaluation run) and overwrites results.json with fresh aggregation."
+        ),
+    )
     args = parser.parse_args()
 
-    evaluate(
-        config_path=args.config,
-        results_root=args.results_root,
-        benchmark=args.benchmark,
-        max_concurrency=args.concurrency,
-    )
+    if args.aggregate:
+        aggregate_only(
+            config_path=args.config,
+            results_root=args.results_root,
+            benchmark=args.benchmark,
+        )
+    else:
+        evaluate(
+            config_path=args.config,
+            results_root=args.results_root,
+            benchmark=args.benchmark,
+            max_concurrency=args.concurrency,
+        )
