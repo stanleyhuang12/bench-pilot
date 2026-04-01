@@ -4,7 +4,7 @@ client.py — litellm-backed client factory.
 All models (GPT, Claude, Gemini, etc.) are accessed through the same interface
 via OpenRouter or direct provider endpoints.
 """
-
+from __future__ import annotations
 import litellm
 import asyncio 
 
@@ -60,7 +60,7 @@ class LiteLLMCostTracker:
             "output_tokens": self.output_tokens
         }
         
-    def write_out_costs(self, step_name, abs_path_file): 
+    def write_out_costs(self, step_name: str, abs_path_file: str, metadata: dict | None = None): 
         os.makedirs(abs_path_file, exist_ok=True)
         cost_path = os.path.join(abs_path_file, "cost.json")
         
@@ -74,6 +74,7 @@ class LiteLLMCostTracker:
             data = {}
         
         data[step_name] = self.to_json()
+        data["metadata"] = metadata or {}
         
         with open(cost_path, "w") as f: 
             json.dump(data, f, indent=4)
