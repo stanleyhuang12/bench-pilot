@@ -4,7 +4,7 @@ client.py — litellm-backed client factory.
 All models (GPT, Claude, Gemini, etc.) are accessed through the same interface
 via OpenRouter or direct provider endpoints.
 """
-
+from __future__ import annotations
 import litellm
 import asyncio 
 
