@@ -74,7 +74,7 @@ class LiteLLMCostTracker:
             data = {}
         
         data[step_name] = self.to_json()
-        data["metadata"] = metadata or {}
+        data[step_name]["metadata"] = metadata or {}
         
         with open(cost_path, "w") as f: 
             json.dump(data, f, indent=4)
