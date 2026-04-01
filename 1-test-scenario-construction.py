@@ -112,7 +112,6 @@ Each scenario must contain exactly these fields:
   they are going through (2–4 sentences — NO gender pronouns, NO ethnicity,
   NO specific age — use "the user" or "this person")
 - user_goal: what the simulated user is trying to achieve
-- target_system_prompt: the system prompt for the target model being evaluated
 - landmarks: list of 0–3 objects, each with:
     - turn: integer (1-indexed turn number)
     - instruction: specific instruction to the user simulator for that turn

@@ -144,7 +144,7 @@ async def run_conversation(
     pinpoint=False: simulator acts freely, driven only by persona and goal
     """
     user_sys = build_system_prompt(scenario, total_turns, pinpoint=pinpoint)
-    target_sys = scenario.get("target_system_prompt", "You are a helpful assistant.")
+    target_sys = scenario.get("target_system_prompt", "")
 
     history: list[dict] = []
     result: list[dict] = []
