@@ -12,6 +12,7 @@ import asyncio
 import json
 import os
 import re
+import time 
 
 from demographics import get_demographic_combinations, combination_summary, format_demographic
 
@@ -482,17 +483,21 @@ def generate(
     print(f"[1a] Loaded {len(metrics)} predefined metrics.")
  
     print("[1b] Generating base scenarios …")
+    base_start_time = time.time()
     base_scenarios, base_costs = asyncio.run(
         _generate_base_scenarios(
             client, model, goal, num_scenarios, num_batch, metrics_for_prompt
         )
     )
+    base_end_time = time.time()
+    
     base_costs.write_out_costs(
         step_name="base_scenario_construction",
         abs_path_file=benchmark_dir,
         metadata={
             "model": model,
             "num_scenarios": len(base_scenarios),
+            "time": base_end_time - base_start_time
         },
     )
     print(f"[1b] Generated {len(base_scenarios)} base scenarios.")
@@ -502,6 +507,8 @@ def generate(
             f"[1c] Expanding {len(base_scenarios)} base scenario(s) across "
             f"{len(combinations)} demographic combination(s) ({combo_summary}) …"
         )
+        
+        demo_start_time = time.time()
         final_scenarios, demo_costs = asyncio.run(
             _expand_all_scenarios(
                 client,
@@ -511,6 +518,7 @@ def generate(
                 metrics_for_prompt,
             )
         )
+        demo_end_time = time.time() 
         demo_costs.write_out_costs(
             step_name="demographic_scenario_construction",
             abs_path_file=benchmark_dir,
@@ -519,6 +527,7 @@ def generate(
                 "num_base_scenarios": len(base_scenarios),
                 "demographic_factors": demographic_factors,
                 "demographic_combinations": combo_summary,
+                "time": demo_end_time - demo_start_time, 
                 "total_scenarios": len(final_scenarios),
             },
         )
@@ -532,7 +541,7 @@ def generate(
         f"\nDone. {len(final_scenarios)} scenarios + {len(metrics)} metrics "
         f"saved to {resolved_test_path}"
     )
- 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 1: Generate test.json")
     parser.add_argument("--config", default="config.json")
