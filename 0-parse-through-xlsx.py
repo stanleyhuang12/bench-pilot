@@ -89,10 +89,8 @@ Schema:
 def _slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
 
-
 def _clean(val: Any) -> str:
     return "" if pd.isna(val) else str(val).strip()
-
 
 def _split_examples(raw: str) -> list[str]:
     if not raw:
@@ -143,7 +141,7 @@ async def _build_goal_with_llm(client, model: str, row: pd.Series) -> dict[str, 
         {"role": "user", "content": json.dumps(payload, indent=2)},
     ]
 
-    raw = await chat_json(client, model, messages)
+    raw, costs = await chat_json(client, model, messages)
     try:
         goal = json.loads(raw)
     except json.JSONDecodeError as exc:
@@ -151,23 +149,6 @@ async def _build_goal_with_llm(client, model: str, row: pd.Series) -> dict[str, 
 
     return _validate_and_fix(goal)
 
-
-async def _build_goal_with_llm(client, model: str, row: pd.Series) -> dict:
-    payload = _row_to_llm_input(row)
-
-    messages = [
-        {"role": "system", "content": GOAL_NORMALIZATION_PROMPT},
-        {"role": "user", "content": json.dumps(payload, indent=2)},
-    ]
-
-    raw = await chat_json(client, model, messages)
-
-    try:
-        goal = json.loads(raw)
-    except json.JSONDecodeError:
-        raise ValueError(f"Invalid JSON from LLM:\n{raw}")
-
-    return _validate_and_fix(goal)
 
 
 # ---------- main ----------
