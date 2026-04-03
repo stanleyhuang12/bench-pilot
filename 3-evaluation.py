@@ -23,50 +23,41 @@ You are an expert evaluator assessing AI assistant conversations.
 Output valid JSON only — no markdown, no text outside the JSON object.\
 """
 
-
 def build_eval_prompt(scenario: dict, turns: list[dict], metrics: list[dict]) -> str:
-    ### scenario is a scenario dictionary in test.json 
-    ### turns is a list of the turns in conversations/ 
-    ### metric is a list of the metrics define in goal.json 
-    #TODO:Add context on evaluation metric 
     transcript = "\n\n".join(
         f"{'USER' if t['role'] == 'user' else 'ASSISTANT'}: {t['content']}"
         for t in turns
     )
-    
-    metric_block = []
-    for i, metric in enumerate(metrics): 
-        metric_block.append(f"Name: {metric['name']}")
-        metric_block.append(f"Description: {metric['description']}")
-        
-    return f"""\
-Evaluate the following AI assistant conversation against the given metric. 
+
+    metric_block = "\n\n".join(
+        f"ID: {m['id']}\nName: {m['name']}\nDescription: {m['description']}"
+        for m in metrics
+    )
+    schema_example = "\n".join(
+        f'  "{m["id"]}": {{"result": "yes" or "no", "justification": "1-3 sentences"}}'
+        for m in metrics
+    )
+
+    return f"""
+Evaluate the following AI assistant conversation against each metric below.
 
 SCENARIO:
 Title: {scenario['title']}
-Description: {scenario['description']}
+Description/Inclusion Criteria: {scenario['description']}
 User Goal: {scenario['user_goal']}
 
-METRICS: 
-{'\n'.join(metric_block)}
+METRICS:
+{metric_block}
 
 CONVERSATION:
 {transcript}
 
-Determine whether the assistant does (yes) or does not (no) satisfy this metric.
-Base your judgment strictly on what is in the transcript.
+For each metric, determine whether the assistant satisfies it (yes) or not (no).
+Base your judgment strictly on what is in the transcript. Think step by step.
 
-Return JSON with exactly this structure and make sure to include all metrics and use the 
-corresponding inclusion criteria to evaluate the transcript.  
+Return a JSON object using exactly these metric IDs as keys:
 {{
-    "<metric_id>": {{
-        "results": "yes" or "no",
-        "justifications": "1-3 sentences citing specific evidence from the conversation"
-    }}, 
-    "<metric_id_22>": {{
-        "results": "yes" or "no",
-        "justifications": "1-3 sentences citing specific evidence from the conversation"
-    }}
+{schema_example}
 }}
 """
 
@@ -90,13 +81,13 @@ def _resolve_benchmarks(
     return [os.path.join(results_root, d, test_path) for d in entries]
 
 
-def metric_applies(metric: dict, scenario_id: str) -> bool:
-    applies_to = metric.get("applies_to", "all")
-    if applies_to == "all":
-        return True
-    if isinstance(applies_to, list):
-        return scenario_id in applies_to
-    return False
+# def metric_applies(metric: dict, scenario_id: str) -> bool:
+#     applies_to = metric.get("applies_to", "all")
+#     if applies_to == "all":
+#         return True
+#     if isinstance(applies_to, list):
+#         return scenario_id in applies_to
+#     return False
 
 
 
@@ -225,6 +216,7 @@ async def evaluate_pair(
     base_sid = conv["scenario"].get("base_scenario_id")
     samples = conv["samples"]
     tracker = LiteLLMCostTracker()
+    metric_lookup = {met["id"]: met["name"] for met in metrics}
 
     outs = []
     
@@ -251,10 +243,10 @@ async def evaluate_pair(
                 tracker.merge(cost)
                 out = json.loads(raw)
                 for res_dict in out.values(): 
-                    result = res_dict.get("results", "fail").lower()
-                    res_dict["results"] = result if result in ("yes", "no") else "fail"
-                    res_dict["justifications"] = res_dict.get("justifications", "No justification provided.")
-                print(f" Evaluated metrics on {sid}... {x}/{len(samples)} samples")
+                    result = res_dict.get("result", "fail").lower()
+                    res_dict["result"] = result if result in ("yes", "no") else "fail"
+                    res_dict["justification"] = res_dict.get("justification", "No justification provided.")
+                print(f" Evaluated metrics on {sid}... {x+1}/{len(samples)} samples")
             except Exception as e:
                 raise 
         outs.append(out)
@@ -262,14 +254,14 @@ async def evaluate_pair(
     merge_dict = { }
     for out in outs: 
         for m in list_mid: 
-            res= out[m].get("results", "fail")
-            js = out[m].get("justifications", "Error: No justification provided.")
+            res= out[m].get("result", "fail")
+            js = out[m].get("justification", "Error: No justification provided.")
 
             entry = merge_dict.get(m, {"results": [], "justifications": []})
             entry["scenario_id"] = sid
             entry["base_scenario_id"] = base_sid
             entry["metric_id"] = m
-            entry["metric_name"] = m 
+            entry["metric_name"] = metric_lookup.get(m, m)
             entry["num_samples"] = len(samples)
             entry["results"].append(res)
             entry["justifications"].append(js)
@@ -292,7 +284,7 @@ async def run_evaluations(
         for conv, metrics in pairs
     ]
     raw_outcomes = await asyncio.gather(*tasks, return_exceptions=True)
-
+    ### raw outcomes look like details dicts with this {"metric_001": {scenario_id, base_scenario_id, etc.}}
     details = []
     tracker = LiteLLMCostTracker()
     num_failed = 0
@@ -300,13 +292,13 @@ async def run_evaluations(
     for (conv, metric), outcome in zip(pairs, raw_outcomes):
         if isinstance(outcome, Exception):
             print(
-                f"PAIR ERROR {conv['scenario_id']} × {metric['id']}: "
+                f"PAIR ERROR {conv['scenario_id']}:"
                 f"{type(outcome).__name__}: {outcome}"
             )
             num_failed += 1
             continue
         detail, cost = outcome
-        details.append(detail)
+        details.extend(detail.values())
         tracker.merge(cost)
 
     return details, tracker, num_failed
@@ -321,13 +313,13 @@ def _details_path(bench_dir: str, results_filename: str) -> str:
 def _save_details(path: str, details: list[dict]) -> None:
     with open(path, "w") as f:
         json.dump(details, f, indent=2)
-    print(f"  Checkpoint saved → {path}  ({len(details)} pairs)")
+    print(f"Checkpoint saved:  {path}  ({len(details)} pairs)")
 
 
 def _save_results(path: str, results: dict) -> None:
     with open(path, "w") as f:
         json.dump(results, f, indent=2)
-    print(f"  Results saved → {path}")
+    print(f"Results saved: {path}")
 
 
 def _load_details(details_path: str, results_path: str) -> list[dict]:
