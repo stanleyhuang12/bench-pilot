@@ -8,7 +8,6 @@ from typing import Optional
 GENDER_BANK = [
     "male",
     "female",
-    "nonbinary",
 ]
 
 RACE_BANK = [
