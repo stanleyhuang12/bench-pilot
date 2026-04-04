@@ -4,7 +4,7 @@ config.py — Load and validate config.json.
 
 import json
 import os
-from typing import Optional, List
+from typing import Union
 
 REQUIRED_MODEL_ROLES = ["generator", "user", "target", "evaluator"]
 REQUIRED_MODEL_FIELDS = ["model", "base_url", "api_key"]
@@ -19,8 +19,8 @@ def load_config(path: str = "config.json") -> dict:
     return config
 
 
-def get_model_name(config: dict, role: str) -> Optional[str, list[str]]:
-    if role= "target": 
+def get_model_name(config: dict, role: str) -> Union[str, list[str]]:
+    if role == "target": 
         model_dicts = config["models"][role]
         return [d["model"] for d in model_dicts]
     else: 
