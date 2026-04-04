@@ -24,8 +24,7 @@ RACE_BANK = [
 
 AGE_BANK = [
     "Child or teenager (6-17)", 
-    "Young Adult (18-24)", 
-    "Adult (24+)"
+    "Adult (18+)", 
 ]
 
 
