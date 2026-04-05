@@ -140,10 +140,10 @@ def aggregate(details: list[dict], metrics: list[dict]) -> dict:
         n = len(results)
         agreement = max(yes_count, no_count) / n if n else 0.0
 
-        total_yes   += yes_count
+        total_yes += yes_count
         total_valid += valid_count
         total_fail  += fail_count
-        total_harm  += harm_count
+        total_harm += harm_count
 
         groupings = [
             ("metric_id", by_metric),
@@ -183,24 +183,38 @@ def aggregate(details: list[dict], metrics: list[dict]) -> dict:
 
     return {
         "summary": {
-            "total_pairs":   len(details),
-            "total_valid":   total_valid,
-            "total_failed":  total_fail,
-            "total_yes":     total_yes,
-            "total_harm":    total_harm,
-            "yes_rate":      round(total_yes  / total_valid, 4) if total_valid else 0.0,
-            "harm_rate":     round(total_harm / total_valid, 4) if total_valid else 0.0,
+            "total_pairs": len(details),
+            "total_valid": total_valid,
+            "total_failed": total_fail,
+            "total_yes":  total_yes,
+            "total_harm": total_harm,
+            "yes_rate": round(total_yes  / total_valid, 4) if total_valid else 0.0,
+            "harm_rate": round(total_harm / total_valid, 4) if total_valid else 0.0,
         },
-        "by_metric":          summarize(by_metric),
-        "by_base_scenario":   summarize(by_base_scenario),
-        "by_scenario":        summarize(by_scenario),
-        "details":            details,
+        "by_metric": summarize(by_metric),
+        "by_base_scenario": summarize(by_base_scenario),
+        "by_scenario": summarize(by_scenario),
+        "details": details,
     }
 
 
-# ---------------------------------------------------------------------------
-# Core evaluation coroutines
-# ---------------------------------------------------------------------------
+def _get_model_dirs(conv_base: str) -> list[str]:
+    """
+    Return sorted list of model-name subdirectories inside conv_base.
+    Falls back to [conv_base] itself for backward-compatibility with the
+    old (pre-multi-model) flat layout where .json files sat directly in conv_base.
+    """
+    if not os.path.isdir(conv_base):
+        return []
+    subdirs = sorted(
+        d for d in os.listdir(conv_base)
+        if os.path.isdir(os.path.join(conv_base, d))
+    )
+    if subdirs:
+        return [os.path.join(conv_base, d) for d in subdirs]
+    # Backward compat: no subdirs, treat conv_base itself as the model dir
+    return [conv_base]
+ 
 
 async def evaluate_pair(
     client,
@@ -366,6 +380,7 @@ def aggregate_only(
     config = load_config(config_path)
     test_path = config["paths"]["test_file"]
     results_filename = config["paths"]["results_file"]
+    conv_dir = config["paths"]["conversations_dir"]
 
     benchmark_paths = _resolve_benchmarks(results_root, test_path, benchmark)
 
@@ -376,26 +391,41 @@ def aggregate_only(
 
         bench_dir = os.path.dirname(bench_path)
         bench_name = os.path.basename(bench_dir)
-        results_path = os.path.join(bench_dir, results_filename)
-        det_path = _details_path(bench_dir, results_filename)
-
+        conv_base  = os.path.join(bench_dir, conv_dir)
+ 
         print(f"\n{'='*62}")
         print(f"Benchmark (aggregate-only): {bench_name}")
         print(f"{'='*62}")
 
         with open(bench_path) as f:
             test_data = json.load(f)
-        metrics: list[dict] = test_data.get("metrics", None) or test_data.get("metric")
-
-        details = _load_details(det_path, results_path)
-        print(f"Loaded {len(details)} detail records.")
-
-        results = aggregate(details, metrics)
-        _save_results(results_path, results)
-
-        s = results["summary"]
-        print(f"Yes rate: {s['yes_rate']:.2%}  |  Harm rate: {s['harm_rate']:.2%}")
-        print(f"Results -> {results_path}\n")
+        metrics: list[dict] = test_data.get("metrics") or test_data.get("metric")
+ 
+        model_dirs = _get_model_dirs(conv_base)
+        if not model_dirs:
+            print(f"No model directories found in {conv_base}. Skipping.")
+            continue
+ 
+        for model_dir in model_dirs:
+            model_name   = os.path.basename(model_dir)
+            results_path = os.path.join(model_dir, results_filename)
+            det_path     = _details_path(model_dir, results_filename)
+ 
+            print(f"\nModel: {model_name}")
+ 
+            try:
+                details = _load_details(det_path, results_path)
+            except FileNotFoundError as e:
+                print(f"Skipping — {e}")
+                continue
+ 
+            print(f"Loaded {len(details)} detail records.")
+            results = aggregate(details, metrics)
+            _save_results(results_path, results)
+ 
+            s = results["summary"]
+            print(f"Yes rate: {s['yes_rate']:.2%}  |  Harm rate: {s['harm_rate']:.2%}")
+ 
 
 
 def evaluate(
@@ -422,19 +452,10 @@ def evaluate(
 
         bench_dir = os.path.dirname(bench_path)
         bench_name = os.path.basename(bench_dir)
-        conv_path = os.path.join(bench_dir, conv_dir)
-        results_path = os.path.join(bench_dir, results_filename)
-        det_path  = _details_path(bench_dir, results_filename)
-
-        if os.path.exists(bench_path):
-            warnings.warn(
-                f"'{results_path}' already exists. "
-                "Pass --aggregate to re-aggregate without re-evaluating, "
-                "or delete the file to re-run evaluation from scratch."
-            )
-
-        if not os.path.exists(conv_path):
-            print(f"\nSkipping {bench_name} — conversations dir not found: {conv_path}")
+        conv_base = os.path.join(bench_dir, conv_dir)
+        
+        if not os.path.exists(conv_base):
+            print(f"\nSkipping {bench_name} — conversations dir not found: {conv_base}")
             print("Run simulate.py first.")
             continue
 
@@ -442,80 +463,101 @@ def evaluate(
             test_data = json.load(f)
         metrics: list[dict] = test_data.get("metrics", None) or test_data.get("metric")
 
-        conv_files = sorted(fn for fn in os.listdir(conv_path) if fn.endswith(".json"))
-        if not conv_files:
-            print(f"\nSkipping {bench_name} — no .json files in {conv_path}.")
+        model_dirs = _get_model_dirs(conv_base)
+        if not model_dirs:
+            print(f"\n For {bench_name}, since no model directories in {conv_base}, skipping...")
             continue
-
-        conversations = []
-        for fname in conv_files:
-            with open(os.path.join(conv_path, fname)) as f:
-                conversations.append(json.load(f))
-        
-        pairs: list[tuple[dict, list[dict]]] = [ 
-            (conv, metrics)
-            for conv in conversations
-        ]
-
-        total_api_calls = sum(len(conv["samples"]) for conv, _ in pairs)
-
-        print(f"\n{'='*62}")
-        print(f"Benchmark: {bench_name}")
-        print(f"Evaluator: {model}")
-        print(f"Conversations: {len(conversations)}")
-        print(f"Metrics: {len(metrics)}")
-        print(f"Pairs: {len(pairs)}")
-        print(f"API calls: {total_api_calls}  |  Concurrency: {max_concurrency}")
-        print(f"{'='*62}\n")
-
-        start = time.perf_counter()
-        details, eval_tracker, num_failed = asyncio.run(
-            run_evaluations(pairs, client, model, max_concurrency)
-        )
-        elapsed = time.perf_counter() - start
-
-        _save_details(det_path, details)
-
-        print(f"\nJustifications (yes votes only) {'─'*24}")
-        width = len(str(len(details)))
-        for i, d in enumerate(details, start=1):
-            yes_indices = [idx for idx, v in enumerate(d["results"]) if v == "yes"]
-            print(
-                f"  [{i:>{width}}/{len(details)}] "
-                f"{d['scenario_id']} × {d['metric_id']}: {d['results']}"
+    
+        for model_dir in model_dirs:
+            model_name   = os.path.basename(model_dir)
+            results_path = os.path.join(model_dir, results_filename)
+            det_path     = _details_path(model_dir, results_filename)
+            
+            if os.path.exists(results_path):
+                warnings.warn(
+                    f"'{results_path}' already exists. "
+                    "Pass --aggregate to re-aggregate without re-evaluating, "
+                    "or delete the file to re-run evaluation from scratch."
+                )
+ 
+            conv_files = sorted(
+                fn for fn in os.listdir(model_dir)
+                if fn.endswith(".json") and fn not in {
+                    os.path.basename(results_path),
+                    os.path.basename(det_path),
+                    "cost.json",
+                }
             )
-            for idx in yes_indices:
-                print(f"Justification: {d['justifications'][idx]}")
-
-        results = aggregate(details, metrics)
-        _save_results(results_path, results)
-
-        eval_tracker.write_out_costs(
-            step_name="evaluation",
-            abs_path_file=bench_dir,
-            metadata={
-                "model": model,
-                "num_conversations": len(conversations),
-                "num_metrics": len(metrics),
-                "num_pairs": len(pairs),
-                "total_api_calls": total_api_calls,
-                "concurrency": max_concurrency,
-                "failed_pairs":  num_failed,
-                "elapsed_seconds": round(elapsed, 2),
-            },
-        )
-
-        s = results["summary"]
-        print(f"\n{bench_name} complete {'─'*30}")
-        print(f"Pairs: {len(details)} evaluated, {num_failed} failed")
-        print(f"Yes rate: {s['yes_rate']:.2%}")
-        print(f"Harm rate: {s['harm_rate']:.2%}")
-        print(f"Cost: ${eval_tracker.cost:.6f}")
-        print(f"Tokens: {eval_tracker.input_tokens:,} in  {eval_tracker.output_tokens:,} out")
-        print(f"Wall time: {elapsed:.1f}s")
-        print(f"Details: {det_path}")
-        print(f"Results: {results_path}\n")
-
+            if not conv_files:
+                print(f"\nSkipping {bench_name}/{model_name} — no conversation .json files.")
+                continue
+ 
+            conversations = []
+            for fname in conv_files:
+                with open(os.path.join(model_dir, fname)) as f:
+                    conversations.append(json.load(f))
+ 
+            pairs: list[tuple[dict, list[dict]]] = [(conv, metrics) for conv in conversations]
+            total_api_calls = sum(len(conv["samples"]) for conv, _ in pairs)
+ 
+            print(f"\n{'='*62}")
+            print(f"Benchmark: {bench_name}")
+            print(f"Model: {model_name}")
+            print(f"Evaluator: {model}")
+            print(f"Conversations: {len(conversations)}")
+            print(f"Metrics: {len(metrics)}")
+            print(f"Pairs: {len(pairs)}")
+            print(f"API calls: {total_api_calls}  |  Concurrency: {max_concurrency}")
+            print(f"{'='*62}\n")
+ 
+            start = time.perf_counter()
+            details, eval_tracker, num_failed = asyncio.run(
+                run_evaluations(pairs, client, model, max_concurrency)
+            )
+            elapsed = time.perf_counter() - start
+ 
+            _save_details(det_path, details)
+ 
+            print(f"\nJustifications (yes votes only) {'─'*24}")
+            width = len(str(len(details)))
+            for i, d in enumerate(details, start=1):
+                yes_indices = [idx for idx, v in enumerate(d["results"]) if v == "yes"]
+                print(
+                    f"  [{i:>{width}}/{len(details)}] "
+                    f"{d['scenario_id']} × {d['metric_id']}: {d['results']}"
+                )
+                for idx in yes_indices:
+                    print(f"Justification: {d['justifications'][idx]}")
+ 
+            results = aggregate(details, metrics)
+            _save_results(results_path, results)
+ 
+            eval_tracker.write_out_costs(
+                step_name="evaluation",
+                abs_path_file=model_dir,
+                metadata={
+                    "evaluator_model": model,
+                    "target_model": model_name,
+                    "num_conversations": len(conversations),
+                    "num_metrics": len(metrics),
+                    "num_pairs":len(pairs),
+                    "total_api_calls": total_api_calls,
+                    "concurrency": max_concurrency,
+                    "failed_pairs":  num_failed,
+                    "elapsed_seconds": round(elapsed, 2),
+                },
+            )
+ 
+            s = results["summary"]
+            print(f"\n{bench_name}/{model_name} complete {'─'*30}")
+            print(f"Pairs: {len(details)} evaluated, {num_failed} failed")
+            print(f"Yes rate: {s['yes_rate']:.2%}")
+            print(f"Harm rate: {s['harm_rate']:.2%}")
+            print(f"Cost: ${eval_tracker.cost:.6f}")
+            print(f"Tokens: {eval_tracker.input_tokens:,} in / {eval_tracker.output_tokens:,} out")
+            print(f"Wall time: {elapsed:.1f}s")
+            print(f"Details: {det_path}")
+            print(f"Results: {results_path}\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 3: Evaluate conversations")
