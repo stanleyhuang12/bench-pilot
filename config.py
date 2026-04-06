@@ -35,10 +35,18 @@ def _validate(config: dict) -> None:
     for role in REQUIRED_MODEL_ROLES:
         if role not in config["models"]:
             raise ValueError(f"config.json missing model role: '{role}'")
-        for field in REQUIRED_MODEL_FIELDS:
-            if field not in config["models"][role]:
-                raise ValueError(f"config.json model '{role}' missing field: '{field}'")
-
+        
+        for field in REQUIRED_MODEL_FIELDS: 
+            value  = config["models"][role]
+            if isinstance(value, list): 
+                for v in value: 
+                    for field in REQUIRED_MODEL_FIELDS: 
+                        if field not in v: 
+                            raise ValueError(f"config.json model '{role}' missing field: '{field}")
+            else: 
+                if field not in config["models"][role]: 
+                    raise ValueError(f"config.json model '{role}' missing field: '{field}")
+        
     for field in ["num_scenarios", "turns_per_conversation"]:
         if field not in config["generation"]:
             raise ValueError(f"config.json missing generation field: '{field}'")
