@@ -191,6 +191,7 @@ async def run_conversation(
 
 async def run_many_conversations(
     scenarios: list[dict],
+    num_samples: int, 
     user_client,
     user_model: str,
     target_client,
@@ -204,9 +205,9 @@ async def run_many_conversations(
     """
     sem = asyncio.Semaphore(semaphore)
 
-    async def _run(scenario: dict):
+    async def _run(scenario: dict, sample_idx: int):
         async with sem:
-            return await run_conversation(
+            result = await run_conversation(
                 scenario,
                 user_client,
                 user_model,
@@ -215,9 +216,15 @@ async def run_many_conversations(
                 total_turns,
                 pinpoint,
             )
-
-    return await asyncio.gather(*[_run(s) for s in scenarios], return_exceptions=True)
-
+            return (scenario, sample_idx, result)
+ 
+    tasks = [
+        _run(scenario, sample_idx)
+        for sample_idx in range(num_samples)
+        for scenario in scenarios
+    ]
+    return await asyncio.gather(*tasks, return_exceptions=True)
+ 
 
 
 def _resolve_benchmarks(
@@ -285,52 +292,58 @@ def simulate(
     conv_dir = config["paths"]["conversations_dir"]
     total_turns = config["generation"]["turns_per_conversation"]
 
-    benchmark_paths = _resolve_benchmarks(results_root, test_path, benchmark)
+    benchmark_paths = _resolve_benchmarks(results_root, test_path, benchmark) # results/emotional-dependency/test.json
+    target_models = get_model_name(config, "target") # list[str] for target / i.e. simulation
 
-    for bench in benchmark_paths:
+    for bench in benchmark_paths: # this would look like results/emotional-dependency/test.json
         if not os.path.exists(bench):
-            print(f"Skipping {bench} — file not found. Run generate.py first.")
+            print(f"Skipping {bench} - file not found. Run generate.py first.")
             continue
-
-        bench_dir = os.path.dirname(bench)
-        out_dir = os.path.join(bench_dir, conv_dir) 
-        os.makedirs(out_dir, exist_ok=True)
-
-        bench_name = os.path.basename(bench_dir)
-
+        
+        bench_dir = os.path.dirname(bench) # results/emotional-dependency
+        bench_name = os.path.basename(bench_dir) #emotional-dependency
+        
         with open(bench) as f:
-            test_data = json.load(f)
-
+            test_data = json.load(f) 
+            
         scenarios: list[dict] = test_data["scenarios"]
         n = len(scenarios)
-
+        
         user_client = make_client(config["models"]["user"])
         user_model = get_model_name(config, "user")
-        target_client = make_client(config["models"]["target"])
-        target_model = get_model_name(config, "target")
-
-        print(f"\n{'='*62}")
-        print(f"Benchmark: {bench_name}")
-        print(f"Scenarios: {n}  |  Samples: {num_samples}  |  Concurrency: {concurrent_threads}")
-        print(f"User model: {user_model}")
-        print(f"Target: {target_model}")
-        print(f"Turns: {total_turns}")
-        print(f"Output: {out_dir}")
-        print(f"{'='*62}\n")
-
-        bench_tracker = LiteLLMCostTracker()
-        total_saved = 0
-        total_failed = 0
+        
+        per_bench_tracker = LiteLLMCostTracker()
         bench_start = time.perf_counter()
+        all_saved = 0 
+        all_failed = 0 
 
-        for num in range(1, num_samples + 1):
-            print("="*60)
-            print(f"Sample {num:03} / {num_samples:03} ")
-            print("="*60)
+        for target_cfg, target_model in zip(config["models"]["target"], target_models):
+            ## note that within this scope we are testing each model 
+            out_dir = os.path.join(bench_dir, conv_dir, target_model)  # results/emotional-dependency/conversations/gpt-4o/
+            os.makedirs(out_dir, exist_ok=True)
+            
+            target_client = make_client(target_cfg)
+            total_tasks = num_samples * n  ## this is us multiply the n scenarios and sampling num_samples times (i.e., test retest)
+            
+            print(f"\n{'='*62}")
+            print(f"Benchmark: {bench_name}")
+            print(f"User model: {user_model}")
+            print(f"Testing assistant: {target_model}")
+            print(f"Scenarios: {n}  |  Samples: {num_samples}  |  Concurrency: {concurrent_threads}")
+            print(f"Turns: {total_turns}")
+            print(f"Output: {out_dir}")
+            print(f"{'='*62}\n")
 
-            results = asyncio.run(
+            ## within this scope we are keeping track of costs/models + total saved and fails / models
+            per_model_tracker = LiteLLMCostTracker()
+            model_start = time.perf_counter()
+            total_saved = 0
+            total_failed = 0
+
+            all_outcomes = asyncio.run(
                 run_many_conversations(
                     scenarios=scenarios,
+                    num_samples=num_samples, 
                     user_client=user_client,
                     user_model=user_model,
                     target_client=target_client,
@@ -339,62 +352,67 @@ def simulate(
                     semaphore=concurrent_threads,
                 )
             )
-
-            sample_saved = 0
-            sample_failed = 0
-
-            for i, (scenario, result) in enumerate(zip(scenarios, results), start=1):
-                sid = scenario["id"]
-                title = scenario["title"]
-                prefix = f"  [{i:>{len(str(n))}}/{n}] {sid} — {title}"
-
-                if isinstance(result, Exception):
-                    print(f"{prefix}")
-                    print(f"ERROR: {type(result).__name__}: {result}")
-                    sample_failed += 1
+            
+            for item in all_outcomes:
+                if isinstance(item, Exception):
+                    print(f"  ERROR: {type(item).__name__}: {item}")
+                    total_failed += 1
                     continue
-                conversation, conv_tracker = result
-                bench_tracker.merge(conv_tracker)
-
-                out_path = os.path.join(out_dir, f"{sid}.json")
+ 
+                scenario, sample_idx, (conversation, conv_tracker) = item
+                per_model_tracker.merge(conv_tracker)
+                out_path = os.path.join(out_dir, f"{scenario['id']}.json")
                 _write_conversation(out_path, scenario, conversation)
-                sample_saved += 1
+                total_saved += 1
+ 
+            model_elapsed = time.perf_counter() - model_start
+            
+            print(f"\n{bench_name} / {target_model} complete {'─'*30}")
+            print(f"Conversations : {total_saved} saved, {total_failed} failed")
+            print(f"Cost : ${per_model_tracker.cost:.6f}")
+            print(f"Tokens: {per_model_tracker.input_tokens:,} in / {per_model_tracker.output_tokens:,} out")
+            print(f"Wall time: {model_elapsed:.1f}s")
+            print(f"Output dir: {out_dir}\n")
 
-            total_saved += sample_saved
-            total_failed += sample_failed
-            print(
-                f"Sample #{num:03} done — "
-                f"saved: {sample_saved}, failed: {sample_failed}"
+            per_model_tracker.write_out_costs(
+                step_name="simulation",
+                abs_path_file=out_dir,
+                metadata={
+                    "user_model": user_model,
+                    "target_model": target_model,
+                    "num_scenarios": n,
+                    "num_samples": num_samples,
+                    "total_conversations": total_saved + total_failed,
+                    "saved": total_saved,
+                    "failed": total_failed,
+                    "time": round(model_elapsed, 2),
+                    "total_tasks": total_tasks,
+                    "concurrency": concurrent_threads, 
+                },
             )
+            
+            per_bench_tracker.merge(per_model_tracker)
 
+        all_saved += total_saved
+        all_failed += total_failed 
         bench_elapsed = time.perf_counter() - bench_start
-
-        bench_tracker.write_out_costs(
-            step_name="simulation",
-            abs_path_file=bench_dir,
+        per_bench_tracker.write_out_costs(
+            step_name="simulation", 
+            abs_path_file=bench_dir, 
             metadata={
                 "user_model": user_model,
-                "target_model": target_model,
-                "num_scenarios": n,
-                "num_samples": num_samples,
-                "total_conversations": total_saved + total_failed,
-                "saved": total_saved,
-                "failed": total_failed,
+                "num_target_models": len(target_models),
+                "num_scenarios": n, 
+                "num_samples": num_samples, 
+                "saved": all_saved, 
+                "failed": all_failed,
+                "total_tasks": all_saved + all_failed, 
                 "time": bench_elapsed,
-            },
+                "concurrency": concurrent_threads,
+                
+            }
         )
 
-        print(f"\-{bench_name} complete {'─'*30}")
-        print(f"Conversations: {total_saved} saved, {total_failed} failed")
-        print(f"Cost : ${bench_tracker.cost:.6f}")
-        print(f"Tokens: {bench_tracker.input_tokens:,} in {bench_tracker.output_tokens:,} out")
-        print(f"Wall time : {bench_elapsed:.1f}s")
-        print(f"Output dir: {out_dir}\n")
-
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 2: Simulate conversations")

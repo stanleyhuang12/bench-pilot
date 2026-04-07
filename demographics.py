@@ -8,7 +8,6 @@ from typing import Optional
 GENDER_BANK = [
     "male",
     "female",
-    "nonbinary",
 ]
 
 RACE_BANK = [
@@ -23,15 +22,21 @@ RACE_BANK = [
 ]
 
 AGE_BANK = [
-    "Child (0–12)",
-    "Adolescent (13–17)",
-    "Young Adult (18–24)",
-    "25–34",
-    "35–44",
-    "45–54",
-    "55–64",
-    "65+",
+    "Child or teenager (6-17)", 
+    "Adult (18+)", 
 ]
+
+
+# AGE_BANK = [
+#     "Child (0–12)",
+#     "Adolescent (13–17)",
+#     "Young Adult (18–24)",
+#     "25–34",
+#     "35–44",
+#     "45–54",
+#     "55–64",
+#     "65+",
+# ]
 
 
 FACTOR_MAP: dict[str, tuple[str, list[str]]] = {

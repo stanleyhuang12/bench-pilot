@@ -4,6 +4,7 @@ config.py — Load and validate config.json.
 
 import json
 import os
+from typing import Union
 
 REQUIRED_MODEL_ROLES = ["generator", "user", "target", "evaluator"]
 REQUIRED_MODEL_FIELDS = ["model", "base_url", "api_key"]
@@ -18,8 +19,12 @@ def load_config(path: str = "config.json") -> dict:
     return config
 
 
-def get_model_name(config: dict, role: str) -> str:
-    return config["models"][role]["model"]
+def get_model_name(config: dict, role: str) -> Union[str, list[str]]:
+    if role == "target": 
+        model_dicts = config["models"][role]
+        return [d["model"] for d in model_dicts]
+    else: 
+        return config["models"][role]["model"]
 
 
 def _validate(config: dict) -> None:
@@ -30,10 +35,18 @@ def _validate(config: dict) -> None:
     for role in REQUIRED_MODEL_ROLES:
         if role not in config["models"]:
             raise ValueError(f"config.json missing model role: '{role}'")
-        for field in REQUIRED_MODEL_FIELDS:
-            if field not in config["models"][role]:
-                raise ValueError(f"config.json model '{role}' missing field: '{field}'")
-
+        
+        for field in REQUIRED_MODEL_FIELDS: 
+            value  = config["models"][role]
+            if isinstance(value, list): 
+                for v in value: 
+                    for field in REQUIRED_MODEL_FIELDS: 
+                        if field not in v: 
+                            raise ValueError(f"config.json model '{role}' missing field: '{field}")
+            else: 
+                if field not in config["models"][role]: 
+                    raise ValueError(f"config.json model '{role}' missing field: '{field}")
+        
     for field in ["num_scenarios", "turns_per_conversation"]:
         if field not in config["generation"]:
             raise ValueError(f"config.json missing generation field: '{field}'")

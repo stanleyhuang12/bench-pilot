@@ -14,9 +14,11 @@ import re
 from typing import Any
 import pandas as pd
 
-from client import make_client, chat_json
+from client import make_client, chat_json, LiteLLMCostTracker
 from config import load_config, get_model_name
 from demographics import AGE_BANK, GENDER_BANK, RACE_BANK
+
+import time 
 
 COLUMN_MAP = {
     "Timestamp": "timestamp", 
@@ -88,12 +90,10 @@ Schema:
 
 def _slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
-
-
+ 
 def _clean(val: Any) -> str:
     return "" if pd.isna(val) else str(val).strip()
-
-
+ 
 def _split_examples(raw: str) -> list[str]:
     if not raw:
         return []
@@ -101,8 +101,8 @@ def _split_examples(raw: str) -> list[str]:
     if len(parts) > 1:
         return [p.strip() for p in parts if p.strip()]
     return [p.strip() for p in re.split(r"\n{2,}", raw) if p.strip()]
-
-
+ 
+ 
 def _row_to_llm_input(row: pd.Series) -> dict[str, Any]:
     return { 
         "benchmark_name": row.get("construct_name", ""),
@@ -116,146 +116,173 @@ def _row_to_llm_input(row: pd.Series) -> dict[str, Any]:
         "negative_examples": _split_examples(row.get("neg_examples", "")),
         "judge_prompt": row.get("llm_as_judge_prompt", ""),
     }
-
-
+ 
+ 
 def _validate_and_fix(goal: dict[str, Any]) -> dict[str, Any]:
+    defaults = {
+        "target_population": {},
+    }
+    for key, default in defaults.items():
+        if key not in goal or goal[key] is None:
+            goal[key] = default
+ 
     required = ["benchmark_name", "description", "metadata", "target_population", "scenario", "metric"]
     for key in required:
         if key not in goal:
             raise ValueError(f"Missing '{key}' field in goal.json")
-
+ 
     if not isinstance(goal["metric"], list) or not goal["metric"]:
         raise ValueError("'metric' must be a non-empty list")
-
+ 
     for i, metric in enumerate(goal["metric"], 1):
         metric["id"] = f"metric_{i:03d}"
         metric.setdefault("type", "binary")
         metric.setdefault("applies_to", "all")
         metric.setdefault("examples", [])
-
+ 
     return goal
-
-
-async def _build_goal_with_llm(client, model: str, row: pd.Series) -> dict[str, Any]:
+ 
+ 
+async def _build_goal_with_llm(
+    client, model: str, row: pd.Series
+) -> tuple[dict[str, Any], LiteLLMCostTracker]:
+    """Returns (goal_dict, cost_tracker) — caller is responsible for accumulating costs."""
     payload = _row_to_llm_input(row)
     messages = [
         {"role": "system", "content": GOAL_NORMALIZATION_PROMPT},
         {"role": "user", "content": json.dumps(payload, indent=2)},
     ]
-
-    raw = await chat_json(client, model, messages)
+ 
+    raw, tracker = await chat_json(client, model, messages)
     try:
         goal = json.loads(raw)
     except json.JSONDecodeError as exc:
         raise ValueError(f"Invalid JSON from LLM:\n{raw}") from exc
-
-    return _validate_and_fix(goal)
-
-
-async def _build_goal_with_llm(client, model: str, row: pd.Series) -> dict:
-    payload = _row_to_llm_input(row)
-
-    messages = [
-        {"role": "system", "content": GOAL_NORMALIZATION_PROMPT},
-        {"role": "user", "content": json.dumps(payload, indent=2)},
-    ]
-
-    raw = await chat_json(client, model, messages)
-
-    try:
-        goal = json.loads(raw)
-    except json.JSONDecodeError:
-        raise ValueError(f"Invalid JSON from LLM:\n{raw}")
-
-    return _validate_and_fix(goal)
-
-
-# ---------- main ----------
-
+ 
+    return _validate_and_fix(goal), tracker
+ 
+ 
+ 
 async def ingest(
     csv_path: str,
     results_root: str,
     dry_run: bool,
     benchmark: str | None,
-    row_entry: int, 
+    row_entry: int | None,
 ) -> list[str]:
-
+ 
     if not os.path.exists(csv_path):
         raise FileNotFoundError(csv_path)
-
+ 
     config = load_config("config.json")
     client = make_client(config["models"]["generator"])
     model = get_model_name(config, "generator")
-
+ 
     df = pd.read_csv(csv_path)
     print(df)
-    
-    df = df.iloc[[row_entry], :]
-
-    # rename
+ 
+    if row_entry is not None:
+        df = df.iloc[[row_entry], :]
+ 
     df = df.rename(columns={k: v for k, v in COLUMN_MAP.items() if k in df.columns})
-
+ 
     for col in df.select_dtypes(include="object"):
         df[col] = df[col].apply(_clean)
-
-    # filter
-    if benchmark:
-        df = df[df["construct_name"].str.lower() == benchmark.lower()]
-        if df.empty:
-            raise ValueError(f"No benchmark found: {benchmark}")
-
-    print(f"\nRows: {len(df)}")
-
-    semaphore = asyncio.Semaphore(5)  # limit concurrency
-
+ 
     if "construct_name" not in df.columns:
         raise ValueError("CSV is missing required column: construct_name")
-
+ 
     if benchmark:
         df = df[df["construct_name"].str.lower() == benchmark.lower()]
         if df.empty:
             raise ValueError(f"No benchmark found: {benchmark}")
-
+ 
     print(f"\nRows: {len(df)}")
-
-    client = None
-    model = None
-    if not dry_run:
-        config = load_config("config.json")
-        client = make_client(config["models"]["generator"])
-        model = get_model_name(config, "generator")
-
+ 
+    if dry_run:
+        for _, row in df.iterrows():
+            name = row.get("construct_name")
+            if name:
+                slug = _slugify(name)
+                path = os.path.join(results_root, slug, "goal.json")
+                print(f"[dry-run] would write: {path}")
+        return []
+ 
     semaphore = asyncio.Semaphore(5)
-
+ 
+    # Shared cost accumulator — updated inside process_row via a lock-free
+    # append pattern (asyncio is single-threaded, so no lock needed).
+    per_row_trackers: list[LiteLLMCostTracker] = []
+ 
     async def process_row(row: pd.Series) -> str | None:
         async with semaphore:
             name = row.get("construct_name")
             if not name:
                 return None
-
+ 
             slug = _slugify(name)
-            path = os.path.join(results_root, slug, "goal.json")
-
-            if dry_run:
-                print(f"[DRY] {path}")
-                return path
-
-            goal = await _build_goal_with_llm(client, model, row)
-            os.makedirs(os.path.dirname(path), exist_ok=True)
+            out_dir = os.path.join(results_root, slug)
+            path = os.path.join(out_dir, "goal.json")
+ 
+            goal, tracker = await _build_goal_with_llm(client, model, row)
+            per_row_trackers.append(tracker)
+ 
+            os.makedirs(out_dir, exist_ok=True)
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(goal, f, indent=2)
-
-            print(f"[✓] {slug}")
+ 
+            # Write a per-benchmark cost.json so each benchmark folder is self-contained
+            tracker.write_out_costs(
+                step_name="goal_normalization",
+                abs_path_file=out_dir,
+                metadata={
+                    "model": model,
+                    "benchmark": slug,
+                },
+            )
+ 
+            print(f"  [✓] {slug}  — ${tracker.cost:.6f}  "
+                  f"({tracker.input_tokens:,} in / {tracker.output_tokens:,} out)")
             return path
-
+ 
+    start = time.perf_counter()
     tasks = [process_row(row) for _, row in df.iterrows()]
-    results = await asyncio.gather(*tasks)
-
-    written = [r for r in results if r]
-    print(f"\nDone: {len(written)} files")
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    elapsed = time.perf_counter() - start
+ 
+    written = []
+    failed = 0
+    for r in results:
+        if isinstance(r, Exception):
+            print(f"  ERROR: {type(r).__name__}: {r}")
+            failed += 1
+        elif r:
+            written.append(r)
+ 
+    # Roll up all per-row trackers into one total and write to results_root/cost.json
+    total_tracker = LiteLLMCostTracker()
+    for t in per_row_trackers:
+        total_tracker.merge(t)
+ 
+    total_tracker.write_out_costs(
+        step_name="goal_normalization",
+        abs_path_file=results_root,
+        metadata={
+            "model": model,
+            "total_rows": len(df),
+            "written": len(written),
+            "failed": failed,
+            "elapsed_seconds": round(elapsed, 2),
+        },
+    )
+ 
+    print(f"\nDone: {len(written)} written, {failed} failed")
+    print(f"Total cost : ${total_tracker.cost:.6f}")
+    print(f"Tokens     : {total_tracker.input_tokens:,} in / {total_tracker.output_tokens:,} out")
+    print(f"Wall time  : {elapsed:.1f}s")
     return written
-
-
+ 
+ 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--csv", default="benchmark_submission.csv")
@@ -263,15 +290,15 @@ if __name__ == "__main__":
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--benchmark", default=None)
     parser.add_argument("--row-entry", type=int, required=False)
-
+ 
     args = parser.parse_args()
-
+ 
     asyncio.run(
         ingest(
             csv_path=args.csv,
             results_root=args.results_root,
             dry_run=args.dry_run,
             benchmark=args.benchmark,
-            row_entry=args.row_entry, 
+            row_entry=args.row_entry,
         )
     )
