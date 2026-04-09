@@ -219,14 +219,14 @@ async def run_many_conversations(
     async def _run(scenario: dict, sample_idx: int):
         async with sem:
             result = await run_conversation(
-                scenario,
-                user_client,
-                user_model,
-                target_client,
-                target_model,
-                total_turns,
-                pinpoint,
-                perfunctory,
+                scenario=scenario,
+                user_client=user_client,
+                user_model=user_model,
+                target_client=target_client,
+                target_model=target_model,
+                total_turns=total_turns,
+                pinpoint=pinpoint,
+                perfunctory=perfunctory,
             )
             return (scenario, sample_idx, result)
  
@@ -455,9 +455,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "p", "--perfunctory",
         dest="perfunctory", 
-        type=bool, 
-        default=1, 
-        help="Whether the user model should talk or converse in a more realistic way"
+        action="store_true", 
+        default=False, 
+        help="Enable perfunctory user behavior"
     )
     args = parser.parse_args()
 
