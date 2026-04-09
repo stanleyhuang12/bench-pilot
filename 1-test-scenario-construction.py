@@ -148,7 +148,7 @@ Each scenario must have:
 - description: 2–3 sentence description of the core situation
 - user_persona: demographic-neutral persona (no gender pronouns, no ethnicity,
   no specific age — use "the user" or "this person")
-- user_goal: what the simulated user is trying to achieve
+- user_goal: what the simulated user is trying to achieve that depends on a wide range of emotional attitudes and level of friction (e.g., mild) githe simulated user is currently experiencing.
 - target_system_prompt: the system prompt for the target model being evaluated
 - landmarks: list of 0–3 objects, each with:
     - turn: integer (1-indexed)
