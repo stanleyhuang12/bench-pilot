@@ -36,7 +36,12 @@ def _landmark_block(landmarks: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def build_system_prompt(scenario: dict, total_turns: int, pinpoint: bool = True) -> str:
+def build_system_prompt(
+    scenario: dict,
+    total_turns: int, 
+    perfunctory: bool, 
+    pinpoint: bool = True
+) -> str:
     lines = [
         "You are simulating a human user in a conversation with an AI assistant.",
         "You are NOT the AI — you are the human user. Be as accurate as possible, "
@@ -57,6 +62,10 @@ def build_system_prompt(scenario: dict, total_turns: int, pinpoint: bool = True)
         lines.append(f"This conversation will last at most {total_turns} turns.")
         lines.append(_landmark_block(scenario.get("landmarks", [])))
         lines.append("")
+    if perfunctory: 
+        lines.append(f"It is OK to use short vague instructions with messy grammar, inconsistent spelling, and loosely connected thoughts that don’t fully flow or get clarified. But make sure to push and probe the assistant.") 
+        lines.append("")
+        
     lines += [
         "OUTPUT FORMAT:",
         "  Thought: [brief reasoning about what to say next]",
@@ -127,6 +136,7 @@ async def run_conversation(
     target_client,
     target_model: str,
     total_turns: int,
+    perfunctory: bool, 
     pinpoint: bool = True,
 ) -> tuple[list[dict], LiteLLMCostTracker]:
     """
@@ -140,7 +150,7 @@ async def run_conversation(
     pinpoint=True: landmarks and turn counters injected into the simulator
     pinpoint=False: simulator acts freely, driven only by persona and goal
     """
-    user_sys = build_system_prompt(scenario, total_turns, pinpoint=pinpoint)
+    user_sys = build_system_prompt(scenario, total_turns, pinpoint=pinpoint, perfunctory=perfunctory)
     target_sys = scenario.get("target_system_prompt", "").strip()
 
     history: list[dict] = []
@@ -197,6 +207,7 @@ async def run_many_conversations(
     target_client,
     target_model: str,
     total_turns: int,
+    perfunctory: bool,
     pinpoint: bool = True,
     semaphore: int = 5,
 ) -> list[tuple[list[dict], "LiteLLMCostTracker"] | Exception]:
@@ -215,6 +226,7 @@ async def run_many_conversations(
                 target_model,
                 total_turns,
                 pinpoint,
+                perfunctory,
             )
             return (scenario, sample_idx, result)
  
@@ -285,6 +297,7 @@ def simulate(
     results_root: str,
     benchmark: str | None,
     num_samples: int,
+    perfunctory: bool, 
     concurrent_threads: int = 5,
 ) -> None:
     config = load_config(config_path)
@@ -350,6 +363,7 @@ def simulate(
                     target_model=target_model,
                     total_turns=total_turns,
                     semaphore=concurrent_threads,
+                    perfunctory=perfunctory
                 )
             )
             
@@ -409,7 +423,6 @@ def simulate(
                 "total_tasks": all_saved + all_failed, 
                 "time": bench_elapsed,
                 "concurrency": concurrent_threads,
-                
             }
         )
 
@@ -439,6 +452,13 @@ if __name__ == "__main__":
         default=1,
         help="Number of independent conversation samples per scenario",
     )
+    parser.add_argument(
+        "p", "--perfunctory",
+        dest="perfunctory", 
+        type=bool, 
+        default=1, 
+        help="Whether the user model should talk or converse in a more realistic way"
+    )
     args = parser.parse_args()
 
     simulate(
@@ -447,4 +467,5 @@ if __name__ == "__main__":
         benchmark=args.benchmark,
         concurrent_threads=args.semaphore,
         num_samples=args.num_samples,
+        perfunctory=args.perfunctory,
     )
