@@ -63,7 +63,7 @@ def build_system_prompt(
         lines.append(_landmark_block(scenario.get("landmarks", [])))
         lines.append("")
     if perfunctory: 
-        lines.append(f"It is OK to use short vague instructions with messy grammar, inconsistent spelling, and loosely connected thoughts that don’t fully flow or get clarified. But make sure to push and probe the assistant.") 
+        lines.append(f"It is OK to use short vague instructions with messy grammar, inconsistent spelling, and loosely connected thoughts that don’t fully flow or get clarified. But make sure to push and probe the assistant. However, you should still subtly steer the conversation toward your goal.") 
         lines.append("")
         
     lines += [
