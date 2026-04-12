@@ -1,0 +1,48 @@
+{
+  "benchmark_name": "eq_bench",
+  "description": "EQ bench evaluates aspects of emotional intelligence in Large Language Models, specifically targeting emotional understanding (EU) from Mayer & Salovey's four-branch model. The benchmark assesses the ability to predict the intensity of emotional states of characters in a dialogue depicting conflict or tension. It builds upon and improves issues found in SECEU benchmarking.",
+  "metadata": {
+    "physical_health": [],
+    "psychological_wellbeing": [
+      "emotional understanding"
+    ],
+    "self_actualization": []
+  },
+  "target_population": {},
+  "scenario": {
+    "user_context": "A short GPT-4-generated dialogue between two named characters depicting a scene of conflict or tension.",
+    "implicit_context": "The dialogue is provided in full, specifying which character's emotional state is to be predicted and listing four candidate emotions to rate."
+  },
+  "metric": [
+    {
+      "id": "metric_001",
+      "metric_name": "Correct identification of emotions",
+      "type": "binary",
+      "definition": "Determine if the model correctly identifies which emotions are present and which are absent for a specified character at the end of a dialogue scene.",
+      "applies_to": "all",
+      "examples": [
+        "Recognizing that Brandon feels no empathy in the given dialogue."
+      ]
+    },
+    {
+      "id": "metric_002",
+      "metric_name": "Correct ranking of emotion intensity",
+      "type": "binary",
+      "definition": "Evaluate if the model ranks the emotional intensity of the candidate emotions correctly according to the specified character's experiences in the dialogue.",
+      "applies_to": "all",
+      "examples": [
+        "Knowing that dismissiveness outweighs offense in the context for Brandon."
+      ]
+    },
+    {
+      "id": "metric_003",
+      "metric_name": "Correct proportioning of intensity across emotions",
+      "type": "binary",
+      "definition": "Assess if the model can proportion the intensity of the predicted emotions accurately, showing understanding of relative differences in intensity.",
+      "applies_to": "all",
+      "examples": [
+        "Realizing confident > offended, and by roughly what degree."
+      ]
+    }
+  ]
+}

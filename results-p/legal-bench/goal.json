@@ -1,0 +1,75 @@
+{
+  "benchmark_name": "legal_bench",
+  "description": "LEGAL BENCH is a collaboratively constructed legal reasoning benchmark consisting of 162 tasks covering six different types of legal reasoning: issue-spotting, rule-recall, rule-application, rule-conclusion, interpretation, and rhetorical-understanding. These tasks were designed by legal professionals to measure practically useful legal reasoning capabilities and skills that lawyers find interesting.",
+  "metadata": {
+    "physical_health": [],
+    "psychological_wellbeing": [],
+    "self_actualization": [
+      "Development of legal reasoning skills",
+      "Understanding of LLM capabilities in legal contexts",
+      "Evaluation of LLM's integration into legal workflows"
+    ]
+  },
+  "target_population": {
+    "age": [],
+    "gender": [],
+    "race": []
+  },
+  "scenario": {
+    "user_context": "The model is provided with a combination of legal fact patterns, relevant legal rules or statutes (in some prompts), in-context demonstrations (zero to eight labeled examples), and task-specific instructions.",
+    "implicit_context": "The benchmark assesses legal reasoning abilities across a diverse set of tasks and contexts."
+  },
+  "metric": [
+    {
+      "id": "metric_001",
+      "metric_name": "Exact Match Classification Accuracy",
+      "type": "binary",
+      "definition": "Measures the accuracy of the model in classification tasks using an exact-match approach, accounting for class imbalance.",
+      "applies_to": "all",
+      "examples": [
+        "Classify if a given scenario violates the Telemarketing Sales Rule"
+      ]
+    },
+    {
+      "id": "metric_002",
+      "metric_name": "F1 Score for Multi-output Tasks",
+      "type": "binary",
+      "definition": "Evaluates multi-output tasks (e.g., successor_liability) based on precision and recall using the F1 metric.",
+      "applies_to": "all",
+      "examples": [
+        "Evaluate the liability of successors in a corporate merger scenario"
+      ]
+    },
+    {
+      "id": "metric_003",
+      "metric_name": "Correctness of Rule Application",
+      "type": "binary",
+      "definition": "Assesses whether the model correctly applies legal rules without misstating facts, outcomes, or rules, and without logical errors.",
+      "applies_to": "all",
+      "examples": [
+        "Determine the correctness of a legal conclusion based on provided facts and legal rules"
+      ]
+    },
+    {
+      "id": "metric_004",
+      "metric_name": "Analysis and Inference Quality",
+      "type": "binary",
+      "definition": "Evaluates the model's ability to make necessary inferences and connect evidence to legal conclusions, ensuring thorough analysis beyond rule restatement.",
+      "applies_to": "all",
+      "examples": [
+        "Analyze the implication of hearsay evidence in a given case"
+      ]
+    },
+    {
+      "id": "metric_005",
+      "metric_name": "Task-specific Metric for Generation Tasks",
+      "type": "binary",
+      "definition": "Uses specific evaluation methods for generation tasks: manual evaluation against an answer key, accuracy with stemming normalization, accuracy within 10% of the correct amount, and case-name containment checks.",
+      "applies_to": "all",
+      "examples": [
+        "Assess the accuracy of a generated legal definition",
+        "Check case-name containment in generated citations"
+      ]
+    }
+  ]
+}

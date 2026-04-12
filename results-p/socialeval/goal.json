@@ -1,0 +1,63 @@
+{
+  "benchmark_name": "SocialEval",
+  "description": "SOCIALEVAL evaluates Social Intelligence (SI) in LLMs, focusing on the ability to understand and manage human behaviors for wise social interactions. The benchmark draws on social psychology theories like script theory and interdependence theory, using a bilingual SI assessment via outcome-oriented goal achievement and process-oriented interpersonal ability evaluation. It addresses limitations of existing benchmarks by considering sequential social dynamics and detailed interactive processes.",
+  "metadata": {
+    "physical_health": [],
+    "psychological_wellbeing": [
+      "interpersonal relationships",
+      "conflict resolution",
+      "trust-building",
+      "collaboration"
+    ],
+    "self_actualization": [
+      "goal achievement",
+      "social skill adaptation"
+    ]
+  },
+  "target_population": {
+    "age": [
+      "Child or teenager (6-17)",
+      "Adult (18+)"
+    ],
+    "gender": [
+      "male",
+      "female"
+    ],
+    "race": [
+      "American Indian or Alaska Native",
+      "Asian",
+      "Black or African American",
+      "Hispanic or Latino",
+      "Middle Eastern or North African",
+      "Native Hawaiian or Pacific Islander",
+      "White",
+      "Multiracial"
+    ]
+  },
+  "scenario": {
+    "user_context": "The model is given the protagonist's public profile, private profile, social goal, other characters' profiles, and the dialogue context up to the current episode transition. The model selects options based on achieving the social goal or demonstrating interpersonal abilities.",
+    "implicit_context": "The model cannot directly observe plot endings, behavioral polarity annotations, or private profiles of non-protagonist characters."
+  },
+  "metric": [
+    {
+      "id": "metric_001",
+      "metric_name": "Goal Achievement Ratio",
+      "type": "binary",
+      "definition": "Whether the model's selected candidate utterance leads to a successful plot ending, achieving the protagonist's social goal.",
+      "applies_to": "all",
+      "examples": [
+        "(GAE task) 'What should Ming Qin say to safely escape the bullying, at least temporarily?' with four candidate utterances."
+      ]
+    },
+    {
+      "id": "metric_002",
+      "metric_name": "Ability Selection Accuracy",
+      "type": "binary",
+      "definition": "Whether the model selects the correct candidate utterance that reflects the intended interpersonal ability as determined by expert annotation.",
+      "applies_to": "all",
+      "examples": [
+        "(IAE task) 'What should Simon say to make Xiao Yisen feel understood and let down his guard?' with four candidate utterances."
+      ]
+    }
+  ]
+}
