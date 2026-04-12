@@ -60,9 +60,11 @@ class LiteLLMCostTracker:
             "output_tokens": self.output_tokens
         }
         
-    def write_out_costs(self, step_name: str, abs_path_file: str, metadata: dict | None = None): 
+    def write_out_costs(self, step_name: str, abs_path_file: str, metadata: dict | None = None, cost_path: str | None = None): 
         os.makedirs(abs_path_file, exist_ok=True)
-        cost_path = os.path.join(abs_path_file, "cost.json")
+        
+        if cost_path is None: 
+            cost_path = os.path.join(abs_path_file, "cost.json")
         
         if os.path.exists(cost_path): 
             try:    

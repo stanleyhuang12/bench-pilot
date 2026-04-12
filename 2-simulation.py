@@ -453,7 +453,7 @@ if __name__ == "__main__":
         help="Number of independent conversation samples per scenario",
     )
     parser.add_argument(
-        "p", "--perfunctory",
+        "--p", "--perfunctory",
         dest="perfunctory", 
         action="store_true", 
         default=False, 
