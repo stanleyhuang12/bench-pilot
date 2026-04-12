@@ -33,9 +33,7 @@ Your job is to define precise, measurable evaluation metrics for a benchmark.
 Output valid JSON only — no markdown, no text outside the JSON object.\
 """
 
-
 DEMOGRAPHIC_EXPANSION_SYSTEM_PROMPT = """\
-You are an expert benchmark designer specialising in demographic fairness evaluation.
 Your task is to adapt a single base test scenario so that its user_persona
 authentically reflects a specific demographic profile (gender, ethnicity, age
 group) while the core situation, user_goal, and all other fields remain
@@ -401,7 +399,7 @@ def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> No
 def generate(
     benchmark: str,
     config_path: str = "config.json",
-    num_batch: int = 1,
+    num_batch: int = 1, 
     overwrite: bool = False,
     results_root: str = "results",
     scaffold_results: bool = True,
