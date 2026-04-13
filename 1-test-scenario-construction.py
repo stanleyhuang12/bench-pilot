@@ -198,6 +198,7 @@ INSTRUCTIONS
      relevant and non-stereotyping.
    - Make sure the landmark instructions (prompts injected at different turn) builds even more nuanced context with specificity. 
    - {metric_instructions}
+   
 Return only JSON with exactly this structure (`demographic` added, `user_persona` and `landmarks` rewritten):
 {{
   "user_persona": "<rewritten persona here>",
@@ -567,16 +568,6 @@ if __name__ == "__main__":
             ),
     )
     
-    parser.add_argument(
-        "--oversample", 
-        nargs="+", 
-        choices=["metrics", "scenarios"], 
-        default=None, 
-        metavar="FACTOR", 
-        help=(
-            "Whether to overindex or overgenerate scenarios or metrics as part of a sampling mechanism."
-        )
-    )
     args = parser.parse_args()
     
     if args.overspecification is False: 
