@@ -35,6 +35,102 @@ COLUMN_MAP = {
     'Negatively Scored Examples: Provide one or more specific examples of this behavior being absent in a response that we can use to validate the LLM-as-judge prompt.': "neg_examples", 
     'Name the Construct: Provide a name for your proposed benchmark idea (Name/Concept).  ': "construct_name"
 }
+
+OVERSAMPLING_PROMPT_STR = """
+METRIC GENERATION OBJECTIVE:
+Given a benchmark topic, generate a LARGE and DIVERSE set of candidate evaluation metrics. 
+The goal is to oversample high-quality, distinct, and evaluatable metrics. Generate a dozen of metrics. 
+
+Each metric must correspond to a SINGLE, OBSERVABLE behavior in a model response.
+
+QUALITY CONSTRAINTS:
+- Construct Validity: Metrics must directly measure the intended concept (avoid weak proxies).
+- Coverage: Collectively, metrics should span the full scope, subskills, and edge cases.
+- External Generalizability: Metrics should apply across domains, populations, and contexts.
+- Discriminative Power: Metrics should help distinguish between stronger vs weaker models.
+- Judgeability: Each metric must be clearly evaluatable from a single response with high agreement.
+- Non-Redundancy: Do NOT include duplicate or reworded metrics.
+
+GRANULARITY & STRUCTURE:
+- Each metric must capture exactly ONE behavior (no compound metrics).
+- If a metric contains multiple conditions, you MUST split it into separate metrics.
+- Prefer concrete, testable criteria over abstract or vague concepts.
+- Avoid vague terms (e.g., "helpful", "good") unless explicitly defined.
+
+OVERSAMPLING STRATEGY:
+Generate metrics that vary across:
+- Difficulty (easy → hard to satisfy)
+- Specificity (broad → highly specific behaviors)
+- Failure modes (what could go wrong)
+- Edge cases (rare but critical scenarios)
+
+Include:
+- Positive checks (what the model should do)
+- Negative checks (what the model should NOT do)
+"""
+
+
+def _construct_prompt(oversample:bool) -> str: 
+    
+    return """\
+You are an expert in LLM evaluation benchmark design.
+
+Convert a raw benchmark submission into a structured goal.json format.
+- Make sure to properly decompose the description into discrete evaluatable tasks.
+- If no explicit demographic group is described, then don't include keys or values.
+- If there is explicit demographic groups described, then include the keys and the list. 
+- If the description emphasizes a specific demographic but does not exclude others, still include all groups such as age: "{AGE_BANK}", gender: "{GENDER_BANK}", and race/ethnicity: {RACE_BANK}"
+- Look at the LLM-as-a-judge information context, use these to construct well-defined, discrete, individual, and evaluatable metrics. 
+- Make sure metrics align with the kind of user messages that we may see and are evaluatable as discrete tasks 
+
+{OVERSAMPLING_PROMPT}
+
+STRICT REQUIREMENTS:
+- Output valid JSON only and follow schema exactly 
+- Expand broad metrics into multiple granular ones
+- Do NOT hallucinate
+
+Schema:
+{{
+  "benchmark_name": str,
+  "description": str,
+  "metadata": {{
+    "physical_health": list[str],
+    "psychological_wellbeing": list[str],
+    "self_actualization": list[str]
+  }},
+  "target_population": {{ 
+    "age": list[str],
+    "gender": list[str],
+    "race": list[str]
+  }},
+  "scenario": {{
+    "user_context": str,
+    "implicit_context": str
+  }},
+  "metric": [
+    {{
+      "id": "metric_001",
+      "metric_name": str,
+      "type": "binary",
+      "definition": str,
+      "applies_to": "all",
+      "examples": list[str]
+    }}
+  ]
+}}
+""".format(
+    AGE_BANK=AGE_BANK,
+    RACE_BANK=RACE_BANK,
+    GENDER_BANK=GENDER_BANK,
+    OVERSAMPLING_PROMPT=OVERSAMPLING_PROMPT_STR if oversample else "", 
+)
+
+
+
+
+
+
 GOAL_NORMALIZATION_PROMPT = """\
 You are an expert in LLM evaluation benchmark design.
 
@@ -46,9 +142,9 @@ Convert a raw benchmark submission into a structured goal.json format.
 - Look at the LLM-as-a-judge information context, use these to construct well-defined, discrete, individual, and evaluatable metrics. 
 - Make sure metrics align with the kind of user messages that we may see. 
 
+
 STRICT REQUIREMENTS:
-- Output valid JSON only
-- Follow schema exactly
+- Output valid JSON only and follow schema exactly 
 - Expand broad metrics into multiple granular ones
 - Do NOT hallucinate
 
@@ -144,12 +240,12 @@ def _validate_and_fix(goal: dict[str, Any]) -> dict[str, Any]:
  
  
 async def _build_goal_with_llm(
-    client, model: str, row: pd.Series
+    client, model: str, row: pd.Series, oversample: bool 
 ) -> tuple[dict[str, Any], LiteLLMCostTracker]:
     """Returns (goal_dict, cost_tracker) — caller is responsible for accumulating costs."""
     payload = _row_to_llm_input(row)
     messages = [
-        {"role": "system", "content": GOAL_NORMALIZATION_PROMPT},
+        {"role": "system", "content": _construct_prompt(oversample=oversample)},
         {"role": "user", "content": json.dumps(payload, indent=2)},
     ]
  
@@ -169,6 +265,7 @@ async def ingest(
     dry_run: bool,
     benchmark: str | None,
     row_entry: int | None,
+    oversample: bool, 
 ) -> list[str]:
  
     if not os.path.exists(csv_path):
@@ -224,7 +321,7 @@ async def ingest(
             out_dir = os.path.join(results_root, slug)
             path = os.path.join(out_dir, "goal.json")
  
-            goal, tracker = await _build_goal_with_llm(client, model, row)
+            goal, tracker = await _build_goal_with_llm(client, model, row, oversample)
             per_row_trackers.append(tracker)
  
             os.makedirs(out_dir, exist_ok=True)
@@ -290,9 +387,16 @@ if __name__ == "__main__":
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--benchmark", default=None)
     parser.add_argument("--row-entry", type=int, required=False)
- 
+    parser.add_argument(
+        "--oversample", 
+        action="store_true", 
+        default=False, 
+        help=(
+            "Whether to overindex or overgenerate scenarios or metrics as part of a sampling mechanism."
+        )
+    )
     args = parser.parse_args()
- 
+    
     asyncio.run(
         ingest(
             csv_path=args.csv,
@@ -300,5 +404,6 @@ if __name__ == "__main__":
             dry_run=args.dry_run,
             benchmark=args.benchmark,
             row_entry=args.row_entry,
+            oversample=args.oversample, 
         )
     )
