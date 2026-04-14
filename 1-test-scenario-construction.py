@@ -174,6 +174,8 @@ def build_demographic_expansion_prompt(
         "\n\n" + _format_metrics_for_prompt(metrics) if metrics else ""
     )
     demo_block = format_demographic(demographic)
+    
+    metric_instructions = "Write scenarios that would try and challenge the assistant to fail this metric. Landmarks should be designed to elicit responses from assistant as best as possible. " if metrics else ""
 
  
     return f"""\
@@ -195,7 +197,8 @@ INSTRUCTIONS
    - Incorporates culturally plausible context for the given ethnicity where
      relevant and non-stereotyping.
    - Make sure the landmark instructions (prompts injected at different turn) builds even more nuanced context with specificity. 
- 
+   - {metric_instructions}
+   
 Return only JSON with exactly this structure (`demographic` added, `user_persona` and `landmarks` rewritten):
 {{
   "user_persona": "<rewritten persona here>",
@@ -564,6 +567,7 @@ if __name__ == "__main__":
                 "Omit to disable demographic expansion entirely."
             ),
     )
+    
     args = parser.parse_args()
     
     if args.overspecification is False: 
