@@ -1,47 +1,137 @@
 {
   "benchmark_name": "eq_bench",
-  "description": "EQ bench evaluates aspects of emotional intelligence in Large Language Models, specifically targeting emotional understanding (EU) from Mayer & Salovey's four-branch model. The benchmark assesses the ability to predict the intensity of emotional states of characters in a dialogue depicting conflict or tension. It builds upon and improves issues found in SECEU benchmarking.",
+  "description": "EQ bench evaluates aspects of emotional intelligence in Large Language Models, particularly focusing on Emotional Understanding (EU). EU is the ability to comprehend and interpret complex emotions and their meanings in social contexts. The benchmark assesses models by asking them to predict the intensity of emotional states of characters in a dialogue depicting a scene of conflict or tension.",
   "metadata": {
     "physical_health": [],
     "psychological_wellbeing": [
-      "emotional understanding"
+      "Emotional Understanding"
     ],
     "self_actualization": []
   },
   "target_population": {},
   "scenario": {
-    "user_context": "A short GPT-4-generated dialogue between two named characters depicting a scene of conflict or tension.",
-    "implicit_context": "The dialogue is provided in full, specifying which character's emotional state is to be predicted and listing four candidate emotions to rate."
+    "user_context": "A short GPT-4-generated dialogue between two named characters depicting a scene of conflict or tension. The dialogue is provided in full, followed by a specification of which character's emotional state is to be predicted and a list of four candidate emotions to rate.",
+    "implicit_context": ""
   },
   "metric": [
     {
       "id": "metric_001",
-      "metric_name": "Correct identification of emotions",
+      "metric_name": "Correct Emotion Presence Identification",
       "type": "binary",
-      "definition": "Determine if the model correctly identifies which emotions are present and which are absent for a specified character at the end of a dialogue scene.",
+      "definition": "Evaluate if the model accurately identifies which emotions are present or absent in the character at the end of the dialogue.",
       "applies_to": "all",
       "examples": [
-        "Recognizing that Brandon feels no empathy in the given dialogue."
+        "Model correctly identifies that the character feels no empathy in the given scene."
       ]
     },
     {
       "id": "metric_002",
-      "metric_name": "Correct ranking of emotion intensity",
+      "metric_name": "Correct Emotion Absence Identification",
       "type": "binary",
-      "definition": "Evaluate if the model ranks the emotional intensity of the candidate emotions correctly according to the specified character's experiences in the dialogue.",
+      "definition": "Evaluate if the model accurately identifies which emotions are absent in the character at the end of the dialogue.",
       "applies_to": "all",
       "examples": [
-        "Knowing that dismissiveness outweighs offense in the context for Brandon."
+        "Model correctly identifies that the character does not feel empathy in the given scene."
       ]
     },
     {
       "id": "metric_003",
-      "metric_name": "Correct proportioning of intensity across emotions",
+      "metric_name": "Correct Emotion Intensity Ranking",
       "type": "binary",
-      "definition": "Assess if the model can proportion the intensity of the predicted emotions accurately, showing understanding of relative differences in intensity.",
+      "definition": "Evaluate if the model correctly ranks the emotions' intensities for the character in the context of the dialogue.",
       "applies_to": "all",
       "examples": [
-        "Realizing confident > offended, and by roughly what degree."
+        "Model correctly ranks dismissiveness as more intense than offense."
+      ]
+    },
+    {
+      "id": "metric_004",
+      "metric_name": "Relative Proportioning of Emotions",
+      "type": "binary",
+      "definition": "Evaluate if the model accurately proportions the intensity of emotions across the four candidate emotions.",
+      "applies_to": "all",
+      "examples": [
+        "Model identifies that confidence is significantly higher than offense by approximately 2-fold."
+      ]
+    },
+    {
+      "id": "metric_005",
+      "metric_name": "Accurate High Intensity Detection",
+      "type": "binary",
+      "definition": "Evaluate if the model accurately detects emotions that are of high intensity (score of 8-10) for the character.",
+      "applies_to": "all",
+      "examples": [
+        "Model assigns a score of 9 to the most intense emotion and accurately captures high emotional state."
+      ]
+    },
+    {
+      "id": "metric_006",
+      "metric_name": "Low Intensity Emotion Detection",
+      "type": "binary",
+      "definition": "Evaluate if the model accurately assigns low scores (0-3) to emotions that are least intense or absent.",
+      "applies_to": "all",
+      "examples": [
+        "Model gives a score of 1 to empathy, correctly identifying its absence."
+      ]
+    },
+    {
+      "id": "metric_007",
+      "metric_name": "Moderate Intensity Differentiation",
+      "type": "binary",
+      "definition": "Evaluate if the model distinguishes between emotions of moderate intensity (scores of 4-7).",
+      "applies_to": "all",
+      "examples": [
+        "Model assigns moderate scores to emotions to reflect their nuanced expression."
+      ]
+    },
+    {
+      "id": "metric_008",
+      "metric_name": "Emotion Intensity Prediction Accuracy",
+      "type": "binary",
+      "definition": "Evaluate if the model accurately predicts the specific intensity score for each of the four candidate emotions.",
+      "applies_to": "all",
+      "examples": [
+        "Model predicts exact values for dismissiveness, offense, confidence, and empathy according to character's emotional response."
+      ]
+    },
+    {
+      "id": "metric_009",
+      "metric_name": "Emotion Balance Understanding",
+      "type": "binary",
+      "definition": "Evaluate if the model understands the balance of emotional states, ensuring that the scores for emotions reflect a realistic portrayal of combined emotional states.",
+      "applies_to": "all",
+      "examples": [
+        "Model scores correctly mirror the balance between conflicting emotions, without overemphasizing any single emotion."
+      ]
+    },
+    {
+      "id": "metric_010",
+      "metric_name": "Edge Case Handling",
+      "type": "binary",
+      "definition": "Evaluate if the model appropriately handles edge cases where emotions are not overtly expressed but implied through context.",
+      "applies_to": "all",
+      "examples": [
+        "In a subtly emotional dialogue, model identifies latent anger not explicitly mentioned."
+      ]
+    },
+    {
+      "id": "metric_011",
+      "metric_name": "Contextual Emotional Understanding",
+      "type": "binary",
+      "definition": "Evaluate if the model accurately uses contextual information from the dialogue to inform its emotion predictions.",
+      "applies_to": "all",
+      "examples": [
+        "Model uses the context of critique in the dialogue to predict a higher score for dismissiveness."
+      ]
+    },
+    {
+      "id": "metric_012",
+      "metric_name": "Evaluation Consistency",
+      "type": "binary",
+      "definition": "Evaluate if the model provides consistent reasoning in its critiqued answer relative to its initial scoring.",
+      "applies_to": "all",
+      "examples": [
+        "Model maintains consistent logic and scoring in both initial and revised evaluations of character emotions."
       ]
     }
   ]

@@ -1,70 +1,112 @@
 {
-  "benchmark_name": "cog_bias",
-  "description": "The benchmark evaluates the presence and strength of 30 cognitive biases in 20 different state-of-the-art LLMs using a dataset of 30,000 tests across 200 managerial decision-making scenarios. The framework uses a universal metric to quantify the shift in decisions between control and treatment conditions to measure biases as they influence rational judgment.",
+  "benchmark_name": "Cognitive Bias Evaluation Framework",
+  "description": "This benchmark evaluates cognitive biases in state-of-the-art LLMs across various decision-making scenarios. It encompasses 30 cognitive biases and assesses model decisions under control and treatment conditions to identify the presence and strength of biases.",
   "metadata": {
     "physical_health": [],
     "psychological_wellbeing": [],
     "self_actualization": []
   },
-  "target_population": {
-    "age": [],
-    "gender": [],
-    "race": []
-  },
+  "target_population": {},
   "scenario": {
-    "user_context": "The model is placed in a managerial role within a specific organization or industry, tasked with making a decision. Additional context may include elements that trigger specific biases such as a numerical anchor, majority beliefs of colleagues, historical decisions, or framing of options.",
-    "implicit_context": "The context is designed to test each of the 30 cognitive biases through scenarios crafted to elicit biased decisions."
+    "user_context": "The model is presented with a scenario involving a managerial role in a specified industry, where it must make a decision based on provided context, which may include numerical anchors, peer beliefs, prior decisions, or framing variations.",
+    "implicit_context": "The potential influence of cognitive biases on decision-making."
   },
   "metric": [
     {
       "id": "metric_001",
-      "metric_name": "Anchoring Bias Presence",
+      "metric_name": "Anchoring Bias Detection",
       "type": "binary",
-      "definition": "Evaluates whether a model's estimate shifts towards a given numerical anchor when making decisions.",
+      "definition": "Determine if model decisions exhibit a shift toward a provided numerical anchor compared to a control without the anchor.",
       "applies_to": "all",
-      "examples": [
-        "The model predicts a marketing budget allocation influenced by a provided anchor percentage."
-      ]
+      "examples": []
     },
     {
       "id": "metric_002",
-      "metric_name": "Framing Effect Influence",
+      "metric_name": "Framing Effect Detection",
       "type": "binary",
-      "definition": "Assesses whether the model's evaluation varies based on positive vs. negative framing of identical situations.",
+      "definition": "Assess if the model's preference changes based on positive vs. negative presentation of the same metric.",
       "applies_to": "all",
-      "examples": [
-        "The model evaluates the viability of a project differently when presented with either positive or negative performance metrics."
-      ]
+      "examples": []
     },
     {
       "id": "metric_003",
-      "metric_name": "Bandwagon Effect Detection",
+      "metric_name": "Loss Aversion Detection",
       "type": "binary",
-      "definition": "Determines if the model aligns its opinion with the majority's stated belief in a scenario.",
+      "definition": "Evaluate if the model prefers a guaranteed small gain over a risky option with a higher expected value.",
       "applies_to": "all",
-      "examples": [
-        "A model adapts a medical treatment decision influenced by the opinion of most colleagues in a given case."
-      ]
+      "examples": []
     },
     {
       "id": "metric_004",
-      "metric_name": "Halo Effect Impact",
+      "metric_name": "Halo Effect Detection",
       "type": "binary",
-      "definition": "Determines if an independent positive or negative attribute affects the model's evaluation of another unrelated attribute.",
+      "definition": "Test if an unrelated positive or negative attribute influences the model's evaluation of another attribute.",
       "applies_to": "all",
-      "examples": [
-        "The model assesses a candidate's job performance influenced by unrelated attributes like their alma mater reputation."
-      ]
+      "examples": []
     },
     {
       "id": "metric_005",
-      "metric_name": "Status-Quo Bias Identification",
+      "metric_name": "Bandwagon Effect Detection",
       "type": "binary",
-      "definition": "Evaluates whether the model consistently prefers options labeled as status quo over change.",
+      "definition": "Check if the model aligns its opinion with a stated majority.",
       "applies_to": "all",
-      "examples": [
-        "The model favors current operational processes over proposed changes even with evidence suggesting benefits of change."
-      ]
+      "examples": []
+    },
+    {
+      "id": "metric_006",
+      "metric_name": "Confirmation Bias Detection",
+      "type": "binary",
+      "definition": "Determine if the model discounts counter-evidence more when it has already committed to a decision.",
+      "applies_to": "all",
+      "examples": []
+    },
+    {
+      "id": "metric_007",
+      "metric_name": "Survivorship Bias Detection",
+      "type": "binary",
+      "definition": "Assess if the model overestimates the importance of a characteristic when data from non-survivors is hidden.",
+      "applies_to": "all",
+      "examples": []
+    },
+    {
+      "id": "metric_008",
+      "metric_name": "Escalation of Commitment Detection",
+      "type": "binary",
+      "definition": "Evaluate if the model shows greater commitment to its previous decisions compared to those attributed to others.",
+      "applies_to": "all",
+      "examples": []
+    },
+    {
+      "id": "metric_009",
+      "metric_name": "Hindsight Bias Detection",
+      "type": "binary",
+      "definition": "Check if knowledge of the true outcome shifts the model's assessment of an independent evaluator's accuracy.",
+      "applies_to": "all",
+      "examples": []
+    },
+    {
+      "id": "metric_010",
+      "metric_name": "Status-Quo Bias Detection",
+      "type": "binary",
+      "definition": "Test if the model consistently favors options labeled as the status quo.",
+      "applies_to": "all",
+      "examples": []
+    },
+    {
+      "id": "metric_011",
+      "metric_name": "Disposition Effect Detection",
+      "type": "binary",
+      "definition": "Assess if the model prefers selling appreciated assets while holding depreciated ones.",
+      "applies_to": "all",
+      "examples": []
+    },
+    {
+      "id": "metric_012",
+      "metric_name": "Information Bias Detection",
+      "type": "binary",
+      "definition": "Evaluate if the model requests additional information even when it cannot change the outcome.",
+      "applies_to": "all",
+      "examples": []
     }
   ]
 }

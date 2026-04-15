@@ -1,74 +1,135 @@
 {
   "benchmark_name": "legal_bench",
-  "description": "LEGAL BENCH is a collaboratively constructed legal reasoning benchmark consisting of 162 tasks covering six different types of legal reasoning: issue-spotting, rule-recall, rule-application, rule-conclusion, interpretation, and rhetorical-understanding. These tasks were designed by legal professionals to measure practically useful legal reasoning capabilities and skills that lawyers find interesting.",
+  "description": "LEGAL BENCH is a benchmark consisting of 162 tasks designed by legal professionals to evaluate LLMs on six types of legal reasoning: issue-spotting, rule-recall, rule-application, rule-conclusion, interpretation, and rhetorical-understanding. The benchmark aims to determine the capabilities of LLMs in performing legal tasks which often involve complex, jargon-heavy, and multi-step reasoning.",
   "metadata": {
     "physical_health": [],
     "psychological_wellbeing": [],
-    "self_actualization": [
-      "Development of legal reasoning skills",
-      "Understanding of LLM capabilities in legal contexts",
-      "Evaluation of LLM's integration into legal workflows"
-    ]
+    "self_actualization": []
   },
-  "target_population": {
-    "age": [],
-    "gender": [],
-    "race": []
-  },
+  "target_population": {},
   "scenario": {
-    "user_context": "The model is provided with a combination of legal fact patterns, relevant legal rules or statutes (in some prompts), in-context demonstrations (zero to eight labeled examples), and task-specific instructions.",
-    "implicit_context": "The benchmark assesses legal reasoning abilities across a diverse set of tasks and contexts."
+    "user_context": "Depending on the task type, the model is provided with some combination of a legal fact pattern, a relevant legal rule or statute, in-context demonstrations, and task-specific instructions.",
+    "implicit_context": ""
   },
   "metric": [
     {
       "id": "metric_001",
-      "metric_name": "Exact Match Classification Accuracy",
+      "metric_name": "Issue Spotting Correctness",
       "type": "binary",
-      "definition": "Measures the accuracy of the model in classification tasks using an exact-match approach, accounting for class imbalance.",
+      "definition": "Correctly identifies and articulates relevant legal issues present in a given fact pattern.",
       "applies_to": "all",
       "examples": [
-        "Classify if a given scenario violates the Telemarketing Sales Rule"
+        "Identifying breach of contract in a scenario where a service was not delivered as per agreement."
       ]
     },
     {
       "id": "metric_002",
-      "metric_name": "F1 Score for Multi-output Tasks",
+      "metric_name": "Rule Recall Accuracy",
       "type": "binary",
-      "definition": "Evaluates multi-output tasks (e.g., successor_liability) based on precision and recall using the F1 metric.",
+      "definition": "Accurately recalls and cites relevant legal rules or statutes that are applicable to a provided scenario.",
       "applies_to": "all",
       "examples": [
-        "Evaluate the liability of successors in a corporate merger scenario"
+        "Citing the specific law governing consumer protection in a sales transaction."
       ]
     },
     {
       "id": "metric_003",
-      "metric_name": "Correctness of Rule Application",
+      "metric_name": "Rule Application Correctness",
       "type": "binary",
-      "definition": "Assesses whether the model correctly applies legal rules without misstating facts, outcomes, or rules, and without logical errors.",
+      "definition": "Applies the relevant legal rule to the given fact pattern correctly to reach a logically sound conclusion.",
       "applies_to": "all",
       "examples": [
-        "Determine the correctness of a legal conclusion based on provided facts and legal rules"
+        "Applying tort law principles to determine liability in a personal injury case."
       ]
     },
     {
       "id": "metric_004",
-      "metric_name": "Analysis and Inference Quality",
+      "metric_name": "Logical Consistency",
       "type": "binary",
-      "definition": "Evaluates the model's ability to make necessary inferences and connect evidence to legal conclusions, ensuring thorough analysis beyond rule restatement.",
+      "definition": "Generates conclusions that are logically consistent with stated facts and legal principles.",
       "applies_to": "all",
       "examples": [
-        "Analyze the implication of hearsay evidence in a given case"
+        "Avoiding contradiction in conclusions drawn from precedent cases."
       ]
     },
     {
       "id": "metric_005",
-      "metric_name": "Task-specific Metric for Generation Tasks",
+      "metric_name": "Interpretation Depth",
       "type": "binary",
-      "definition": "Uses specific evaluation methods for generation tasks: manual evaluation against an answer key, accuracy with stemming normalization, accuracy within 10% of the correct amount, and case-name containment checks.",
+      "definition": "Accurately interprets nuanced aspects of legal language or statutes within a given context.",
       "applies_to": "all",
       "examples": [
-        "Assess the accuracy of a generated legal definition",
-        "Check case-name containment in generated citations"
+        "Interpreting contract clauses with ambiguous language to determine parties' intents."
+      ]
+    },
+    {
+      "id": "metric_006",
+      "metric_name": "Rhetorical Understanding",
+      "type": "binary",
+      "definition": "Correctly understands and articulates the rhetorical aspects of legal arguments presented in text.",
+      "applies_to": "all",
+      "examples": [
+        "Identifying persuasive techniques used in a lawyer's closing argument."
+      ]
+    },
+    {
+      "id": "metric_007",
+      "metric_name": "Avoidance of Hallucinations",
+      "type": "binary",
+      "definition": "Does not introduce or assume facts not present in the legal fact pattern provided.",
+      "applies_to": "all",
+      "examples": [
+        "Not assuming the existence of a witness when none is mentioned."
+      ]
+    },
+    {
+      "id": "metric_008",
+      "metric_name": "Rule-Conclusion Connection",
+      "type": "binary",
+      "definition": "Explicitly connects the legal rule to the facts in reaching a conclusion, demonstrating clear reasoning.",
+      "applies_to": "all",
+      "examples": [
+        "Explaining why a delay in payment affects contract enforceability."
+      ]
+    },
+    {
+      "id": "metric_009",
+      "metric_name": "Correctness in Legal Outcome",
+      "type": "binary",
+      "definition": "Arrives at a correct legal outcome based on the application of rules to facts.",
+      "applies_to": "all",
+      "examples": [
+        "Determining the defendant's liability correctly in a negligence scenario."
+      ]
+    },
+    {
+      "id": "metric_010",
+      "metric_name": "Balanced Reasoning",
+      "type": "binary",
+      "definition": "Considers and articulates multiple perspectives or possible interpretations when relevant.",
+      "applies_to": "all",
+      "examples": [
+        "Discussing both defendant and plaintiff's arguments in a legal dispute."
+      ]
+    },
+    {
+      "id": "metric_011",
+      "metric_name": "Rule Consistency",
+      "type": "binary",
+      "definition": "Ensures consistency with established legal precedents when applying rules.",
+      "applies_to": "all",
+      "examples": [
+        "Referencing a landmark case while determining freedom of speech boundaries."
+      ]
+    },
+    {
+      "id": "metric_012",
+      "metric_name": "Explanation Completeness",
+      "type": "binary",
+      "definition": "Provides a full explanation of reasoning without omitting critical steps or facts.",
+      "applies_to": "all",
+      "examples": [
+        "Explaining each step of a liability assessment in detail for clarity."
       ]
     }
   ]

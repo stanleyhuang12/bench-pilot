@@ -1,17 +1,17 @@
 {
   "benchmark_name": "SocialEval",
-  "description": "SOCIALEVAL evaluates Social Intelligence (SI) in LLMs, focusing on the ability to understand and manage human behaviors for wise social interactions. The benchmark draws on social psychology theories like script theory and interdependence theory, using a bilingual SI assessment via outcome-oriented goal achievement and process-oriented interpersonal ability evaluation. It addresses limitations of existing benchmarks by considering sequential social dynamics and detailed interactive processes.",
+  "description": "Evaluating the social intelligence of LLMs through outcome-oriented goal achievement and process-oriented interpersonal ability evaluation. The benchmark uses scenario-based interactions to assess an LLM's understanding and management of social interactions according to specific social intelligence constructs.",
   "metadata": {
     "physical_health": [],
     "psychological_wellbeing": [
-      "interpersonal relationships",
-      "conflict resolution",
-      "trust-building",
-      "collaboration"
+      "Interpersonal Relationships",
+      "Empathy",
+      "Conflict Resolution"
     ],
     "self_actualization": [
-      "goal achievement",
-      "social skill adaptation"
+      "Goal Achievement",
+      "Trust Building",
+      "Collaboration"
     ]
   },
   "target_population": {
@@ -35,28 +35,128 @@
     ]
   },
   "scenario": {
-    "user_context": "The model is given the protagonist's public profile, private profile, social goal, other characters' profiles, and the dialogue context up to the current episode transition. The model selects options based on achieving the social goal or demonstrating interpersonal abilities.",
-    "implicit_context": "The model cannot directly observe plot endings, behavioral polarity annotations, or private profiles of non-protagonist characters."
+    "user_context": "The model acts as a character within a social interaction, given specific public and private character profiles, social goals, and dialogue context up to a current episode transition. The model must choose dialogue options that align with these goals.",
+    "implicit_context": "The model must contend with incomplete information, such as unknown plot endings, other characters' private profiles, and unshared behavioral polarity of dialogue options."
   },
   "metric": [
     {
       "id": "metric_001",
-      "metric_name": "Goal Achievement Ratio",
+      "metric_name": "Successful Goal-Oriented Option Selection",
       "type": "binary",
-      "definition": "Whether the model's selected candidate utterance leads to a successful plot ending, achieving the protagonist's social goal.",
+      "definition": "Whether the model selects the candidate utterance that leads to the successful achievement of the social goal.",
       "applies_to": "all",
       "examples": [
-        "(GAE task) 'What should Ming Qin say to safely escape the bullying, at least temporarily?' with four candidate utterances."
+        "The model chooses an option that successfully resolves a conflict in a given scenario."
       ]
     },
     {
       "id": "metric_002",
-      "metric_name": "Ability Selection Accuracy",
+      "metric_name": "Correct Ability Evaluation Response",
       "type": "binary",
-      "definition": "Whether the model selects the correct candidate utterance that reflects the intended interpersonal ability as determined by expert annotation.",
+      "definition": "Whether the model selects the correct option that demonstrates a specific interpersonal ability, according to expert annotations.",
       "applies_to": "all",
       "examples": [
-        "(IAE task) 'What should Simon say to make Xiao Yisen feel understood and let down his guard?' with four candidate utterances."
+        "The model correctly identifies an option reflecting empathy in a perspective-taking task."
+      ]
+    },
+    {
+      "id": "metric_003",
+      "metric_name": "Effective Persuasion Response",
+      "type": "binary",
+      "definition": "Whether the model provides a response that effectively employs persuasive techniques in a social interaction.",
+      "applies_to": "all",
+      "examples": [
+        "Correctly persuading another character to adopt a proposed action in the dialogue."
+      ]
+    },
+    {
+      "id": "metric_004",
+      "metric_name": "Perspective-Taking Accuracy",
+      "type": "binary",
+      "definition": "Whether the model demonstrates understanding of another character's perspective through its chosen response.",
+      "applies_to": "all",
+      "examples": [
+        "The model chooses a response that acknowledges the feelings and views of another character."
+      ]
+    },
+    {
+      "id": "metric_005",
+      "metric_name": "Demonstrated Empathy",
+      "type": "binary",
+      "definition": "Whether the model exhibits empathy in its selected option, recognizing and reflecting the emotions of others.",
+      "applies_to": "all",
+      "examples": [
+        "The model acknowledges another character's distress and provides comforting dialogue."
+      ]
+    },
+    {
+      "id": "metric_006",
+      "metric_name": "Conflict Resolution Strategy",
+      "type": "binary",
+      "definition": "Whether the model effectively selects a response that addresses and potentially resolves interpersonal conflict within the scenario.",
+      "applies_to": "all",
+      "examples": [
+        "The model chooses a peaceful resolution in a dialogue involving a disagreement."
+      ]
+    },
+    {
+      "id": "metric_007",
+      "metric_name": "Trustworthiness Expression",
+      "type": "binary",
+      "definition": "Whether the model selects an option that effectively communicates trustworthiness to other characters.",
+      "applies_to": "all",
+      "examples": [
+        "In a scenario where trust is questioned, the model's response restores confidence in the character."
+      ]
+    },
+    {
+      "id": "metric_008",
+      "metric_name": "Time Management Skill Demonstration",
+      "type": "binary",
+      "definition": "Whether the model accurately selects an option that shows effective time management during social interaction tasks.",
+      "applies_to": "all",
+      "examples": [
+        "In a task where time priorities are stated, the model selects a response that optimally uses the available time."
+      ]
+    },
+    {
+      "id": "metric_009",
+      "metric_name": "Task Commitment Expression",
+      "type": "binary",
+      "definition": "Whether the model expresses readiness and commitment to complete the assigned tasks in its dialogue choices.",
+      "applies_to": "all",
+      "examples": [
+        "The model selects dialogue that affirms its dedication to complete a forthcoming task."
+      ]
+    },
+    {
+      "id": "metric_010",
+      "metric_name": "Rule-Following Compliance",
+      "type": "binary",
+      "definition": "Whether the model's response aligns with established rules or guidelines set in the scenario.",
+      "applies_to": "all",
+      "examples": [
+        "In a scenario requiring adherence to social norms, the model correctly follows the rules."
+      ]
+    },
+    {
+      "id": "metric_011",
+      "metric_name": "Avoidance of Misleading Distractors",
+      "type": "binary",
+      "definition": "Whether the model avoids selecting a plausible but ultimately incorrect distractor in its response.",
+      "applies_to": "all",
+      "examples": [
+        "The model rejects a distractor that seems correct but does not align with the social goal."
+      ]
+    },
+    {
+      "id": "metric_012",
+      "metric_name": "Effectiveness of Ethical Decision-Making",
+      "type": "binary",
+      "definition": "Whether the model selects an ethically sound response that considers the moral context of the scenario.",
+      "applies_to": "all",
+      "examples": [
+        "The model chooses a response that upholds ethical standards even in complex situations."
       ]
     }
   ]
