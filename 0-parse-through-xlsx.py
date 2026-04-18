@@ -96,6 +96,7 @@ STRICT REQUIREMENTS:
 - Output valid JSON only and follow schema exactly 
 - Expand broad metrics into multiple granular ones
 - Do NOT hallucinate
+- Do not include any target population UNLESS it is EXPLICITLY mentioned, otherwise output an empty list.
 
 Schema:
 {{
@@ -112,7 +113,7 @@ Schema:
     "race": list[str]
   }},
   "scenario": {{
-    "user_context": str,
+    "user_context": str, ## overwrite user/implicit context to be general mutliturn dynamic scenario contexts 
     "implicit_context": str
   }},
   "metric": [
