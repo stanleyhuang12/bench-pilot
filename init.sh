@@ -30,7 +30,12 @@ echo "Looping through benchmark scenario construction"
 for dir in "$results_root"/*; do
     [ -d "$dir" ] || continue
     benchmark_name=$(basename "$dir")
-    [ "$benchmark_name" = "$skip_benchmark" ] && continue 
+    skip=false
+    for s in "${skip_benchmark[@]}"; do
+        [ "$benchmark_name" = "$s" ] && { skip=true; break; }
+    done
+    [ "$skip" = true ] && { echo "Skipping $benchmark_name"; continue; }
+
     python3 1-test-scenario-construction.py \
         --b "$benchmark_name" \
         --results-root "$results_root" \
