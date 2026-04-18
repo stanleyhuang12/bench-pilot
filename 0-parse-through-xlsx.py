@@ -14,7 +14,7 @@ import re
 from typing import Any
 import pandas as pd
 
-from client import make_client, chat_json, LiteLLMCostTracker
+from client import make_client, chat_json, LiteLLMCostTracker, _strip_fences
 from config import load_config, get_model_name
 from demographics import AGE_BANK, GENDER_BANK, RACE_BANK
 
@@ -194,11 +194,6 @@ def _validate_and_fix(goal: dict[str, Any]) -> dict[str, Any]:
  
     return goal
  
-def _strip_fences(raw: str) -> str:
-    raw = raw.strip()
-    raw = re.sub(r"^```(?:json)?\s*", "", raw)
-    raw = re.sub(r"\s*```$", "", raw)
-    return raw.strip()
 
 async def _build_goal_with_llm(
     client, model: str, row: pd.Series, oversample: bool 
