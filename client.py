@@ -13,6 +13,7 @@ import json
 import os
 import logging
 from dataclasses import dataclass
+import re 
 
 
 litellm_logger = logging.getLogger("LiteLLM")
@@ -110,6 +111,11 @@ async def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
             else:
                 raise
 
+def _strip_fences(raw: str) -> str:
+    raw = raw.strip()
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$", "", raw)
+    return raw.strip()
 
 async def chat(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> tuple[str, "LiteLLMCostTracker"]:
     response = await _create_with_retry(client, model=model, messages=messages, **kwargs)
