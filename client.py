@@ -28,7 +28,6 @@ _CUSTOM_MODEL_PRICING = {
     "deepinfra/google/gemma-4-31B-it": {
         "input_cost_per_token":  0.00000013,
         "output_cost_per_token": 0.00000038, 
-        "litellm_provider": "openai",
         "mode": "chat",
     },
     "deepinfra/Qwen/Qwen3.6-35B-A3B": {
