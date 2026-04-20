@@ -24,6 +24,29 @@ litellm_logger.setLevel(logging.WARNING)
 _MAX_RETRIES = 5
 _RETRY_DELAY = 10  # seconds, multiplied by attempt number
 
+_CUSTOM_MODEL_PRICING = {
+    "deepinfra/google/gemma-4-31B-it": {
+        "input_cost_per_token":  0.00000013,
+        "output_cost_per_token": 0.00000038, 
+        "litellm_provider": "openai",
+        "mode": "chat",
+    },
+    "deepinfra/Qwen/Qwen3.6-35B-A3B": {
+        "input_cost_per_token":  0.00000006,   # placeholder — check deepinfra.com/pricing
+        "output_cost_per_token": 0.00000006,
+        "litellm_provider": "openai",
+        "mode": "chat",
+    },
+     "deepinfra/deepseek-ai/DeepSeek-V3.2": {
+        "input_cost_per_token":  0.00000020, 
+        "output_cost_per_token": 0.00000077, 
+    },
+}
+
+def register_custom_pricing() -> None:
+    """Register pricing for models not in LiteLLM's model_prices_and_context_window.json."""
+    litellm.register_model(_CUSTOM_MODEL_PRICING)
+    print(f"Registered custom pricing for {len(_CUSTOM_MODEL_PRICING)} models.")
 
 @dataclass
 class LiteLLMClient:
@@ -84,15 +107,11 @@ class LiteLLMCostTracker:
         with open(cost_path, "w") as f: 
             json.dump(data, f, indent=4)
         
-        print(f"Wrote out costs for {step_name} step to {cost_path}")
-
 def make_client(model_config: dict) -> LiteLLMClient:
     return LiteLLMClient(
         base_url=model_config["base_url"],
         api_key=model_config["api_key"],
     )
-
-
 
 
 async def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:

@@ -20,8 +20,10 @@ import asyncio
 import time
 import random
 
-from client import make_client, chat, LiteLLMCostTracker
+from client import make_client, chat, LiteLLMCostTracker, register_custom_pricing
 from config import load_config, get_model_name
+
+register_custom_pricing()
 
 TERMINATE_SIGNAL = "terminate conversation"
 def _landmark_block(landmarks: list[dict]) -> str:
@@ -514,7 +516,7 @@ async def simulate_async(
                 "concurrency": concurrent_threads,
             },
         )
-
+        
 async def simulate_downsample(
     config_path: str,
     results_root: str,
@@ -525,25 +527,20 @@ async def simulate_downsample(
     concurrent_threads: int = 5,
     flush_every: int = 10,
 ) -> None:
-    """
-    Like simulate_async but randomly samples `test_size` scenarios.
-    Saves under conversations-downsample/ with cost-downsample.json.
-    """
     config = load_config(config_path)
     test_path = config["paths"]["test_file"]
-    conv_dir = config["paths"]["conversations_dir"] + "-downsample"
+    conv_dir = config["paths"]["conversations_dir"] + "downsample"
     total_turns = config["generation"]["turns_per_conversation"]
 
     benchmark_paths = _resolve_benchmarks(results_root, test_path, benchmark)
-    target_models  = get_model_name(config, "target")
-    target_models  = [target_models[0]]  # downsample tests first model only
+    target_models = get_model_name(config, "target")  # all models, no truncation
 
     for bench in benchmark_paths:
         if not os.path.exists(bench):
             print(f"Skipping {bench} — not found.  Run generate.py first.")
             continue
 
-        bench_dir  = os.path.dirname(bench)
+        bench_dir = os.path.dirname(bench)
         bench_name = os.path.basename(bench_dir)
 
         with open(bench) as f:
@@ -552,40 +549,44 @@ async def simulate_downsample(
         metrics: list[dict] = test_data.get("metrics") or test_data.get("metric") or []
         all_scenarios: list[dict] = test_data["scenarios"]
         scenarios = [all_scenarios[i]
-                     for i in random.sample(range(len(all_scenarios)), test_size)]
+                     for i in random.sample(range(len(all_scenarios)), min(test_size, len(all_scenarios)))]
         n = len(scenarios)
 
         user_client = make_client(config["models"]["user"])
         user_model = get_model_name(config, "user")
 
-        target_cfg   = config["models"]["target"][0]
-        target_model = target_models[0]
-        out_dir      = os.path.join(bench_dir, conv_dir)
-        os.makedirs(out_dir, exist_ok=True)
-        target_client = make_client(target_cfg)
+        # Build per-model output dirs and clients — same pattern as simulate_async
+        model_out_dirs: dict[str, str] = {}
+        model_clients: dict[str, object] = {}
+        for target_cfg, target_model in zip(config["models"]["target"], target_models):
+            out_dir = os.path.join(bench_dir, conv_dir, target_model)
+            os.makedirs(out_dir, exist_ok=True)
+            model_out_dirs[target_model] = out_dir
+            model_clients[target_model] = make_client(target_cfg)
 
-        total_tasks = num_samples * n
+        total_tasks = num_samples * n * len(target_models)
         bench_start = time.perf_counter()
 
         print(f"\n{'='*62}")
-        print(f"Benchmark (downsample) : {bench_name}")
+        print(f"Benchmark (downsample): {bench_name}")
         print(f"User model: {user_model}")
-        print(f"Target model: {target_model}")
-        print(f"Scenarios: {n} / {len(all_scenarios)}  |  Samples: {num_samples}")
+        print(f"Target models: {', '.join(target_models)}")
+        print(f"Scenarios: {n}/{len(all_scenarios)}  ×  {num_samples} samples  ×  {len(target_models)} models  =  {total_tasks} tasks")
         print(f"Concurrency: {concurrent_threads}  |  Flush every: {flush_every}")
-        print(f"Metrics loaded : {len(metrics)}")
-        print(f"Output: {out_dir}")
+        print(f"Metrics loaded: {len(metrics)}")
         print(f"{'='*62}\n")
 
-        tracker = LiteLLMCostTracker()
-        saved = 0
-        failed = 0
-        completed = 0
+        per_model_saved: dict[str, int] = {tm: 0 for tm in target_models}
+        per_model_failed: dict[str, int] = {tm: 0 for tm in target_models}
+        per_model_tracker: dict[str, LiteLLMCostTracker] = {tm: LiteLLMCostTracker() for tm in target_models}
+
         sem = asyncio.Semaphore(concurrent_threads)
         file_locks: dict[str, asyncio.Lock] = {}
+        completed = 0
 
-        async def _run_one(scenario: dict, sample_idx: int) -> None:
-            nonlocal saved, failed, completed
+        async def _run_one(scenario: dict, sample_idx: int, target_model: str) -> None:
+            nonlocal completed
+            out_dir = model_out_dirs[target_model]
 
             async with sem:
                 try:
@@ -593,7 +594,7 @@ async def simulate_downsample(
                         scenario=scenario,
                         user_client=user_client,
                         user_model=user_model,
-                        target_client=target_client,
+                        target_client=model_clients[target_model],
                         target_model=target_model,
                         total_turns=total_turns,
                         perfunctory=perfunctory,
@@ -604,31 +605,34 @@ async def simulate_downsample(
                         file_locks[out_path] = asyncio.Lock()
                     async with file_locks[out_path]:
                         _write_conversation(out_path, scenario, conv)
-                    tracker.merge(conv_tracker)
-                    saved += 1
+
+                    per_model_tracker[target_model].merge(conv_tracker)
+                    per_model_saved[target_model] += 1
 
                 except Exception as e:
-                    print(f"  ERROR {scenario['id']} sample {sample_idx}: "
+                    print(f"  ERROR [{target_model}] {scenario['id']} sample {sample_idx}: "
                           f"{type(e).__name__}: {e}")
-                    failed += 1
+                    per_model_failed[target_model] += 1
 
                 finally:
                     completed += 1
                     if completed % flush_every == 0:
-                        tracker.write_out_costs(
-                            step_name="simulation_checkpoint",
-                            abs_path_file=out_dir,
-                            metadata={
-                                "completed": completed,
-                                "total_tasks": total_tasks,
-                                "checkpoint": True,
-                            },
-                            cost_pathname="cost_checkpoint-downsample.json",
-                        )
-                        print(f"saved checkpoint — {completed}/{total_tasks} done")
+                        for tm in target_models:
+                            per_model_tracker[tm].write_out_costs(
+                                step_name="simulation_checkpoint",
+                                abs_path_file=model_out_dirs[tm],
+                                metadata={
+                                    "completed": completed,
+                                    "total_tasks": total_tasks,
+                                    "checkpoint": True,
+                                },
+                                cost_pathname="cost_checkpoint-downsample.json",
+                            )
+                        print(f"  ✓ checkpoint — {completed}/{total_tasks} done")
 
         all_tasks = [
-            _run_one(scenario, sample_idx)
+            _run_one(scenario, sample_idx, target_model)
+            for target_model in target_models
             for sample_idx in range(num_samples)
             for scenario in scenarios
         ]
@@ -636,33 +640,63 @@ async def simulate_downsample(
 
         bench_elapsed = time.perf_counter() - bench_start
 
-        print(f"\n{bench_name} (downsample) {'─'*30}")
-        print(f"Saved: {saved}   Failed: {failed}")
-        print(f"Cost: ${tracker.cost:.6f}")
-        print(f"Tokens: {tracker.input_tokens:,} in / {tracker.output_tokens:,} out")
-        print(f"Time: {bench_elapsed:.1f}s")
+        all_saved = 0
+        all_failed = 0
+        bench_tracker = LiteLLMCostTracker()
 
-        meta = {
-            "user_model": user_model,
-            "target_model": target_model,
-            "num_scenarios": n,
-            "num_samples": num_samples,
-            "saved": saved,
-            "failed": failed,
-            "total_tasks": total_tasks,
-            "concurrency": concurrent_threads,
-            "time": round(bench_elapsed, 2),
-        }
-        tracker.write_out_costs(
-            step_name="simulation",
-            abs_path_file=out_dir,
-            metadata=meta,
-            cost_pathname="cost-downsample.json",
-        )
-        tracker.write_out_costs(
+        for target_model in target_models:
+            out_dir = model_out_dirs[target_model]
+            saved = per_model_saved[target_model]
+            failed = per_model_failed[target_model]
+            tracker = per_model_tracker[target_model]
+
+            print(f"\n  {bench_name} / {target_model} {'─'*28}")
+            print(f"  Saved: {saved}   Failed: {failed}")
+            print(f"  Cost: ${tracker.cost:.6f}")
+            print(f"  Tokens: {tracker.input_tokens:,} in / {tracker.output_tokens:,} out")
+            print(f"  Output: {out_dir}")
+
+            tracker.write_out_costs(
+                step_name="simulation",
+                abs_path_file=out_dir,
+                metadata={
+                    "user_model": user_model,
+                    "target_model": target_model,
+                    "num_scenarios": n,
+                    "num_samples": num_samples,
+                    "saved": saved,
+                    "failed": failed,
+                    "total_tasks": num_samples * n,
+                    "concurrency": concurrent_threads,
+                    "time": round(bench_elapsed, 2),
+                },
+                cost_pathname="cost-downsample.json",
+            )
+            all_saved += saved
+            all_failed += failed
+            bench_tracker.merge(tracker)
+
+        print(f"\n{'='*62}")
+        print(f"Benchmark done (downsample): {bench_name}")
+        print(f"Total: {all_saved} saved,  {all_failed} failed")
+        print(f"Total cost: ${bench_tracker.cost:.6f}")
+        print(f"Total tokens: {bench_tracker.input_tokens:,} in / {bench_tracker.output_tokens:,} out")
+        print(f"Wall time: {bench_elapsed:.1f}s")
+
+        bench_tracker.write_out_costs(
             step_name="simulation",
             abs_path_file=bench_dir,
-            metadata=meta,
+            metadata={
+                "user_model": user_model,
+                "num_target_models": len(target_models),
+                "num_scenarios": n,
+                "num_samples": num_samples,
+                "saved": all_saved,
+                "failed": all_failed,
+                "total_tasks": total_tasks,
+                "time": bench_elapsed,
+                "concurrency": concurrent_threads,
+            },
             cost_pathname="cost-downsample.json",
         )
 
