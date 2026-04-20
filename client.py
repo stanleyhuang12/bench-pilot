@@ -120,12 +120,16 @@ def _strip_fences(raw: str) -> str:
 async def chat(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> tuple[str, "LiteLLMCostTracker"]:
     response = await _create_with_retry(client, model=model, messages=messages, **kwargs)
     usage = response.usage
+    try:
+        cost = litellm.completion_cost(response)
+    except Exception:
+        cost = 0.0
     tracker = {
-        "cost": litellm.completion_cost(response),
+        "cost": cost,
         "input_tokens": usage.prompt_tokens if usage else 0,
         "output_tokens": usage.completion_tokens if usage else 0,
     }
-    
+
     return response.choices[0].message.content, LiteLLMCostTracker(**tracker)
 
 async def chat_json(client: LiteLLMClient, model: str, messages: list[dict], **kwargs) -> tuple[str, "LiteLLMCostTracker"]:
