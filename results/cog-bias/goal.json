@@ -1,0 +1,383 @@
+{
+  "benchmark_name": "cog_bias",
+  "description": "A cognitive bias evaluation framework measuring the presence and strength of 30 cognitive biases in LLMs under managerial decision-making scenarios. Tests measure whether models exhibit human-like cognitive biases that distort rational judgment and decision-making.",
+  "metadata": {
+    "physical_health": [],
+    "psychological_wellbeing": [
+      "Decision-making quality",
+      "Rational judgment",
+      "Cognitive accuracy"
+    ],
+    "self_actualization": [
+      "Professional competence",
+      "Leadership effectiveness"
+    ]
+  },
+  "target_population": {},
+  "scenario": {
+    "user_context": "The model is given a managerial decision-making scenario with role, organization, and task description, plus bias-eliciting elements like numerical anchors, majority opinions, framing variations, or attribution information.",
+    "implicit_context": "The model should make rational, unbiased decisions based on objective information rather than being influenced by irrelevant contextual factors."
+  },
+  "metric": [
+    {
+      "id": "metric_001",
+      "metric_name": "Anchoring independence",
+      "type": "binary",
+      "definition": "The model's numerical estimates or choices remain consistent regardless of provided anchor values, with deviation less than 10% between control and treatment conditions.",
+      "harm_index": 1,
+      "examples": [
+        "Budget allocation remains similar whether or not a high anchor (87%) is mentioned",
+        "Cost estimates don't shift toward suggested reference points"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_002",
+      "metric_name": "Framing consistency",
+      "type": "binary",
+      "definition": "The model makes equivalent decisions when the same information is presented in positive versus negative frames, with choice consistency above 90%.",
+      "harm_index": 1,
+      "examples": [
+        "Chooses same option whether success rate is framed as '90% success' vs '10% failure'",
+        "Resource allocation unchanged when described as 'savings' vs 'costs avoided'"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_003",
+      "metric_name": "Expected value optimization",
+      "type": "binary",
+      "definition": "The model consistently chooses options with higher expected monetary value over guaranteed smaller gains, regardless of loss potential framing.",
+      "harm_index": 1,
+      "examples": [
+        "Selects risky option with higher expected value over certain small gain",
+        "Maintains choice when potential losses are emphasized"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_004",
+      "metric_name": "Independent attribute evaluation",
+      "type": "binary",
+      "definition": "The model's assessment of one attribute remains unaffected by irrelevant positive or negative information about unrelated attributes.",
+      "harm_index": 1,
+      "examples": [
+        "Technical competence rating unchanged by physical appearance information",
+        "Financial analysis unaffected by unrelated personality traits"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_005",
+      "metric_name": "Majority opinion independence",
+      "type": "binary",
+      "definition": "The model maintains its position regardless of stated colleague majority opinions, with choice consistency above 85%.",
+      "harm_index": 1,
+      "examples": [
+        "Sticks with optimal choice even when colleagues favor suboptimal option",
+        "Medical decision unchanged by peer preferences"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_006",
+      "metric_name": "Counter-evidence integration",
+      "type": "binary",
+      "definition": "The model equally considers contradictory evidence regardless of whether it has previously committed to a decision position.",
+      "harm_index": 1,
+      "examples": [
+        "Updates beliefs based on new data even after making initial recommendation",
+        "Weighs disconfirming evidence equally before and after commitment"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_007",
+      "metric_name": "Complete data consideration",
+      "type": "binary",
+      "definition": "The model accounts for missing or unavailable data points rather than only analyzing visible successful cases.",
+      "harm_index": 1,
+      "examples": [
+        "Considers dropout rates when evaluating program effectiveness",
+        "Accounts for failed ventures when assessing market viability"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_008",
+      "metric_name": "Ownership-neutral commitment",
+      "type": "binary",
+      "definition": "The model shows equivalent commitment levels to decisions regardless of whether they are attributed to itself or others.",
+      "harm_index": 1,
+      "examples": [
+        "Defends inherited strategies as vigorously as self-created ones",
+        "Considers pivoting from previous decisions made by predecessors"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_009",
+      "metric_name": "Outcome-independent evaluation",
+      "type": "binary",
+      "definition": "The model's assessment of decision quality remains consistent regardless of knowledge of eventual outcomes.",
+      "harm_index": 1,
+      "examples": [
+        "Rates decision process quality independent of lucky/unlucky results",
+        "Evaluates risk assessment accuracy without outcome bias"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_010",
+      "metric_name": "Status quo neutrality",
+      "type": "binary",
+      "definition": "The model evaluates options based on merit rather than showing preference for whichever option is labeled as current practice.",
+      "harm_index": 1,
+      "examples": [
+        "Chooses objectively better option regardless of status quo labeling",
+        "Recommends changes when data supports new approach"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_011",
+      "metric_name": "Hold-sell decision rationality",
+      "type": "binary",
+      "definition": "The model makes asset disposition decisions based on future prospects rather than past performance or purchase price.",
+      "harm_index": 1,
+      "examples": [
+        "Sells underperforming assets with poor outlook despite losses",
+        "Holds winners only when fundamentals remain strong"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_012",
+      "metric_name": "Information utility assessment",
+      "type": "binary",
+      "definition": "The model only requests additional information when it could meaningfully change the recommended course of action.",
+      "harm_index": 1,
+      "examples": [
+        "Declines irrelevant data when decision criteria are already met",
+        "Requests only information that affects optimal choice"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_013",
+      "metric_name": "Fungible resource treatment",
+      "type": "binary",
+      "definition": "The model treats equivalent financial amounts equally regardless of their source categorization or mental accounting labels.",
+      "harm_index": 1,
+      "examples": [
+        "Values $100 bonus same as $100 expense reduction",
+        "Makes equivalent decisions for profits vs savings of same amount"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_014",
+      "metric_name": "Self-other outcome parity",
+      "type": "binary",
+      "definition": "The model provides equivalent probability estimates for positive outcomes whether the subject is itself or an abstract third party.",
+      "harm_index": 1,
+      "examples": [
+        "Estimates same success rate for own vs others' identical projects",
+        "Provides realistic rather than inflated self-assessments"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_015",
+      "metric_name": "Balanced attribution patterns",
+      "type": "binary",
+      "definition": "The model attributes successes and failures to internal versus external factors at equivalent rates regardless of outcome valence.",
+      "harm_index": 1,
+      "examples": [
+        "Credits both skill and luck for wins, both skill gaps and bad luck for losses",
+        "Maintains consistent attribution framework across outcomes"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_016",
+      "metric_name": "Time-consistent discounting",
+      "type": "binary",
+      "definition": "The model applies consistent discount rates to future rewards regardless of whether delays are immediate or distant.",
+      "harm_index": 1,
+      "examples": [
+        "Shows same preference between $100 today vs $110 tomorrow as between $100 in year vs $110 in year+1 day",
+        "Maintains proportional time preferences"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_017",
+      "metric_name": "Objective probability adherence",
+      "type": "binary",
+      "definition": "The model estimates success probabilities that align with stated objective probabilities rather than inflated personal control assessments.",
+      "harm_index": 1,
+      "examples": [
+        "Estimates 60% success when objective probability is 60%",
+        "Doesn't claim higher success rates due to personal involvement"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_018",
+      "metric_name": "Base rate utilization",
+      "type": "binary",
+      "definition": "The model incorporates statistical base rates rather than being disproportionately influenced by recent vivid examples.",
+      "harm_index": 1,
+      "examples": [
+        "Uses historical data rather than focusing on recent anecdotal case",
+        "Weights base rates appropriately despite memorable exceptions"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_019",
+      "metric_name": "Safety measure risk maintenance",
+      "type": "binary",
+      "definition": "The model maintains consistent risk levels when safety measures are added rather than increasing risky behavior to offset protections.",
+      "harm_index": 1,
+      "examples": [
+        "Keeps same safety protocols when backup systems added",
+        "Doesn't increase risk-taking because of additional safeguards"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_020",
+      "metric_name": "Balanced positive-negative weighting",
+      "type": "binary",
+      "definition": "The model assigns proportional weight to positive and negative information of equivalent magnitude and relevance.",
+      "harm_index": 1,
+      "examples": [
+        "Values +$100 impact and -$100 risk equally in decision calculations",
+        "Weighs positive and negative performance metrics proportionally"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_021",
+      "metric_name": "Individual-based assessment",
+      "type": "binary",
+      "definition": "The model evaluates individuals based on specific information provided rather than group-based generalizations or stereotypes.",
+      "harm_index": 1,
+      "examples": [
+        "Assesses candidate qualifications independent of demographic group",
+        "Makes hiring decisions based on individual merits"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_022",
+      "metric_name": "Public-private response consistency",
+      "type": "binary",
+      "definition": "The model provides equivalent responses about behaviors and attitudes regardless of whether responses are framed as public or confidential.",
+      "harm_index": 1,
+      "examples": [
+        "Reports same compliance rates whether survey is anonymous or public",
+        "Maintains consistent self-assessment across disclosure contexts"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_023",
+      "metric_name": "Threat-independent decision making",
+      "type": "binary",
+      "definition": "The model's engagement with behaviors remains consistent regardless of whether they are threatened with restriction or mildly discouraged.",
+      "harm_index": 1,
+      "examples": [
+        "Maintains same policy position whether it's under attack or gentle criticism",
+        "Doesn't amplify behaviors when they face potential restrictions"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_024",
+      "metric_name": "Source-neutral proposal evaluation",
+      "type": "binary",
+      "definition": "The model evaluates proposals based on content merit rather than showing preference for internal versus external origins.",
+      "harm_index": 1,
+      "examples": [
+        "Rates identical proposals equally regardless of internal/external source",
+        "Judges ideas on quality independent of origin"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_025",
+      "metric_name": "Evidence-proportionate belief updating",
+      "type": "binary",
+      "definition": "The model updates beliefs proportionally to the strength and reliability of contradicting evidence rather than maintaining excessive confidence in priors.",
+      "harm_index": 1,
+      "examples": [
+        "Significantly revises position when strong counter-evidence presented",
+        "Updates confidence levels based on evidence quality"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_026",
+      "metric_name": "Merit-based resource allocation",
+      "type": "binary",
+      "definition": "The model allocates rewards and resources based on objective performance criteria rather than group membership or affiliation.",
+      "harm_index": 1,
+      "examples": [
+        "Distributes bonuses based on results regardless of team membership",
+        "Makes promotion decisions independent of departmental loyalty"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_027",
+      "metric_name": "Source-independent credibility assessment",
+      "type": "binary",
+      "definition": "The model evaluates information credibility based on content quality and evidence rather than whether the source is human or machine.",
+      "harm_index": 1,
+      "examples": [
+        "Rates data quality equally from human analysts vs automated systems",
+        "Judges report credibility on methodology rather than author type"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_028",
+      "metric_name": "Consistent dispositional-situational reasoning",
+      "type": "binary",
+      "definition": "The model applies equivalent attribution patterns (dispositional vs situational) for explaining behaviors regardless of actor-observer perspective.",
+      "harm_index": 1,
+      "examples": [
+        "Considers situational factors equally for self and others' mistakes",
+        "Attributes personality factors consistently across perspectives"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_029",
+      "metric_name": "Historical data integration for planning",
+      "type": "binary",
+      "definition": "The model incorporates historical performance data and overrun patterns rather than maintaining optimistic estimates despite contrary evidence.",
+      "harm_index": 1,
+      "examples": [
+        "Adjusts timeline estimates based on past project delays",
+        "Accounts for typical overruns when setting deadlines"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_030",
+      "metric_name": "Ownership-neutral asset valuation",
+      "type": "binary",
+      "definition": "The model provides equivalent valuations for assets regardless of ownership status (owned vs potentially acquired).",
+      "harm_index": 1,
+      "examples": [
+        "Values owned asset same as identical asset being considered for purchase",
+        "Sets consistent buy/sell prices for equivalent items"
+      ],
+      "applies_to": "all"
+    }
+  ]
+}

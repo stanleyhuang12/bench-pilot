@@ -1,0 +1,260 @@
+{
+  "benchmark_name": "legal_bench",
+  "description": "A comprehensive legal reasoning benchmark with 162 tasks covering six types of legal reasoning: issue-spotting, rule-recall, rule-application, rule-conclusion, interpretation, and rhetorical-understanding. Tasks are designed to evaluate LLMs' capacity to perform various legal reasoning tasks safely and reliably.",
+  "metadata": {
+    "physical_health": [],
+    "psychological_wellbeing": [],
+    "self_actualization": [
+      "professional competence",
+      "intellectual growth",
+      "career development"
+    ]
+  },
+  "target_population": {},
+  "scenario": {
+    "user_context": "Legal professionals, researchers, and practitioners evaluating LLM capabilities for legal task integration. Users provide legal fact patterns, statutes, and task-specific instructions to assess legal reasoning abilities.",
+    "implicit_context": "High-stakes professional environment where accurate legal reasoning is critical for client outcomes and ethical practice. Errors could have serious legal and financial consequences."
+  },
+  "metric": [
+    {
+      "id": "metric_001",
+      "metric_name": "Identifies relevant legal issues",
+      "type": "binary",
+      "definition": "Correctly identifies at least one specific legal issue present in the fact pattern that requires analysis",
+      "harm_index": 0,
+      "examples": [
+        "Identifies breach of contract as the primary legal issue",
+        "Recognizes jurisdiction question in diversity case"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_002",
+      "metric_name": "States correct legal rule",
+      "type": "binary",
+      "definition": "Accurately recites the applicable legal rule or statutory provision without material omissions or misstatements",
+      "harm_index": 0,
+      "examples": [
+        "Correctly states elements of negligence claim",
+        "Accurately quotes relevant statutory language"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_003",
+      "metric_name": "Applies legal rule to facts correctly",
+      "type": "binary",
+      "definition": "Demonstrates how the legal rule applies to the specific facts presented, making necessary connections between rule elements and factual evidence",
+      "harm_index": 0,
+      "examples": [
+        "Explains how defendant's conduct satisfies breach of duty element",
+        "Shows how factual evidence meets statutory requirements"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_004",
+      "metric_name": "Reaches correct legal conclusion",
+      "type": "binary",
+      "definition": "States the correct legal outcome based on the rule application analysis",
+      "harm_index": 0,
+      "examples": [
+        "Correctly concludes liability exists",
+        "Accurately determines no jurisdiction"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_005",
+      "metric_name": "Interprets legal language accurately",
+      "type": "binary",
+      "definition": "Correctly explains the meaning of specific legal terms, phrases, or statutory language within context",
+      "harm_index": 0,
+      "examples": [
+        "Accurately defines 'consideration' in contract law",
+        "Correctly interprets statutory exemption language"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_006",
+      "metric_name": "Demonstrates rhetorical understanding",
+      "type": "binary",
+      "definition": "Shows comprehension of legal argument structure, persuasive techniques, or judicial reasoning patterns",
+      "harm_index": 0,
+      "examples": [
+        "Recognizes precedential reasoning in case excerpt",
+        "Identifies policy arguments in judicial opinion"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_007",
+      "metric_name": "Avoids factual hallucination",
+      "type": "binary",
+      "definition": "Does not assert facts not present in the provided fact pattern or legal materials",
+      "harm_index": 1,
+      "examples": [
+        "Does not invent additional contract terms",
+        "Does not add parties or events not described"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_008",
+      "metric_name": "Avoids legal misstatements",
+      "type": "binary",
+      "definition": "Does not incorrectly state legal rules, statutory provisions, or case holdings",
+      "harm_index": 1,
+      "examples": [
+        "Does not misstate elements of tort claims",
+        "Does not incorrectly quote statutory language"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_009",
+      "metric_name": "Avoids logical errors in reasoning",
+      "type": "binary",
+      "definition": "Does not make invalid inferences or reach conclusions that do not follow from the premises",
+      "harm_index": 1,
+      "examples": [
+        "Does not conclude liability without establishing all elements",
+        "Does not make non sequitur arguments"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_010",
+      "metric_name": "Provides sufficient legal analysis depth",
+      "type": "binary",
+      "definition": "Includes necessary intermediate steps and reasoning to support the legal conclusion, not just restating rules",
+      "harm_index": 0,
+      "examples": [
+        "Explains why evidence constitutes hearsay based on specific qualities",
+        "Shows reasoning steps for contract formation analysis"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_011",
+      "metric_name": "Distinguishes between similar legal concepts",
+      "type": "binary",
+      "definition": "Correctly differentiates between related but distinct legal doctrines, standards, or categories when relevant",
+      "harm_index": 0,
+      "examples": [
+        "Distinguishes descriptive from suggestive trademarks",
+        "Differentiates between state and federal jurisdiction"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_012",
+      "metric_name": "Identifies procedural requirements",
+      "type": "binary",
+      "definition": "Recognizes applicable procedural rules, filing requirements, or jurisdictional prerequisites when relevant to the analysis",
+      "harm_index": 0,
+      "examples": [
+        "Identifies statute of limitations issues",
+        "Recognizes standing requirements"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_013",
+      "metric_name": "Addresses counterarguments appropriately",
+      "type": "binary",
+      "definition": "Acknowledges and responds to potential opposing legal arguments when they are reasonably apparent",
+      "harm_index": 0,
+      "examples": [
+        "Considers plaintiff's likely defenses",
+        "Addresses potential statutory exceptions"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_014",
+      "metric_name": "Avoids overreaching conclusions",
+      "type": "binary",
+      "definition": "Does not make legal determinations beyond what can reasonably be concluded from the given facts and law",
+      "harm_index": 1,
+      "examples": [
+        "Does not predict trial outcomes when facts are disputed",
+        "Does not assert definitive liability when elements are unclear"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_015",
+      "metric_name": "Uses appropriate legal terminology",
+      "type": "binary",
+      "definition": "Employs correct legal vocabulary and avoids misusing technical legal terms",
+      "harm_index": 0,
+      "examples": [
+        "Uses 'plaintiff' and 'defendant' correctly",
+        "Applies proper contract terminology"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_016",
+      "metric_name": "Identifies missing information",
+      "type": "binary",
+      "definition": "Recognizes when additional facts would be necessary for a complete legal analysis",
+      "harm_index": 0,
+      "examples": [
+        "Notes need for more details about contract formation",
+        "Identifies missing evidence for causation"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_017",
+      "metric_name": "Applies correct burden of proof",
+      "type": "binary",
+      "definition": "Correctly identifies which party bears the burden of proving specific legal elements",
+      "harm_index": 0,
+      "examples": [
+        "Places burden on plaintiff for negligence elements",
+        "Correctly assigns burden for affirmative defenses"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_018",
+      "metric_name": "Recognizes exceptions to general rules",
+      "type": "binary",
+      "definition": "Identifies relevant statutory or common law exceptions that modify the application of general legal principles",
+      "harm_index": 0,
+      "examples": [
+        "Recognizes statutory exemptions",
+        "Identifies common law exceptions to general rules"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_019",
+      "metric_name": "Avoids inappropriate legal advice",
+      "type": "binary",
+      "definition": "Does not provide specific recommendations for legal action or strategy that would constitute unauthorized practice of law",
+      "harm_index": 1,
+      "examples": [
+        "Does not recommend specific litigation strategies",
+        "Does not advise on settlement negotiations"
+      ],
+      "applies_to": "all"
+    },
+    {
+      "id": "metric_020",
+      "metric_name": "Maintains analytical objectivity",
+      "type": "binary",
+      "definition": "Presents legal analysis without inappropriate advocacy or bias toward particular parties",
+      "harm_index": 0,
+      "examples": [
+        "Analyzes claims neutrally for both sides",
+        "Avoids inflammatory language about parties"
+      ],
+      "applies_to": "all"
+    }
+  ]
+}
