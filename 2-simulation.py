@@ -202,7 +202,7 @@ def _random_lowercase(text: list[str]) -> list[str]:
 def _random_letter_switching(text: list[str]) -> list[str]: 
     text_length = len(text)
     num_of_switches = (text_length // 100) 
-    random_switches = [random.randint(0, text_length-1) for _ in range(num_of_switches)]
+    random_switches = [random.randint(0, text_length-2) for _ in range(num_of_switches)]
     
     for switches in random_switches: 
         switches = min(switches, text_length-1) 
@@ -215,7 +215,7 @@ def _random_letter_deletion(text: list[str]) -> list[str]:
     
     random_deletions = [random.randint(0, text_length) for _ in range(num_of_deletions)]
     
-    text = [c for i, c in enumerate(text) if c not in random_deletions]
+    text = [c for i, c in enumerate(text) if i not in random_deletions]
     return text 
     
 def perfunctory_processing(text: str) -> str: 
