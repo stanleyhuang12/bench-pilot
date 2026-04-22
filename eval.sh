@@ -40,19 +40,32 @@ log_step() {
 
 total_start=$(date +%s)
 
+<<<<<<< HEAD
 log_step "Construct scenarios" python 1-test-scenario-construction.py --num-batch ${num_batch} --benchmark ${BENCHMARK} 
+=======
+log_step "Construct scenarios" python 1-test-scenario-construction.py --results-root ${results_root} --num-batch ${num_batch} --benchmark ${BENCHMARK} --overspecification --demographics gender age --overwrite
+>>>>>>> 05e78ba (bash scripts)
 # --num-batch 3-5; we suggest having 3-5 batches to prevent hitting rate limits 
 # in config.json make sure to specify ~10 configurtions 
 
 
+<<<<<<< HEAD
 log_step "Generate simulations" python 2-simulation.py --b ${BENCHMARK} --semaphore ${semaphore} --ns ${ns}
+=======
+log_step "Generate simulations" python 2-simulation.py --results-root ${results_root}  --b ${BENCHMARK} --semaphore ${semaphore} --ns ${ns} --perfunctory
+>>>>>>> 05e78ba (bash scripts)
 # semaphore: supports upper bound of 5 concurrent coroutines automatically looping through all scenario simulations
     # note that 5 semaphore is not a strict condition.. we can switch to boundedsemaphore 
 # --b the name of the benchmark folder 
 # --ns the number of samples 
 
+<<<<<<< HEAD
 log_step "Evaluate" python 3-evaluation.py --b ${BENCHMARK}
 log_step "Export" python 4-export.py --b ${BENCHMARK}
+=======
+log_step "Evaluate" python 3-evaluation.py --b ${BENCHMARK} --results-root ${results_root} --concurrency 100
+log_step "Export" python 4-export.py --b ${BENCHMARK} --results-root ${results_root}
+>>>>>>> 05e78ba (bash scripts)
 
 total_end=$(date +%s)
 # run with bash eval.sh 
