@@ -22,6 +22,8 @@ import random
 
 from client import make_client, chat, LiteLLMCostTracker, register_custom_pricing
 from config import load_config, get_model_name
+import litellm 
+
 
 register_custom_pricing()
 
@@ -211,7 +213,7 @@ def _random_lowercase(text: list[str]) -> list[str]:
     
 def _random_letter_switching(text: list[str]) -> list[str]: 
     text_length = len(text)
-    num_of_switches = (text_length // 100) 
+    num_of_switches = (text_length // 150) 
     random_switches = [random.randint(0, text_length-2) for _ in range(num_of_switches)]
     
     for switches in random_switches: 
@@ -221,7 +223,7 @@ def _random_letter_switching(text: list[str]) -> list[str]:
 
 def _random_letter_deletion(text: list[str]) -> list[str]: 
     text_length = len(text) 
-    num_of_deletions =  (text_length//100)
+    num_of_deletions =  (text_length//200)
     
     random_deletions = [random.randint(0, text_length) for _ in range(num_of_deletions)]
     
@@ -256,7 +258,6 @@ async def run_conversation(
     target_model: str,
     total_turns: int,
     perfunctory: bool,
-    semaphore: asyncio.Semaphore, 
     pinpoint: bool = True,
     metrics: list[dict] | None = None,
 ) -> tuple[list[dict], LiteLLMCostTracker]:
@@ -279,9 +280,9 @@ async def run_conversation(
             + history
             + [{"role": "user", "content": turn_prompt}]
         )
-        async with semaphore: 
-            raw, user_cost = await chat(user_client, user_model, user_messages)
-            tracker.merge(user_cost)
+        
+        raw, user_cost = await chat(user_client, user_model, user_messages)
+        tracker.merge(user_cost)
 
         user_content = parse_message(raw, perfunctory=perfunctory)
         if user_content is None:
@@ -294,12 +295,11 @@ async def run_conversation(
             ([{"role": "system", "content": target_sys}] if target_sys else [])
             + history
         )
-        
-        async with semaphore: 
-            target_content, target_cost = await chat(
-                target_client, target_model, target_messages
-            )
-            tracker.merge(target_cost)
+
+        target_content, target_cost = await chat(
+            target_client, target_model, target_messages
+        )
+        tracker.merge(target_cost)
 
         history.append({"role": "assistant", "content": target_content})
         result.append( {"role": "assistant", "content": target_content})
@@ -340,6 +340,34 @@ def _resolve_benchmarks(
     return [os.path.join(results_root, d, test_path) for d in entries]
 
 
+def _samples_done(out_path: str) -> int:
+    """Return number of samples already saved in out_path."""
+    if not os.path.exists(out_path):
+        return 0
+    try:
+        with open(out_path) as f:
+            data = json.load(f)
+        return len(data.get("samples", []))
+    except (json.JSONDecodeError, KeyError):
+        return 0
+
+
+def _accumulated_tracker(cost_path: str, step_name: str) -> LiteLLMCostTracker:
+    """Load an existing cost entry from cost_path and return it as a tracker."""
+    t = LiteLLMCostTracker()
+    if not os.path.exists(cost_path):
+        return t
+    try:
+        with open(cost_path) as f:
+            data = json.load(f)
+        entry = data.get(step_name, {})
+        t.cost = entry.get("cost", 0.0)
+        t.input_tokens = entry.get("input_tokens", 0)
+        t.output_tokens = entry.get("output_tokens", 0)
+    except (json.JSONDecodeError, KeyError):
+        pass
+    return t
+
 
 async def simulate_async(
     config_path: str,
@@ -348,7 +376,7 @@ async def simulate_async(
     num_samples: int,
     perfunctory: bool,
     concurrent_threads: int = 5,
-    flush_every: int = 10,
+    flush_every: int = 5,
 ) -> None:
     """
     Run all (model × scenario × sample) tasks concurrently under a single
@@ -395,37 +423,36 @@ async def simulate_async(
         print(f"\n{'='*62}")
         print(f"Benchmark: {bench_name}")
         print(f"User model: {user_model}")
-        print(f"Target models : {', '.join(target_models)}")
-        print(f"Scenarios: {n}  ×  {num_samples} samples  ×  {len(target_models)} models  =  {total_tasks} tasks")
-        print(f"Concurrency: {concurrent_threads}  |  Flush every: {flush_every}")
+        print(f"Target models: {', '.join(target_models)}")
+        print(f"Scenarios: {n} x {num_samples} samples × {len(target_models)} models = {total_tasks} tasks")
+        print(f"Concurrency: {concurrent_threads} | Flush every: {flush_every}")
         print(f"Metrics loaded: {len(metrics)}")
         print(f"{'='*62}\n")
 
-        # Per-model accumulators — asyncio is single-threaded, no locks needed
         per_model_saved: dict[str, int] = {tm: 0 for tm in target_models}
         per_model_failed:  dict[str, int]= {tm: 0 for tm in target_models}
         per_model_tracker: dict[str, LiteLLMCostTracker] = {tm: LiteLLMCostTracker() for tm in target_models}
 
         sem = asyncio.Semaphore(concurrent_threads)
         file_locks: dict[str, asyncio.Lock] = {}
-        completed = 0  # total conversations finished (saved + failed)
+        completed = 0
 
         async def _run_one(scenario: dict, sample_idx: int, target_model: str) -> None:
             nonlocal completed
             out_dir = model_out_dirs[target_model]
 
             try:
-                conv, conv_tracker = await run_conversation(
-                    scenario=scenario,
-                    user_client=user_client,
-                    user_model=user_model,
-                    target_client=model_clients[target_model],
-                    target_model=target_model,
-                    total_turns=total_turns,
-                    sem=sem,
-                    perfunctory=perfunctory,
-                    metrics=metrics,
-                )
+                async with sem:
+                    conv, conv_tracker = await run_conversation(
+                        scenario=scenario,
+                        user_client=user_client,
+                        user_model=user_model,
+                        target_client=model_clients[target_model],
+                        target_model=target_model,
+                        total_turns=total_turns,
+                        perfunctory=perfunctory,
+                        metrics=metrics,
+                    )
 
                 # Immediate write — serialised per file path
                 out_path = os.path.join(out_dir, f"{scenario['id']}.json")
@@ -441,7 +468,6 @@ async def simulate_async(
                 print(f"  ERROR [{target_model}] {scenario['id']} sample {sample_idx}: "
                         f"{type(e).__name__}: {e}")
                 per_model_failed[target_model] += 1
-
             finally:
                 completed += 1
                 # Periodic cost checkpoint every flush_every completions
@@ -457,76 +483,95 @@ async def simulate_async(
                             },
                             cost_pathname="cost_checkpoint.json",
                         )
-                    print(f"  ✓ checkpoint — {completed}/{total_tasks} done")
+                    print(f" [done] checkpoint — {completed}/{total_tasks} done")
 
-        # Launch ALL tasks across ALL models simultaneously
+        # Skip scenarios already fully completed on a prior run
         all_tasks = [
             _run_one(scenario, sample_idx, target_model)
             for target_model in target_models
-            for sample_idx in range(num_samples)
             for scenario in scenarios
+            for sample_idx in range(
+                _samples_done(os.path.join(model_out_dirs[target_model], f"{scenario['id']}.json")),
+                num_samples,
+            )
         ]
-        await asyncio.gather(*all_tasks)
+        skipped = total_tasks - len(all_tasks)
+        if skipped:
+            print(f"  Resuming — skipping {skipped} already-completed conversations")
 
-        bench_elapsed = time.perf_counter() - bench_start
+        def _write_costs(elapsed: float) -> None:
+            all_saved  = 0
+            all_failed = 0
+            bench_tracker = LiteLLMCostTracker()
+            for target_model in target_models:
+                out_dir   = model_out_dirs[target_model]
+                saved     = per_model_saved[target_model]
+                failed    = per_model_failed[target_model]
+                tracker   = per_model_tracker[target_model]
 
-        all_saved   = 0
-        all_failed  = 0
-        bench_tracker = LiteLLMCostTracker()
+                cost_path = os.path.join(out_dir, "cost.json")
+                accumulated = _accumulated_tracker(cost_path, "simulation")
+                accumulated.merge(tracker)
 
-        for target_model in target_models:
-            out_dir = model_out_dirs[target_model]
-            saved = per_model_saved[target_model]
-            failed = per_model_failed[target_model]
-            tracker = per_model_tracker[target_model]
+                print(f"\n  {bench_name} / {target_model} {'─'*28}")
+                print(f"  Saved: {saved}   Failed: {failed}")
+                print(f"  Cost this run: ${tracker.cost:.6f}  |  Total: ${accumulated.cost:.6f}")
+                print(f"  Tokens: {tracker.input_tokens:,} in / {tracker.output_tokens:,} out")
+                print(f"  Output: {out_dir}")
 
-            print(f"\n  {bench_name} / {target_model} {'─'*28}")
-            print(f"  Saved: {saved}   Failed: {failed}")
-            print(f"  Cost: ${tracker.cost:.6f}")
-            print(f"  Tokens: {tracker.input_tokens:,} in / {tracker.output_tokens:,} out")
-            print(f"  Output: {out_dir}")
+                accumulated.write_out_costs(
+                    step_name="simulation",
+                    abs_path_file=out_dir,
+                    metadata={
+                        "user_model": user_model,
+                        "target_model": target_model,
+                        "num_scenarios": n,
+                        "num_samples": num_samples,
+                        "saved": saved,
+                        "failed": failed,
+                        "total_tasks": num_samples * n,
+                        "concurrency": concurrent_threads,
+                        "time": round(elapsed, 2),
+                    },
+                )
+                all_saved  += saved
+                all_failed += failed
+                bench_tracker.merge(accumulated)
 
-            tracker.write_out_costs(
+            print(f"\n{'='*62}")
+            print(f"Benchmark done : {bench_name}")
+            print(f"Total: {all_saved} saved,  {all_failed} failed")
+            print(f"Total cost: ${bench_tracker.cost:.6f}")
+            print(f"Total tokens: {bench_tracker.input_tokens:,} in / {bench_tracker.output_tokens:,} out")
+            print(f"Wall time: {elapsed:.1f}s")
+
+            bench_tracker.write_out_costs(
                 step_name="simulation",
-                abs_path_file=out_dir,
+                abs_path_file=bench_dir,
                 metadata={
                     "user_model": user_model,
-                    "target_model":  target_model,
+                    "num_target_models": len(target_models),
                     "num_scenarios": n,
                     "num_samples": num_samples,
-                    "saved": saved,
-                    "failed":failed,
-                    "total_tasks": num_samples * n,
+                    "saved": all_saved,
+                    "failed": all_failed,
+                    "total_tasks": total_tasks,
+                    "time": elapsed,
                     "concurrency": concurrent_threads,
-                    "time": round(bench_elapsed, 2),
                 },
             )
-            all_saved += saved
-            all_failed += failed
-            bench_tracker.merge(tracker)
 
-        print(f"\n{'='*62}")
-        print(f"Benchmark done : {bench_name}")
-        print(f"Total: {all_saved} saved,  {all_failed} failed")
-        print(f"Total cost: ${bench_tracker.cost:.6f}")
-        print(f"Total tokens: {bench_tracker.input_tokens:,} in / {bench_tracker.output_tokens:,} out")
-        print(f"Wall time: {bench_elapsed:.1f}s")
+        try:
+            await asyncio.gather(*all_tasks)
+        except asyncio.CancelledError:
+            elapsed = time.perf_counter() - bench_start
+            print("\nInterrupted — flushing costs for completed conversations...")
+            _write_costs(elapsed)
+            raise
 
-        bench_tracker.write_out_costs(
-            step_name="simulation",
-            abs_path_file=bench_dir,
-            metadata={
-                "user_model": user_model,
-                "num_target_models": len(target_models),
-                "num_scenarios": n,
-                "num_samples":num_samples,
-                "saved": all_saved,
-                "failed": all_failed,
-                "total_tasks": total_tasks,
-                "time": bench_elapsed,
-                "concurrency": concurrent_threads,
-            },
-        )
+        _write_costs(time.perf_counter() - bench_start)
+
+    await asyncio.sleep(0.5)
         
 async def simulate_downsample(
     config_path: str,
@@ -536,7 +581,7 @@ async def simulate_downsample(
     perfunctory: bool,
     test_size: int = 2,
     concurrent_threads: int = 5,
-    flush_every: int = 10,
+    flush_every: int = 5,
 ) -> None:
     config = load_config(config_path)
     test_path = config["paths"]["test_file"]
@@ -600,17 +645,17 @@ async def simulate_downsample(
             out_dir = model_out_dirs[target_model]
 
             try:
-                conv, conv_tracker = await run_conversation(
-                    scenario=scenario,
-                    user_client=user_client,
-                    user_model=user_model,
-                    target_client=model_clients[target_model],
-                    target_model=target_model,
-                    total_turns=total_turns,
-                    perfunctory=perfunctory,
-                    semaphore=sem,
-                    metrics=metrics,
-                )
+                async with sem:
+                    conv, conv_tracker = await run_conversation(
+                        scenario=scenario,
+                        user_client=user_client,
+                        user_model=user_model,
+                        target_client=model_clients[target_model],
+                        target_model=target_model,
+                        total_turns=total_turns,
+                        perfunctory=perfunctory,
+                        metrics=metrics,
+                    )
                 out_path = os.path.join(out_dir, f"{scenario['id']}.json")
                 if out_path not in file_locks:
                     file_locks[out_path] = asyncio.Lock()
@@ -644,72 +689,92 @@ async def simulate_downsample(
         all_tasks = [
             _run_one(scenario, sample_idx, target_model)
             for target_model in target_models
-            for sample_idx in range(num_samples)
             for scenario in scenarios
+            for sample_idx in range(
+                _samples_done(os.path.join(model_out_dirs[target_model], f"{scenario['id']}.json")),
+                num_samples,
+            )
         ]
-        await asyncio.gather(*all_tasks)
+        skipped = total_tasks - len(all_tasks)
+        if skipped:
+            print(f"  Resuming — skipping {skipped} already-completed conversations")
 
-        bench_elapsed = time.perf_counter() - bench_start
+        def _write_costs(elapsed: float) -> None:
+            all_saved  = 0
+            all_failed = 0
+            bench_tracker = LiteLLMCostTracker()
+            for target_model in target_models:
+                out_dir  = model_out_dirs[target_model]
+                saved    = per_model_saved[target_model]
+                failed   = per_model_failed[target_model]
+                tracker  = per_model_tracker[target_model]
 
-        all_saved = 0
-        all_failed = 0
-        bench_tracker = LiteLLMCostTracker()
+                cost_path   = os.path.join(out_dir, "cost-downsample.json")
+                accumulated = _accumulated_tracker(cost_path, "simulation")
+                accumulated.merge(tracker)
 
-        for target_model in target_models:
-            out_dir = model_out_dirs[target_model]
-            saved = per_model_saved[target_model]
-            failed = per_model_failed[target_model]
-            tracker = per_model_tracker[target_model]
+                print(f"\n  {bench_name} / {target_model} {'─'*28}")
+                print(f"  Saved: {saved}   Failed: {failed}")
+                print(f"  Cost this run: ${tracker.cost:.6f}  |  Total: ${accumulated.cost:.6f}")
+                print(f"  Tokens: {tracker.input_tokens:,} in / {tracker.output_tokens:,} out")
+                print(f"  Output: {out_dir}")
 
-            print(f"\n  {bench_name} / {target_model} {'─'*28}")
-            print(f"  Saved: {saved}   Failed: {failed}")
-            print(f"  Cost: ${tracker.cost:.6f}")
-            print(f"  Tokens: {tracker.input_tokens:,} in / {tracker.output_tokens:,} out")
-            print(f"  Output: {out_dir}")
+                accumulated.write_out_costs(
+                    step_name="simulation",
+                    abs_path_file=out_dir,
+                    metadata={
+                        "user_model": user_model,
+                        "target_model": target_model,
+                        "num_scenarios": n,
+                        "num_samples": num_samples,
+                        "saved": saved,
+                        "failed": failed,
+                        "total_tasks": num_samples * n,
+                        "concurrency": concurrent_threads,
+                        "time": round(elapsed, 2),
+                    },
+                    cost_pathname="cost-downsample.json",
+                )
+                all_saved  += saved
+                all_failed += failed
+                bench_tracker.merge(accumulated)
 
-            tracker.write_out_costs(
+            print(f"\n{'='*62}")
+            print(f"Benchmark done (downsample): {bench_name}")
+            print(f"Total: {all_saved} saved,  {all_failed} failed")
+            print(f"Total cost: ${bench_tracker.cost:.6f}")
+            print(f"Total tokens: {bench_tracker.input_tokens:,} in / {bench_tracker.output_tokens:,} out")
+            print(f"Wall time: {elapsed:.1f}s")
+
+            bench_tracker.write_out_costs(
                 step_name="simulation",
-                abs_path_file=out_dir,
+                abs_path_file=bench_dir,
                 metadata={
                     "user_model": user_model,
-                    "target_model": target_model,
+                    "num_target_models": len(target_models),
                     "num_scenarios": n,
                     "num_samples": num_samples,
-                    "saved": saved,
-                    "failed": failed,
-                    "total_tasks": num_samples * n,
+                    "saved": all_saved,
+                    "failed": all_failed,
+                    "total_tasks": total_tasks,
+                    "time": elapsed,
                     "concurrency": concurrent_threads,
-                    "time": round(bench_elapsed, 2),
                 },
                 cost_pathname="cost-downsample.json",
             )
-            all_saved += saved
-            all_failed += failed
-            bench_tracker.merge(tracker)
 
-        print(f"\n{'='*62}")
-        print(f"Benchmark done (downsample): {bench_name}")
-        print(f"Total: {all_saved} saved,  {all_failed} failed")
-        print(f"Total cost: ${bench_tracker.cost:.6f}")
-        print(f"Total tokens: {bench_tracker.input_tokens:,} in / {bench_tracker.output_tokens:,} out")
-        print(f"Wall time: {bench_elapsed:.1f}s")
+        try:
+            await asyncio.gather(*all_tasks)
+        except asyncio.CancelledError:
+            elapsed = time.perf_counter() - bench_start
+            print("\nInterrupted — flushing costs for completed conversations...")
+            _write_costs(elapsed)
+            raise
 
-        bench_tracker.write_out_costs(
-            step_name="simulation",
-            abs_path_file=bench_dir,
-            metadata={
-                "user_model": user_model,
-                "num_target_models": len(target_models),
-                "num_scenarios": n,
-                "num_samples": num_samples,
-                "saved": all_saved,
-                "failed": all_failed,
-                "total_tasks": total_tasks,
-                "time": bench_elapsed,
-                "concurrency": concurrent_threads,
-            },
-            cost_pathname="cost-downsample.json",
-        )
+        _write_costs(time.perf_counter() - bench_start)
+
+    await asyncio.sleep(0.5)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Phase 2: Simulate conversations")
@@ -722,7 +787,7 @@ if __name__ == "__main__":
                         help="Independent conversation samples per scenario")
     parser.add_argument("--p", "--perfunctory", dest="perfunctory",
                         action="store_true", default=False)
-    parser.add_argument("--flush-every", type=int, default=10,
+    parser.add_argument("--flush-every", type=int, default=5,
                         help="Write a cost checkpoint every N completed conversations")
     parser.add_argument("--downsample", action="store_true", default=False)
     parser.add_argument("--test-size", type=int,
