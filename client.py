@@ -123,11 +123,12 @@ async def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
                 api_key=client.api_key,
                 **kwargs,
             )
-        except Exception as e:
-            is_server_error = "500" in str(e) or "502" in str(e) or "503" in str(e)
-            if is_server_error and attempt < _MAX_RETRIES - 1:
-                await asyncio.sleep(_RETRY_DELAY * (attempt + 1))
-            else:
+        except litellm.RateLimitError:
+            if attempt < _MAX_RETRIES - 1:
+                wait = _RETRY_DELAY * (attempt + 1)
+                print(f"[RateLimit] attempt {attempt+1}/{_MAX_RETRIES}, retrying in {wait}s...")
+                await asyncio.sleep(wait)
+        else:
                 raise
 
 def _strip_fences(raw: str) -> str:
