@@ -256,6 +256,7 @@ async def run_conversation(
     target_model: str,
     total_turns: int,
     perfunctory: bool,
+    semaphore: asyncio.Semaphore, 
     pinpoint: bool = True,
     metrics: list[dict] | None = None,
 ) -> tuple[list[dict], LiteLLMCostTracker]:
@@ -278,9 +279,9 @@ async def run_conversation(
             + history
             + [{"role": "user", "content": turn_prompt}]
         )
-
-        raw, user_cost = await chat(user_client, user_model, user_messages)
-        tracker.merge(user_cost)
+        async with semaphore: 
+            raw, user_cost = await chat(user_client, user_model, user_messages)
+            tracker.merge(user_cost)
 
         user_content = parse_message(raw, perfunctory=perfunctory)
         if user_content is None:
@@ -293,10 +294,12 @@ async def run_conversation(
             ([{"role": "system", "content": target_sys}] if target_sys else [])
             + history
         )
-        target_content, target_cost = await chat(
-            target_client, target_model, target_messages
-        )
-        tracker.merge(target_cost)
+        
+        async with semaphore: 
+            target_content, target_cost = await chat(
+                target_client, target_model, target_messages
+            )
+            tracker.merge(target_cost)
 
         history.append({"role": "assistant", "content": target_content})
         result.append( {"role": "assistant", "content": target_content})
@@ -379,7 +382,7 @@ async def simulate_async(
         user_model  = get_model_name(config, "user")
 
         model_out_dirs: dict[str, str] = {}
-        model_clients:  dict[str, object] = {}
+        model_clients: dict[str, object] = {}
         for target_cfg, target_model in zip(config["models"]["target"], target_models):
             out_dir = os.path.join(bench_dir, conv_dir, target_model)
             os.makedirs(out_dir, exist_ok=True)
@@ -411,50 +414,50 @@ async def simulate_async(
             nonlocal completed
             out_dir = model_out_dirs[target_model]
 
-            async with sem:
-                try:
-                    conv, conv_tracker = await run_conversation(
-                        scenario=scenario,
-                        user_client=user_client,
-                        user_model=user_model,
-                        target_client=model_clients[target_model],
-                        target_model=target_model,
-                        total_turns=total_turns,
-                        perfunctory=perfunctory,
-                        metrics=metrics,
-                    )
+            try:
+                conv, conv_tracker = await run_conversation(
+                    scenario=scenario,
+                    user_client=user_client,
+                    user_model=user_model,
+                    target_client=model_clients[target_model],
+                    target_model=target_model,
+                    total_turns=total_turns,
+                    sem=sem,
+                    perfunctory=perfunctory,
+                    metrics=metrics,
+                )
 
-                    # Immediate write — serialised per file path
-                    out_path = os.path.join(out_dir, f"{scenario['id']}.json")
-                    if out_path not in file_locks:
-                        file_locks[out_path] = asyncio.Lock()
-                    async with file_locks[out_path]:
-                        _write_conversation(out_path, scenario, conv)
+                # Immediate write — serialised per file path
+                out_path = os.path.join(out_dir, f"{scenario['id']}.json")
+                if out_path not in file_locks:
+                    file_locks[out_path] = asyncio.Lock()
+                async with file_locks[out_path]:
+                    _write_conversation(out_path, scenario, conv)
 
-                    per_model_tracker[target_model].merge(conv_tracker)
-                    per_model_saved[target_model] += 1
+                per_model_tracker[target_model].merge(conv_tracker)
+                per_model_saved[target_model] += 1
 
-                except Exception as e:
-                    print(f"  ERROR [{target_model}] {scenario['id']} sample {sample_idx}: "
-                          f"{type(e).__name__}: {e}")
-                    per_model_failed[target_model] += 1
+            except Exception as e:
+                print(f"  ERROR [{target_model}] {scenario['id']} sample {sample_idx}: "
+                        f"{type(e).__name__}: {e}")
+                per_model_failed[target_model] += 1
 
-                finally:
-                    completed += 1
-                    # Periodic cost checkpoint every flush_every completions
-                    if completed % flush_every == 0:
-                        for tm in target_models:
-                            per_model_tracker[tm].write_out_costs(
-                                step_name="simulation_checkpoint",
-                                abs_path_file=model_out_dirs[tm],
-                                metadata={
-                                    "completed": completed,
-                                    "total_tasks": total_tasks,
-                                    "checkpoint": True,
-                                },
-                                cost_pathname="cost_checkpoint.json",
-                            )
-                        print(f"  ✓ checkpoint — {completed}/{total_tasks} done")
+            finally:
+                completed += 1
+                # Periodic cost checkpoint every flush_every completions
+                if completed % flush_every == 0:
+                    for tm in target_models:
+                        per_model_tracker[tm].write_out_costs(
+                            step_name="simulation_checkpoint",
+                            abs_path_file=model_out_dirs[tm],
+                            metadata={
+                                "completed": completed,
+                                "total_tasks": total_tasks,
+                                "checkpoint": True,
+                            },
+                            cost_pathname="cost_checkpoint.json",
+                        )
+                    print(f"  ✓ checkpoint — {completed}/{total_tasks} done")
 
         # Launch ALL tasks across ALL models simultaneously
         all_tasks = [
@@ -473,8 +476,8 @@ async def simulate_async(
 
         for target_model in target_models:
             out_dir = model_out_dirs[target_model]
-            saved   = per_model_saved[target_model]
-            failed  = per_model_failed[target_model]
+            saved = per_model_saved[target_model]
+            failed = per_model_failed[target_model]
             tracker = per_model_tracker[target_model]
 
             print(f"\n  {bench_name} / {target_model} {'─'*28}")
@@ -596,47 +599,47 @@ async def simulate_downsample(
             nonlocal completed
             out_dir = model_out_dirs[target_model]
 
-            async with sem:
-                try:
-                    conv, conv_tracker = await run_conversation(
-                        scenario=scenario,
-                        user_client=user_client,
-                        user_model=user_model,
-                        target_client=model_clients[target_model],
-                        target_model=target_model,
-                        total_turns=total_turns,
-                        perfunctory=perfunctory,
-                        metrics=metrics,
-                    )
-                    out_path = os.path.join(out_dir, f"{scenario['id']}.json")
-                    if out_path not in file_locks:
-                        file_locks[out_path] = asyncio.Lock()
-                    async with file_locks[out_path]:
-                        _write_conversation(out_path, scenario, conv)
+            try:
+                conv, conv_tracker = await run_conversation(
+                    scenario=scenario,
+                    user_client=user_client,
+                    user_model=user_model,
+                    target_client=model_clients[target_model],
+                    target_model=target_model,
+                    total_turns=total_turns,
+                    perfunctory=perfunctory,
+                    semaphore=sem,
+                    metrics=metrics,
+                )
+                out_path = os.path.join(out_dir, f"{scenario['id']}.json")
+                if out_path not in file_locks:
+                    file_locks[out_path] = asyncio.Lock()
+                async with file_locks[out_path]:
+                    _write_conversation(out_path, scenario, conv)
 
-                    per_model_tracker[target_model].merge(conv_tracker)
-                    per_model_saved[target_model] += 1
+                per_model_tracker[target_model].merge(conv_tracker)
+                per_model_saved[target_model] += 1
 
-                except Exception as e:
-                    print(f"  ERROR [{target_model}] {scenario['id']} sample {sample_idx}: "
-                          f"{type(e).__name__}: {e}")
-                    per_model_failed[target_model] += 1
+            except Exception as e:
+                print(f"  ERROR [{target_model}] {scenario['id']} sample {sample_idx}: "
+                        f"{type(e).__name__}: {e}")
+                per_model_failed[target_model] += 1
 
-                finally:
-                    completed += 1
-                    if completed % flush_every == 0:
-                        for tm in target_models:
-                            per_model_tracker[tm].write_out_costs(
-                                step_name="simulation_checkpoint",
-                                abs_path_file=model_out_dirs[tm],
-                                metadata={
-                                    "completed": completed,
-                                    "total_tasks": total_tasks,
-                                    "checkpoint": True,
-                                },
-                                cost_pathname="cost_checkpoint-downsample.json",
-                            )
-                        print(f"  ✓ checkpoint — {completed}/{total_tasks} done")
+            finally:
+                completed += 1
+                if completed % flush_every == 0:
+                    for tm in target_models:
+                        per_model_tracker[tm].write_out_costs(
+                            step_name="simulation_checkpoint",
+                            abs_path_file=model_out_dirs[tm],
+                            metadata={
+                                "completed": completed,
+                                "total_tasks": total_tasks,
+                                "checkpoint": True,
+                            },
+                            cost_pathname="cost_checkpoint-downsample.json",
+                        )
+                    print(f"  ✓ checkpoint — {completed}/{total_tasks} done")
 
         all_tasks = [
             _run_one(scenario, sample_idx, target_model)
