@@ -187,22 +187,29 @@ async def _generate_scenarios_for_metric(
                 goal, metric, num_scenarios
             )},
         ]
-        raw, costs = await chat_json(client, model, messages)
-        try:
-            raw = _strip_fences(raw)
-            data = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"Scenario generation returned invalid JSON for "
-                f"{metric['id']}: {exc}\n\n{raw}"
-            )
-        scenarios = data.get("scenarios")
-        if not scenarios:
-            raise ValueError(
-                f"No 'scenarios' key in response for {metric['id']}.\n\n{raw}"
-            )
-        return scenarios, costs
 
+        last_exc = None
+        for attempt in range(3):
+            raw, costs = await chat_json(client, model, messages)
+            try:
+                raw = _strip_fences(raw)
+                data = json.loads(raw)
+            except json.JSONDecodeError as exc:
+                last_exc = exc
+                print(f"  [retry {attempt+1}/3] Invalid JSON for {metric['id']}: {exc}")
+                continue
+
+            scenarios = data.get("scenarios")
+            if not scenarios:
+                last_exc = ValueError(f"No 'scenarios' key in response for {metric['id']}.")
+                print(f"  [retry {attempt+1}/3] {last_exc}")
+                continue
+
+            return scenarios, costs
+
+        raise ValueError(
+            f"Scenario generation failed after 3 attempts for {metric['id']}: {last_exc}"
+        )
     batch_results = await asyncio.gather(*(_one_batch() for _ in range(num_batch)))
 
     all_costs = LiteLLMCostTracker()
@@ -213,9 +220,9 @@ async def _generate_scenarios_for_metric(
 
     # Normalise IDs and guarantee metric_id / metric fields are always present
     for i, sc in enumerate(flat, start=1):
-        sc["id"]        = f"scenario_{i:03d}_{metric_slug}"
+        sc["id"] = f"scenario_{i:03d}_{metric_slug}"
         sc["metric_id"] = metric["id"]
-        sc["metric"]    = metric["name"]
+        sc["metric"] = metric["name"]
 
     return flat, all_costs
 
@@ -273,12 +280,13 @@ async def _expand_one_scenario(
             raise ValueError(
                 f"Demographic expansion returned invalid JSON: {exc}\n\n{raw}"
             )
-        variant.setdefault("demographic", demo)
+
+        variant["demographic"] = demo  
         variant["id"] = f"{base_scenario['id']}_v{idx + 1:02d}"
         variant["base_scenario_id"] = base_scenario["id"]
         # Always carry metric fields through from the base scenario
         variant.setdefault("metric_id", base_scenario.get("metric_id"))
-        variant.setdefault("metric",    base_scenario.get("metric"))
+        variant.setdefault("metric", base_scenario.get("metric"))
         return variant, costs
 
     results = await asyncio.gather(
@@ -375,7 +383,9 @@ def _normalise_metrics(raw_metrics: list[dict]) -> list[dict]:
 
 def _save(test_path: str, scenarios: list, metrics: list, overwrite: bool) -> None:
     os.makedirs(os.path.dirname(test_path) or ".", exist_ok=True)
-
+    
+    for sc in scenarios:
+        sc.setdefault("demographic", {})
     if not overwrite and os.path.exists(test_path):
         with open(test_path) as f:
             existing = json.load(f)

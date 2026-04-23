@@ -15,14 +15,13 @@ import logging
 from dataclasses import dataclass
 import re 
 
-
 litellm_logger = logging.getLogger("LiteLLM")
 litellm_logger.setLevel(logging.WARNING)
 
 # Models that require max_completion_tokens instead of max_tokens
 
-_MAX_RETRIES = 5
-_RETRY_DELAY = 10  # seconds, multiplied by attempt number
+_MAX_RETRIES = 7
+_RETRY_DELAY = 25 # seconds, multiplied by attempt number
 
 _CUSTOM_MODEL_PRICING = {
     "deepinfra/google/gemma-4-31B-it": {
@@ -115,7 +114,6 @@ def make_client(model_config: dict) -> LiteLLMClient:
 
 
 async def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
-    """Call litellm.completion with retries on 5xx errors."""
     for attempt in range(_MAX_RETRIES):
         try:
             return await litellm.acompletion(
@@ -128,7 +126,13 @@ async def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
                 wait = _RETRY_DELAY * (attempt + 1)
                 print(f"[RateLimit] attempt {attempt+1}/{_MAX_RETRIES}, retrying in {wait}s...")
                 await asyncio.sleep(wait)
-        else:
+            else:
+                raise
+        except Exception as e:
+            is_server_error = "500" in str(e) or "502" in str(e) or "503" in str(e)
+            if is_server_error and attempt < _MAX_RETRIES - 1:
+                await asyncio.sleep(_RETRY_DELAY * (attempt + 1))
+            else:
                 raise
 
 def _strip_fences(raw: str) -> str:

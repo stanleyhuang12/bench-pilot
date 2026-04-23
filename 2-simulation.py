@@ -540,7 +540,7 @@ async def simulate_async(
 
             print(f"\n{'='*62}")
             print(f"Benchmark done : {bench_name}")
-            print(f"Total: {all_saved} saved,  {all_failed} failed")
+            print(f"Total: {all_saved + skipped} saved,  {all_failed} failed")
             print(f"Total cost: ${bench_tracker.cost:.6f}")
             print(f"Total tokens: {bench_tracker.input_tokens:,} in / {bench_tracker.output_tokens:,} out")
             print(f"Wall time: {elapsed:.1f}s")
