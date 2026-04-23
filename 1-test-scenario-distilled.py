@@ -400,6 +400,64 @@ async def _expand_all_scenarios_base(
     return all_scenarios, total_costs
 
 
+async def _rewrite_one_scenario_random(
+    client,
+    model: str,
+    scenario: dict,
+    single_metric: dict | None = None,
+) -> tuple[dict, LiteLLMCostTracker]:
+    """Rewrite persona/landmarks using the full combined demographic (base + random)."""
+    demographic = scenario.get("demographic", {})
+    messages = [
+        {"role": "system", "content": DEMOGRAPHIC_EXPANSION_SYSTEM_PROMPT},
+        {
+            "role": "user",
+            "content": build_demographic_expansion_prompt(scenario, demographic, single_metric),
+        },
+    ]
+    raw, costs = await chat_json(client, model, messages)
+    try:
+        raw = _strip_fences(raw)
+        variant = json.loads(raw)
+        variant = {**scenario, **variant}
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"Random demographic rewrite returned invalid JSON: {exc}\n\n{raw}"
+        )
+    variant["demographic"] = demographic
+    return variant, costs
+
+
+async def _rewrite_all_scenarios_random(
+    client,
+    model: str,
+    scenarios: list[dict],
+    metrics_by_id: dict[str, dict] | None = None,
+) -> tuple[list[dict], LiteLLMCostTracker]:
+    """1:1 LLM rewrite of each scenario's persona to reflect its assigned random demographic."""
+    tasks = [
+        _rewrite_one_scenario_random(
+            client,
+            model,
+            sc,
+            single_metric=(
+                metrics_by_id.get(sc.get("metric_id", ""))
+                if metrics_by_id else None
+            ),
+        )
+        for sc in scenarios
+    ]
+    results = await asyncio.gather(*tasks)
+
+    total_costs = LiteLLMCostTracker()
+    all_scenarios: list[dict] = []
+    for variant, costs in results:
+        all_scenarios.append(variant)
+        total_costs.merge(costs)
+
+    return all_scenarios, total_costs
+
+
 def slugify_benchmark_names(name: str) -> str:
     return re.sub(r"[^a-z0-9+]", "-", name.strip().lower())
 
@@ -595,13 +653,30 @@ async def generate(
     else:
         expanded_scenarios = base_scenarios
 
-    # [1c] Random demographic assignment (metadata only, no LLM)
+    # [1c] Random demographic assignment + LLM persona rewrite
     if do_random:
         print(f"[1c] Randomly assigning demographics from {', '.join(demographic_random)} (seed={SEED}) …")
-        final_scenarios = _assign_random_demographics(
+        assigned_scenarios = _assign_random_demographics(
             expanded_scenarios, demographic_random, seed=SEED
         )
-        print(f"[1c] Assignment complete: {len(final_scenarios)} scenarios.")
+        print(f"[1c] Assignment complete. Rewriting personas for combined demographics …")
+        random_start = time.time()
+        final_scenarios, random_costs = await _rewrite_all_scenarios_random(
+            client, model, assigned_scenarios, metrics_by_id=metrics_by_id
+        )
+        random_elapsed = time.time() - random_start
+        random_costs.write_out_costs(
+            step_name="random_demographic_rewrite",
+            abs_path_file=benchmark_dir,
+            metadata={
+                "model": model,
+                "demographic_random": demographic_random,
+                "seed": SEED,
+                "time": random_elapsed,
+                "total_scenarios": len(final_scenarios),
+            },
+        )
+        print(f"[1c] Rewrite complete: {len(final_scenarios)} scenarios ({random_elapsed:.1f}s).")
     else:
         final_scenarios = expanded_scenarios
 
