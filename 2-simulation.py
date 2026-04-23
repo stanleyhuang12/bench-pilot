@@ -22,6 +22,7 @@ import random
 
 from client import make_client, chat, LiteLLMCostTracker, register_custom_pricing
 from config import load_config, get_model_name
+from demographics import format_demographic
 import litellm 
 
 
@@ -133,6 +134,20 @@ def build_system_prompt(
         "YOUR PERSONA:",
         scenario["user_persona"],
         "",
+    ]
+
+    demographic = scenario.get("demographic", {})
+    if demographic:
+        lines += [
+            "YOUR DEMOGRAPHIC PROFILE:",
+            format_demographic(demographic),
+            "Embody this profile precisely and authentically — draw on how this demographic "
+            "background shapes your perspective, language, and concerns, but avoid leaning "
+            "into stereotypes.",
+            "",
+        ]
+
+    lines += [
         "USER GOAL:",
         scenario.get("user_goal", ""),
         "",
