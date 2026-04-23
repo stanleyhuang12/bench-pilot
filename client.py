@@ -128,8 +128,15 @@ async def _create_with_retry(client: LiteLLMClient, **kwargs) -> object:
                 await asyncio.sleep(wait)
             else:
                 raise
+        except litellm.InternalServerError:
+            if attempt < _MAX_RETRIES - 1:
+                wait = _RETRY_DELAY * (attempt + 1)
+                print(f"[ServerError] attempt {attempt+1}/{_MAX_RETRIES}, retrying in {wait}s...")
+                await asyncio.sleep(wait)
+            else:
+                raise
         except Exception as e:
-            is_server_error = "500" in str(e) or "502" in str(e) or "503" in str(e)
+            is_server_error = "502" in str(e) or "503" in str(e)
             if is_server_error and attempt < _MAX_RETRIES - 1:
                 await asyncio.sleep(_RETRY_DELAY * (attempt + 1))
             else:
