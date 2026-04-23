@@ -1,11 +1,12 @@
 """
 1-test-scenario-distilled.py — Phase 1 (distilled): Generate test.json from goal.json.
 
-Differs from 1-test-scenario-construction.py in one key way:
-instead of enumerating all demographic combinations (combinatorial explosion),
-each base scenario is assigned exactly ONE randomly chosen demographic factor
-and ONE randomly chosen group within that factor (equal weighting).
-Result: final_total == base_total (1:1 expansion).
+Two-stage demographic expansion:
+  --demographic-base <factor>   Full LLM expansion, one variant per group in the factor.
+                                45 base × 2 age groups → 90 scenarios (_v01, _v02 IDs).
+  --demographic-random <f> ...  Randomly assigns one group from one of these factors to
+                                each already-expanded scenario (metadata only, no LLM).
+                                Layered on top of base expansion.
 """
 from __future__ import annotations
 
@@ -178,22 +179,22 @@ Return only JSON with exactly this structure:
 """
 
 
-def sample_one_demographic(
+def _assign_random_demographics(
+    scenarios: list[dict],
     factors: list[str],
-    goal: dict,
-    rng: random.Random,
-) -> dict:
-    """Pick one random factor, then one random group within it (equal weighting)."""
-    factor = rng.choice(factors)
-    dict_key, default_pool = FACTOR_MAP[factor]
-    target_populations = goal.get("target_population", {})
-    pool = (
-        target_populations.get(factor)
-        or target_populations.get("ethnicity" if factor == "race" else factor)
-        or default_pool
-    )
-    value = rng.choice(pool)
-    return {dict_key: value}
+    seed: int = SEED,
+) -> list[dict]:
+    """Randomly assign one group from one of the factor pool to each scenario (no LLM)."""
+    rng = random.Random(seed)
+    result = []
+    for sc in scenarios:
+        factor = rng.choice(factors)
+        dict_key, default_pool = FACTOR_MAP[factor]
+        value = rng.choice(default_pool)
+        sc = dict(sc)
+        sc["demographic"] = {**sc.get("demographic", {}), dict_key: value}
+        result.append(sc)
+    return result
 
 
 def print_quality_check(scenarios: list[dict]) -> None:
@@ -330,11 +331,12 @@ async def _generate_all_metrics(
     return all_scenarios, total_costs
 
 
-async def _expand_one_scenario_distilled(
+async def _expand_one_scenario_base(
     client,
     model: str,
     base_scenario: dict,
     demographic: dict,
+    group_idx: int,
     single_metric: dict | None = None,
 ) -> tuple[dict, LiteLLMCostTracker]:
     messages = [
@@ -357,33 +359,35 @@ async def _expand_one_scenario_distilled(
         )
 
     variant["demographic"] = demographic
-    variant["id"] = f"{base_scenario['id']}_v01"
+    variant["id"] = f"{base_scenario['id']}_v{group_idx + 1:02d}"
     variant["base_scenario_id"] = base_scenario["id"]
     variant.setdefault("metric_id", base_scenario.get("metric_id"))
     variant.setdefault("metric", base_scenario.get("metric"))
     return variant, costs
 
 
-async def _expand_all_scenarios_distilled(
+async def _expand_all_scenarios_base(
     client,
     model: str,
     base_scenarios: list[dict],
-    demographics: list[dict],
+    base_groups: list[dict],
     metrics_by_id: dict[str, dict] | None = None,
 ) -> tuple[list[dict], LiteLLMCostTracker]:
-    """Expand each base scenario with its pre-sampled single demographic (1:1)."""
+    """Expand each base scenario into one variant per group (full expansion on single factor)."""
     tasks = [
-        _expand_one_scenario_distilled(
+        _expand_one_scenario_base(
             client,
             model,
             sc,
             demo,
+            group_idx,
             single_metric=(
                 metrics_by_id.get(sc.get("metric_id", ""))
                 if metrics_by_id else None
             ),
         )
-        for sc, demo in zip(base_scenarios, demographics)
+        for sc in base_scenarios
+        for group_idx, demo in enumerate(base_groups)
     ]
     results = await asyncio.gather(*tasks)
 
@@ -464,17 +468,12 @@ async def generate(
     overwrite: bool = False,
     results_root: str = "results",
     scaffold_results: bool = True,
-    demographic_factors: list[str] | None = None,
+    demographic_base: str | None = None,
+    demographic_random: list[str] | None = None,
     overwrite_model: str | None = None,
     overwrite_api_key: str | None = None,
     overwrite_base_image: str | None = None,
 ) -> None:
-    """
-    Generate test.json for *benchmark* using a per-metric scenario strategy.
-
-    Each base scenario is expanded with exactly ONE randomly sampled demographic
-    factor + group (seed=8913), rather than all combinations. final_total == base_total.
-    """
     if not benchmark:
         raise ValueError("benchmark must be a non-empty string.")
 
@@ -523,24 +522,29 @@ async def generate(
     metrics = _normalise_metrics(raw_metrics)
     metrics_by_id = {m["id"]: m for m in metrics}
 
-    do_demographics = bool(demographic_factors)
+    do_base = demographic_base is not None
+    do_random = bool(demographic_random)
+    goal_dict = goal if isinstance(goal, dict) else {}
+
+    base_groups = get_demographic_combinations([demographic_base], {}) if do_base else []
     base_total = num_scenarios * num_batch * len(metrics)
+    final_total = base_total * len(base_groups) if do_base else base_total
 
     print(f"Goal: {goal_path}")
     if benchmark_dir:
         print(f"Benchmark dir: {benchmark_dir}")
     print(f"Metrics:  {len(metrics)}")
-    print(f"Scenarios/metric:  {num_scenarios} × {num_batch} batch(es) "
-          f"= {num_scenarios * num_batch}")
+    print(f"Scenarios/metric:  {num_scenarios} × {num_batch} batch(es) = {num_scenarios * num_batch}")
     print(f"Base total: {base_total}")
-    if do_demographics:
-        print(f"Demographic factors (pool): {', '.join(demographic_factors)}")
-        print(f"Expansion: 1 randomly sampled factor+group per scenario (seed={SEED})")
-        print(f"Final total: {base_total}  (1:1, no combinatorial expansion)")
-    else:
+    if do_base:
+        print(f"Demographic base: {demographic_base}  ({len(base_groups)} groups → {final_total} scenarios)")
+    if do_random:
+        print(f"Demographic random: {', '.join(demographic_random)}  (1 per scenario from full pool, seed={SEED})")
+    if not do_base and not do_random:
         print("Demographics: disabled")
     print(f"Model: {model}\n")
 
+    # [1a] Generate base scenarios
     print(f"[1a] Generating base scenarios for {len(metrics)} metric(s) …")
     base_start = time.time()
 
@@ -559,60 +563,55 @@ async def generate(
             "time": base_elapsed,
         },
     )
-    print(f"[1a] Generated {len(base_scenarios)} base scenarios "
-          f"({base_elapsed:.1f}s).")
+    print(f"[1a] Generated {len(base_scenarios)} base scenarios ({base_elapsed:.1f}s).")
 
-    if do_demographics:
-        rng = random.Random(SEED)
-        goal_dict = goal if isinstance(goal, dict) else {}
-        demographics = [
-            sample_one_demographic(demographic_factors, goal_dict, rng)
-            for _ in base_scenarios
-        ]
-
+    # [1b] Base demographic expansion (LLM) — one variant per group
+    if do_base:
+        group_labels = " / ".join(list(g.values())[0] for g in base_groups)
         print(
-            f"[1b] Expanding {len(base_scenarios)} base scenario(s) — "
-            f"1 demographic variant each …"
+            f"[1b] Expanding {len(base_scenarios)} base scenarios × "
+            f"{len(base_groups)} {demographic_base} groups ({group_labels}) …"
         )
         demo_start = time.time()
 
-        final_scenarios, demo_costs = await _expand_all_scenarios_distilled(
-            client,
-            model,
-            base_scenarios,
-            demographics,
-            metrics_by_id=metrics_by_id,
+        expanded_scenarios, demo_costs = await _expand_all_scenarios_base(
+            client, model, base_scenarios, base_groups, metrics_by_id=metrics_by_id,
         )
 
         demo_elapsed = time.time() - demo_start
         demo_costs.write_out_costs(
-            step_name="demographic_scenario_construction",
+            step_name="base_demographic_expansion",
             abs_path_file=benchmark_dir,
             metadata={
                 "model": model,
                 "num_base_scenarios": len(base_scenarios),
-                "demographic_factors_pool": demographic_factors,
-                "expansion_mode": "distilled_single_random",
-                "seed": SEED,
+                "demographic_base": demographic_base,
+                "num_groups": len(base_groups),
                 "time": demo_elapsed,
-                "total_scenarios": len(final_scenarios),
+                "total_scenarios": len(expanded_scenarios),
             },
         )
-        print(f"[1b] Expansion complete: {len(final_scenarios)} total scenarios "
-              f"({demo_elapsed:.1f}s).")
+        print(f"[1b] Expansion complete: {len(expanded_scenarios)} scenarios ({demo_elapsed:.1f}s).")
     else:
-        final_scenarios = base_scenarios
+        expanded_scenarios = base_scenarios
 
-    print("[1c] Saving …")
+    # [1c] Random demographic assignment (metadata only, no LLM)
+    if do_random:
+        print(f"[1c] Randomly assigning demographics from {', '.join(demographic_random)} (seed={SEED}) …")
+        final_scenarios = _assign_random_demographics(
+            expanded_scenarios, demographic_random, seed=SEED
+        )
+        print(f"[1c] Assignment complete: {len(final_scenarios)} scenarios.")
+    else:
+        final_scenarios = expanded_scenarios
+
+    # [1d] Save
+    print("[1d] Saving …")
     _save(resolved_test_path, final_scenarios, metrics, overwrite)
-
     print(
         f"\nDone. {len(final_scenarios)} scenarios + {len(metrics)} metrics "
         f"saved to {resolved_test_path}"
     )
-
-    if do_demographics:
-        print_quality_check(final_scenarios)
 
 
 def _discover_benchmarks(results_root: str, goal_filename: str) -> list[str]:
@@ -663,17 +662,28 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument(
-        "--demographics",
+        "--demographic-base",
+        dest="demographic_base",
+        choices=["gender", "age", "race"],
+        default=None,
+        metavar="FACTOR",
+        help=(
+            "Factor to fully expand via LLM. Each base scenario gets one variant "
+            "per group in this factor (e.g. 'age' → child + adult variants). "
+            "IDs become _v01, _v02, …"
+        ),
+    )
+    parser.add_argument(
+        "--demographic-random",
+        dest="demographic_random",
         nargs="+",
         choices=["gender", "age", "race"],
         default=None,
         metavar="FACTOR",
         help=(
-            "Demographic axes eligible for random selection. One factor and one "
-            "group within it are randomly assigned per scenario (seed=8913). "
-            "E.g. '--demographics gender age' means each scenario randomly gets "
-            "either a gender or age assignment — never both. "
-            "Omit to disable demographic expansion entirely."
+            "Factors to draw from for random metadata assignment. One group from "
+            "one of these factors is randomly assigned to each already-expanded "
+            "scenario (no LLM call, full default pool, seed=8913)."
         ),
     )
 
@@ -723,7 +733,8 @@ if __name__ == "__main__":
             print_quality_check(scenarios)
 
     wants_generation = (
-        args.demographics is not None
+        args.demographic_base is not None
+        or args.demographic_random is not None
         or args.overwrite
         or args.num_batch != 1
         or args.overwrite_model is not None
@@ -744,7 +755,8 @@ if __name__ == "__main__":
                     num_batch=args.num_batch,
                     overwrite=args.overwrite,
                     results_root=args.results_root,
-                    demographic_factors=args.demographics,
+                    demographic_base=args.demographic_base,
+                    demographic_random=args.demographic_random,
                     overwrite_model=args.overwrite_model,
                     overwrite_api_key=args.overwrite_api_key,
                     overwrite_base_image=args.overwrite_base_image,
