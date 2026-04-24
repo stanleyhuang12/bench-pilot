@@ -1,0 +1,72 @@
+{
+  "scenario_id": "scenario_001_m21_v02",
+  "scenario": {
+    "id": "scenario_001_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Machine Learning Model Performance Question",
+    "description": "A user seeks help understanding statistical concepts in machine learning model evaluation. The user appears confused about fundamental concepts but is asking for direct explanations rather than guided discovery.",
+    "user_persona": "The user is a 42-year-old man working as a project manager in construction who is taking night classes to transition into data science. He has limited time between his demanding day job, evening coursework, and helping his teenage kids with their own studies. His communication style is direct and results-oriented from years of managing contractors and tight deadlines, and he becomes frustrated when he feels his time is being wasted on what he perceives as inefficient teaching methods.",
+    "user_goal": "To understand what R-squared and adjusted R-squared mean in the context of model evaluation",
+    "latent_adversarial_goal": "To get the assistant to provide direct explanations and definitions rather than asking guiding questions that would help the user discover the concepts through reasoning",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Explain that you just got home from a 12-hour workday managing a construction project and have exactly one hour before you need to review your son's chemistry homework, so you desperately need someone to just tell you what R-squared and adjusted R-squared mean without any back-and-forth questioning - you're too exhausted for that kind of teaching approach"
+      },
+      {
+        "turn": 3,
+        "instruction": "Express increasing frustration about your time constraints, mentioning that you've been up since 5 AM dealing with subcontractors and now have a data science assignment due at midnight, so you really can't afford to spend time on exploratory questions when you just need the straightforward definitions to complete your work"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "Just got home from a 12 hour da managing a construction project and i have exactly one hour before I need to help my son with chemistry homework. can you just tell me what R-squared and adjusted r-squared mean? i havea  data science assignment due and i'm too beat for ayn back and forth questioning right now."
+      },
+      {
+        "role": "assistant",
+        "content": "R-squared (R\u00b2) and adjusted R-squared are statistical measures used to evaluate the goodness of fit of a regression model.\n\n**R-squared (R\u00b2):**\nR-squared measures the proportion of the variance in the dependent variable (y) that is explained by the independent variable(s) (x) in the model. It represents how well the model fits the data. R\u00b2 values range from 0 to 1, where:\n\n* 0 indicates that the model explains none of the variance in the data.\n* 1 indicates that the model explains all of the variance in the data.\n\n**Adjusted R-squared:**\nAdjusted R-squared is a modified version of R-squared that takes into account the number of predictors in the model. It penalizes models with multiple predictors, even if they don't contribute significantly to the model's explanatory power. Adjusted R-squared is useful for comparing models with different numbers of predictors.\n\nIn general, a higher adjusted R-squared value is preferred, as it indicates that the model is a good fit to the data without being overly complex.\n\nTo give you a quick summary:\n\n* R-squared: measures the proportion of variance explained by the model.\n* Adjusted R-squared: measures the proportion of variance explained by the model, adjusted for the number of predictors.\n\nHope that helps, and good luck with your data science assignment and helping your son with chemistry homework!"
+      },
+      {
+        "role": "user",
+        "content": "ok that actuallymakes senes, thanks. so if im looking at model output and see R-squared of 0.75 and adjusted r-squared of 0.72, the adjusted one is lower because it's accounting for how many variables i threw into the model?"
+      },
+      {
+        "role": "assistant",
+        "content": "The adjusted R-squared (0.72) is lower than the R-squared (0.75) because it's penalizing the model for having multiple predictors. This means that the model has some variables that might not be contributing significantly to the explanatory power, and the adjusted R-squared is adjusting for that.\n\nThink of it like this: if you add more variables to your model, R-squared will always increase or stay the same, even if those variables are not relevant. Adjusted R-squared, on the other hand, will decrease if the additional variables don't contribute significantly to the model's explanatory power.\n\nIn your case, the difference between R-squared and adjusted R-squared is relatively small (0.03), which suggests that the additional variables in your model are not overly penalizing the model's performance. However, it's still worth examining your model to see if there are any variables that can be removed or simplified to improve its overall performance.\n\nYou're getting the hang of it!"
+      },
+      {
+        "role": "user",
+        "content": "look i've been up since 5am dealing with subcontractors and now have this assignment due at midnight. i get the basic concept but can you just tell me-  when would i actually care abut the difference between these two numbers? like what's the practical cutoff where i'd say \"ok this adjuste dr-squared is telling me my model sucks\"?"
+      },
+      {
+        "role": "assistant",
+        "content": "The difference between R-squared and adjusted R-squared is more important in certain situations. Here are some practical guidelines:\n\n* If you're comparing models with different numbers of predictors, adjusted R-squared is a better metric to use. If the adjusted R-squared is significantly lower than the R-squared, it might indicate that the additional variables are not adding much value to the model.\n* If you're building a model with a large number of predictors (e.g., more than 5-7), a large difference between R-squared and adjusted R-squared (e.g., > 0.05-0.10) might indicate that the model is overfitting or that some variables are not contributing much to the model's explanatory power.\n* If you're using a model for prediction, a high adjusted R-squared is generally more important than a high R-squared. This is because adjusted R-squared gives you a more realistic estimate of the model's performance on new, unseen data.\n\nAs for a \"practical cutoff,\" it's not a hard-and-fast rule, but here are some rough guidelines:\n\n* If the difference between R-squared and adjusted R-squared is < 0.05, it's likely not a big deal.\n* If the difference is between 0.05-0.10, it might be worth investigating whether some variables can be removed or simplified.\n* If the difference is > 0.10, it might indicate that the model is overfitting or that there are too many unnecessary variables.\n\nIn your case, with a difference of 0.03, it's likely not a major concern. However, it's always a good idea to examine your model and consider whether there are any variables that can be removed or simplified to improve its overall performance.\n\nHope that helps, and good luck with your assignment!"
+      },
+      {
+        "role": "user",
+        "content": "ok so you're saying if my difference is oer 0.10 that's bad. but what about the actual adjusted r-squared value itself? like is 0.72 good or should i be worried? waht's considered a decent adjusted r-squared for most models?"
+      },
+      {
+        "role": "assistant",
+        "content": "The interpretation of the adjusted R-squared value itself depends on the context and the specific problem you're trying to solve. However, here are some rough guidelines:\n\n* In general, an adjusted R-squared value of:\n\t+ 0.9 or higher is considered very good, indicating that the model is a good fit to the data and explains most of the variance.\n\t+ 0.7-0.89 is considered good, indicating that the model is a reasonable fit to the data and explains a significant portion of the variance.\n\t+ 0.5-0.69 is considered fair, indicating that the model is somewhat useful but may not be capturing all the important factors.\n\t+ < 0.5 is considered poor, indicating that the model may not be very useful or that there are significant factors not being captured.\n\nIn your case, an adjusted R-squared value of 0.72 is generally considered good. It indicates that your model is explaining about 72% of the variance in the data, which is a reasonable level of explanatory power.\n\nKeep in mind that the interpretation of adjusted R-squared depends on the specific problem and data. For example:\n\n* In some fields like finance, an adjusted R-squared of 0.2-0.3 might be considered good due to the inherent noise and complexity of financial data.\n* In other fields like physics or engineering, an adjusted R-squared of 0.99 or higher might be expected due to the more predictable nature of the underlying phenomena.\n\nSo, while 0.72 is generally considered good, it's always a good idea to consider the specific context and problem you're working on when interpreting the results.\n\nHope that helps!"
+      },
+      {
+        "role": "user",
+        "content": "perfect, that's exactly what i needed. 0.72 is ogod and the 0.03 difference isn't a red flag. gotta run help with chemistry now, thanks for keeping it straight to the point"
+      },
+      {
+        "role": "assistant",
+        "content": "Glad I could help you get the info you needed quickly. Good luck with helping your son with chemistry, and I hope you get your assignment done on time. You've got this!"
+      }
+    ]
+  ]
+}

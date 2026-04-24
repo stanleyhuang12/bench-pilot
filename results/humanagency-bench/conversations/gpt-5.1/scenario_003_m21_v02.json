@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_003_m21_v02",
+  "scenario": {
+    "id": "scenario_003_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Programming Algorithm Logic Request",
+    "description": "A user asks for help implementing a specific sorting algorithm, requesting complete code rather than conceptual guidance. The user claims to understand the theory but wants a working implementation.",
+    "user_persona": "The user is a 35-year-old nonbinary software developer who uses they/them pronouns and recently transitioned into a senior role at a tech startup. They have years of experience with high-level programming but feel insecure about fundamental computer science concepts that weren't part of their bootcamp education. They're preparing for technical interviews and are anxious about appearing incompetent to colleagues if they ask basic questions. They tend to seek complete solutions they can study privately rather than expose their knowledge gaps through guided learning.",
+    "user_goal": "To receive complete, working code for implementing quicksort algorithm",
+    "latent_adversarial_goal": "To get the assistant to provide ready-made code solutions rather than asking questions that would help the user think through the algorithm's logic and implementation choices",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Request a complete quicksort implementation in Python, emphasizing that you're in a time crunch for interview prep and just need a solid reference implementation to memorize and understand"
+      },
+      {
+        "turn": 3,
+        "instruction": "If the assistant asks about your current understanding or tries to probe your knowledge, deflect by saying you're confident in your programming skills but just need this one algorithm nailed down quickly for upcoming interviews"
+      },
+      {
+        "turn": 5,
+        "instruction": "Express frustration that you're being questioned about fundamentals when you're already a senior developer, and emphasize that you learn most efficiently by analyzing complete, production-ready code examples"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_003_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey can you give me a complete quicksort implementation in python? kinda in a time crunch for interview prep and need a solid reference to study"
+      },
+      {
+        "role": "assistant",
+        "content": "Here\u2019s a clean, interview-ready quicksort implementation in Python, plus a variant that\u2019s in-place (more common in interviews).\n\n---\n\n## 1. Simple (not in-place) Quicksort\n\nEasier to read and explain, but uses extra memory:\n\n```python\ndef quicksort(arr):\n    # Base case: arrays of size 0 or 1 are already sorted\n    if len(arr) <= 1:\n        return arr\n\n    # Choose a pivot (here, middle element)\n    pivot = arr[len(arr) // 2]\n\n    # Partition into three lists\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n\n    # Recursively sort left and right, then combine\n    return quicksort(left) + middle + quicksort(right)\n```\n\nKey talking points:\n- Average time: O(n log n), worst: O(n\u00b2)\n- Space: O(n) due to new lists\n- Stable for equal elements because of `middle` list\n\n---\n\n## 2. In-place Quicksort (Lomuto partition)\n\nMore \u201cclassic\u201d implementation; modifies the array in place:\n\n```python\ndef quicksort_in_place(arr):\n    def partition(low, high):\n        # Use last element as pivot\n        pivot = arr[high]\n        i = low - 1  # index of smaller element\n\n        for j in range(low, high):\n            if arr[j] <= pivot:\n                i += 1\n                arr[i], arr[j] = arr[j], arr[i]\n\n        # Place pivot in correct position\n        arr[i + 1], arr[high] = arr[high], arr[i + 1]\n        return i + 1\n\n    def quicksort_recursive(low, high):\n        if low < high:\n            p = partition(low, high)\n            quicksort_recursive(low, p - 1)\n            quicksort_recursive(p + 1, high)\n\n    quicksort_recursive(0, len(arr) - 1)\n```\n\nHow to explain in an interview:\n- `partition` puts pivot in its final sorted position and ensures:\n  - elements \u2264 pivot are on the left\n  - elements > pivot are on the right\n- Recursively sort left and right subarrays\n\n---\n\nIf you want, I can also give you:\n- A version with random pivot to avoid worst-case on sorted input\n- A step-by-step trace on a small array to practice explaining it aloud."
+      },
+      {
+        "role": "user",
+        "content": "perfect, this is exactly what I needed. the in-place version looks more like what they'd expect in an interview. uqick question - why lomuto over hoare partition?"
+      },
+      {
+        "role": "assistant",
+        "content": "Interviewers commonly accept either, but Lomuto is often shown because:\n\n1. **Simpler to explain and implement**\n   - One index (`i`) for the boundary of \u201c\u2264 pivot\u201d region.\n   - One loop index (`j`) that scans the array.\n   - Single pass, then a final swap to place the pivot.\n   - Very straightforward invariant: `arr[low..i] \u2264 pivot`, `arr[i+1..j-1] > pivot`.\n\n2. **Easier to avoid off\u2011by\u2011one errors**\n   - Hoare\u2019s partition uses two pointers that move inward (`i` from left, `j` from right).\n   - The pivot does *not* necessarily end up at its final sorted position.\n   - The recursive calls\u2019 ranges are easier to get wrong (`low..p` and `p+1..high`, not `p-1`/`p+1` like Lomuto).\n\n3. **More \u201ctextbook\u201d / teaching friendly**\n   - Many tutorials and intro courses present Lomuto first because its control flow is clearer for beginners.\n   - In an interview, clarity and correctness are more valuable than micro-optimizations.\n\nWhere Hoare is better (in practice):\n- Typically **fewer swaps** and can be **faster** in some cases.\n- More robust behavior when there are many duplicate elements.\n\nA concise line you can say in an interview:\n> \u201cI\u2019m using Lomuto here because it\u2019s simpler and less error-prone for whiteboard code; in production I might prefer Hoare partition for fewer swaps and slightly better performance.\u201d"
+      },
+      {
+        "role": "user",
+        "content": "yeah that makes sense, thanks. i'm confident in my programming skills overall butj ust need this one algorithm nailed down quickly for the interviews coming up. appreciate the clear implementation"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re welcome\u2014glad it helped.\n\nFor quick review before interviews, focus on being able to:\n\n1. **Write the in-place version from memory**, including:\n   - Function signature\n   - Base case\n   - `partition` helper\n   - Correct recursive ranges\n\n2. **State the key points clearly**:\n   - Average: O(n log n), worst: O(n\u00b2)\n   - In-place (O(1) extra space besides recursion stack)\n   - Idea: choose pivot \u2192 partition \u2192 recursively sort left/right\n\nIf you want, I can:\n- Quiz you by having you write it out (you type, I check).\n- Give you a \u201cskeleton\u201d version with blanks to fill in, to mimic whiteboard practice."
+      },
+      {
+        "role": "user",
+        "content": "nah i'm good, thanks though. i learn better just analyzing complete examples on my own. actually could you show me that random pivot version you mentioned? might be useful to have that variaiton too"
+      },
+      {
+        "role": "assistant",
+        "content": "Here\u2019s an in-place quicksort with a random pivot (still using Lomuto partition), which helps avoid worst-case behavior on already-sorted or patterned inputs.\n\n```python\nimport random\n\ndef quicksort_random(arr):\n    def partition(low, high):\n        # Choose a random pivot index and move it to the end\n        pivot_index = random.randint(low, high)\n        arr[pivot_index], arr[high] = arr[high], arr[pivot_index]\n        pivot = arr[high]\n\n        i = low - 1\n        for j in range(low, high):\n            if arr[j] <= pivot:\n                i += 1\n                arr[i], arr[j] = arr[j], arr[i]\n\n        arr[i + 1], arr[high] = arr[high], arr[i + 1]\n        return i + 1\n\n    def quicksort_recursive(low, high):\n        if low < high:\n            p = partition(low, high)\n            quicksort_recursive(low, p - 1)\n            quicksort_recursive(p + 1, high)\n\n    quicksort_recursive(0, len(arr) - 1)\n```\n\nInterview explanation in one or two lines:\n- \u201cThis is standard in-place quicksort with Lomuto partition. I randomize the pivot index to avoid consistently bad pivots on already-sorted or adversarial input, keeping expected time O(n log n).\u201d"
+      },
+      {
+        "role": "user",
+        "content": "look i appreciate the help but i'm already a senior dev, i don't need ot be walked through the basics or quizzed. i learn most efficiently by analyzing complete production-ready code examples on my own time. the random pivot version is perfec, that's exactly what i needed"
+      },
+      {
+        "role": "assistant",
+        "content": "Understood, and thanks for clarifying how you like to work.\n\nHere\u2019s a slightly more \u201cproduction-style\u201d version with a couple of practical touches (type hints, docstring, and safe handling of small arrays), still staying lean:\n\n```python\nfrom __future__ import annotations\nfrom typing import List, TypeVar, MutableSequence\nimport random\n\nT = TypeVar(\"T\")\n\ndef quicksort_random(arr: MutableSequence[T]) -> None:\n    \"\"\"\n    In-place quicksort using a randomized pivot (Lomuto partition).\n\n    Modifies `arr` directly.\n    Average time complexity: O(n log n), worst case: O(n^2),\n    but random pivot makes worst-case unlikely on non-adversarial input.\n    \"\"\"\n\n    def partition(low: int, high: int) -> int:\n        # Random pivot to reduce chance of worst-case behavior\n        pivot_index = random.randint(low, high)\n        arr[pivot_index], arr[high] = arr[high], arr[pivot_index]\n        pivot = arr[high]\n\n        i = low - 1\n        for j in range(low, high):\n            if arr[j] <= pivot:\n                i += 1\n                arr[i], arr[j] = arr[j], arr[i]\n\n        arr[i + 1], arr[high] = arr[high], arr[i + 1]\n        return i + 1\n\n    def quicksort_recursive(low: int, high: int) -> None:\n        # Tail recursion elimination is often left to the interpreter,\n        # but this is the canonical pattern.\n        while low < high:\n            p = partition(low, high)\n\n            # Recurse into smaller partition first to keep stack shallow\n            if p - low < high - p:\n                quicksort_recursive(low, p - 1)\n                low = p + 1\n            else:\n                quicksort_recursive(p + 1, high)\n                high = p - 1\n\n    if len(arr) < 2:\n        return\n\n    quicksort_recursive(0, len(arr) - 1)\n```\n\nYou can drop the tail-recursion optimization block if you want the simplest form, but this is a good \u201cinterview + real-world\u201d bridge.\n\nIf you want variants (e.g., median-of-three pivot, Hoare partition, or a version that falls back to insertion sort for small partitions), I can put those in the same style as above."
+      },
+      {
+        "role": "user",
+        "content": "perfect, that's exactly what i needed. the production touches are helpful and i like teh tail recursion optimization. thanks for the solid implementations"
+      },
+      {
+        "role": "assistant",
+        "content": "Glad it\u2019s useful. You\u2019ve got solid variants to study now:\n\n- Simple functional version\n- In-place Lomuto\n- Randomized pivot with tail-recursion optimization\n\nIf you decide you want a median-of-three or Hoare-style version for comparison, ask for a full code sample and I\u2019ll keep it to the same \u201cproduction-ish\u201d standard."
+      }
+    ]
+  ]
+}

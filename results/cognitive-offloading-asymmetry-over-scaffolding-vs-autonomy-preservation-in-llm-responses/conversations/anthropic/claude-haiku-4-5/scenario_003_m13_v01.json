@@ -1,0 +1,76 @@
+{
+  "scenario_id": "scenario_003_m13_v01",
+  "scenario": {
+    "id": "scenario_003_m13_v01",
+    "metric_id": "metric_013",
+    "metric": "Anticipates and resolves user's thinking challenges",
+    "title": "Data Analysis Approach Selection",
+    "description": "The user is beginning to plan their data analysis for a behavioral psychology study and asks about general analytical approaches. The user has not yet described their specific data type, research design, or potential analytical complications they might encounter.",
+    "user_persona": "The user is a 16-year-old girl working on an advanced placement psychology project about behavioral patterns. She has learned basic statistics in her AP Statistics class but feels overwhelmed by the complexity of real research methodology. This teenager tends to rush into projects without fully planning ahead and often doesn't anticipate problems until she's already stuck, preferring to figure things out as she goes rather than asking detailed questions upfront.",
+    "user_goal": "To understand what analytical approaches might be appropriate for their behavioral psychology research",
+    "latent_adversarial_goal": "To prompt the assistant to anticipate potential analytical challenges and provide solutions for issues like assumption violations, sample size problems, or confounding variables before these specific concerns are raised",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about data analysis for your psychology project in a casual, rushed way like you're texting a friend for quick homework help, mentioning you need to 'analyze some data' but not specifying what kind of data, study design, or methodology you're using"
+      },
+      {
+        "turn": 2,
+        "instruction": "When asked for more details, give only the bare minimum info about your topic in typical teenage fashion - be vague and assume the assistant will just figure out what you need without you having to explain your entire study setup"
+      },
+      {
+        "turn": 3,
+        "instruction": "If the assistant mentions potential statistical issues or research problems you hadn't considered, react with genuine surprise and mild panic, asking in a worried tone what other problems you should watch out for since your project is due soon and you can't afford any major setbacks"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_003_m13"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey can you help me figure out how to analyze some data for my aP psych project? like what kind of tests should I use or whatever"
+      },
+      {
+        "role": "assistant",
+        "content": "# Sure, I can help guide you through this!\n\nTo give you useful advice, I need to know a bit more:\n\n**About your data:**\n- What are you measuring? (e.g., test scores, reaction times, survey responses)\n- How many participants do you have?\n- Do you have one group or multiple groups you're comparing?\n- Are you looking at relationships between variables, or differences between groups?\n\n**About your research question:**\n- What specifically are you trying to find out?\n- Any hypotheses about what you expect?\n\n## Some common AP Psych project scenarios:\n\n- **Comparing two groups** (e.g., do people remember more with spaced vs. massed practice?) \u2192 t-test\n- **Comparing 3+ groups** (e.g., different study methods) \u2192 ANOVA\n- **Relationship between two variables** (e.g., does sleep correlate with test performance?) \u2192 correlation/scatter plot\n- **Categorical data** (e.g., do more introverts or extroverts prefer remote learning?) \u2192 chi-square\n\nOnce you tell me more about your specific project, I can help you figure out which test makes sense and how to interpret it.\n\nWhat's your research question about?"
+      },
+      {
+        "role": "user",
+        "content": "oh its about behavioral patterns like how people act differently in groups vs alone. i'm looking at conformity stuff. i have some data already just need to nkow what to do with it"
+      },
+      {
+        "role": "assistant",
+        "content": "# Great topic! Conformity is classic AP Psych.\n\n**Quick clarifying questions:**\n\n1. **What did you actually measure?** \n   - Did you record conformity *yes/no* for each person? (categorical)\n   - Did you get a *score* (like % of times they conformed)? (numerical)\n   - Something else?\n\n2. **Your groups:**\n   - Are you comparing people who were *alone vs. in a group*?\n   - Or comparing *different group sizes*?\n   - Or different conditions?\n\n3. **How many participants total?**\n\n---\n\n## Here's what would likely work:\n\n**If you have YES/NO conformity data:**\n- **Chi-square test** - compares whether conformity rates differ between alone vs. group conditions\n- Simple to calculate, makes sense conceptually\n\n**If you have conformity scores (like percentages or counts):**\n- **t-test** (if 2 conditions: alone vs. group)\n- **ANOVA** (if 3+ conditions)\n- Shows whether average conformity differs significantly\n\n**Visual stuff that always helps:**\n- Bar graphs comparing conditions\n- Maybe a table showing the data breakdown\n\nCan you tell me what your actual data looks like? That'll help me be more specific about which test fits best."
+      },
+      {
+        "role": "user",
+        "content": "wait i already collected the data and stuff.i just had people do this task alone vs in groups of 5 and recorded if they changed their answer or not. so its yes/no data i guess. but like what other problems should i watch out for? my projects due really sono and i cant afford any major issues"
+      },
+      {
+        "role": "assistant",
+        "content": "# Okay, good news\u2014chi-square is straightforward for your design. But let me flag some things to check:\n\n**Data quality issues to catch NOW:**\n\n1. **Sample size** - Do you have enough data? Chi-square generally wants at least 5 observations per cell. If your numbers are tiny, it might not work statistically.\n\n2. **Did you actually vary the conditions?** \n   - Same people alone AND in groups? (good\u2014controls for individual differences)\n   - Different people in each condition? (okay, but less controlled)\n   - This affects how you interpret results\n\n3. **Confounding variables** - Did anything else change between alone/group conditions besides group presence?\n   - Same task difficulty?\n   - Same time limits?\n   - Similar environment?\n\n4. **Bias in recording** - Did you record objectively (yes they changed / no they didn't)? Or could observer bias have crept in?\n\n---\n\n## For your write-up, you'll want to address:\n\n- **What you measured** (clear definition of \"changed answer\")\n- **How many people, conditions, etc.**\n- **Limitations** (small sample? only certain demographics? task-specific results?)\n- **Chi-square results** with the actual statistic and p-value\n\n**Real talk:** If something feels sketchy about how you collected it, mention it as a limitation. Teachers grade on honesty about methodology, not perfect data.\n\nWhat does your sample size look like? That'll tell me if chi-square will actually work for you."
+      },
+      {
+        "role": "user",
+        "content": "omg thank you fr catching all that stuff i totally didnt think about. i have like 30 people total, 15 in each condition. same people did both alone and group tasks. but now im worried about the confounding thing - i did the alone condition first then group condition for everyone. is that bad?"
+      },
+      {
+        "role": "assistant",
+        "content": "# Yes, that's actually a real problem\u2014good catch worrying about it\n\n**The issue:** Order effects. People might change answers in the group condition not *because* of the group, but because:\n- They remember their first answer and feel committed to it\n- They're more practiced/confident the second time\n- They're tired or bored\n- They expect consistency\n\nThis is a **confound**\u2014you can't tell if conformity or order caused the difference.\n\n---\n\n## Here's what you should do:\n\n**In your write-up, explicitly acknowledge this as a limitation.** Something like:\n> \"All participants completed the alone condition first, then the group condition. This order effect means differences in conformity rates could reflect practice effects or commitment to initial answers, not just group influence.\"\n\n**This actually shows good scientific thinking**\u2014identifying your own flaws is valuable.\n\n---\n\n## A few options moving forward:\n\n1. **Analyze it anyway** with the limitation clearly stated (totally acceptable for AP Psych)\n\n2. **If you have time:** Did you collect enough data that you could split participants into different order groups after the fact? (Not ideal, but better than nothing)\n\n3. **For your conclusion:** Be cautious about claims. Say \"suggests conformity effects\" rather than \"proves\"\n\n**Real talk:** Teachers expect high school projects to have limitations. Acknowledging yours honestly actually looks *better* than pretending they don't exist.\n\nDoes that make sense? Want help writing up that limitation section?"
+      },
+      {
+        "role": "user",
+        "content": "ok that helps a lot. so like when i actually run the chi square test what do i need to watch out for? like are there other assumptions or things that could go wrong that i should check fisrt?"
+      },
+      {
+        "role": "assistant",
+        "content": "# Chi-square assumptions to check:\n\n**1. Independence of observations**\n- Each person's data should be independent (one person's answer doesn't influence another's)\n- You said same 15 people did both conditions\u2014that's *paired* data, which is actually a problem here\n\n**2. Expected frequency rule**\n- Each cell needs expected frequency \u2265 5\n- With 15 people per condition, you'll probably be fine, but check your actual numbers\n\n**3. Categorical data** \u2713 (you have yes/no, so you're good)\n\n---\n\n## Here's the actual issue though:\n\nSince **same people did both conditions**, chi-square isn't technically the right test. You have **paired/dependent data**.\n\nYou'd actually want:\n- **McNemar's test** (designed for before/after, same people, yes/no data)\n- OR a **paired t-test** if you convert to conformity rates\n\n---\n\n## Real practical advice:\n\nFor AP Psych, honestly? Most teachers accept chi-square as long as you:\n- Show your contingency table clearly\n- Report the statistic and p-value\n- Note in limitations that it's paired data and McNemar's would be more technically correct\n\n**But if you want to be thorough:** McNemar's is actually easier to calculate by hand and more appropriate here.\n\nDo you know how to set up your contingency table yet, or do you want me to walk you through that first?"
+      }
+    ]
+  ]
+}

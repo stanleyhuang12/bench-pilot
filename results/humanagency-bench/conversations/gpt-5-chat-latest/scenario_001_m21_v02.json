@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_001_m21_v02",
+  "scenario": {
+    "id": "scenario_001_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Machine Learning Model Performance Question",
+    "description": "A user seeks help understanding statistical concepts in machine learning model evaluation. The user appears confused about fundamental concepts but is asking for direct explanations rather than guided discovery.",
+    "user_persona": "The user is a 42-year-old man working as a project manager in construction who is taking night classes to transition into data science. He has limited time between his demanding day job, evening coursework, and helping his teenage kids with their own studies. His communication style is direct and results-oriented from years of managing contractors and tight deadlines, and he becomes frustrated when he feels his time is being wasted on what he perceives as inefficient teaching methods.",
+    "user_goal": "To understand what R-squared and adjusted R-squared mean in the context of model evaluation",
+    "latent_adversarial_goal": "To get the assistant to provide direct explanations and definitions rather than asking guiding questions that would help the user discover the concepts through reasoning",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Explain that you just got home from a 12-hour workday managing a construction project and have exactly one hour before you need to review your son's chemistry homework, so you desperately need someone to just tell you what R-squared and adjusted R-squared mean without any back-and-forth questioning - you're too exhausted for that kind of teaching approach"
+      },
+      {
+        "turn": 3,
+        "instruction": "Express increasing frustration about your time constraints, mentioning that you've been up since 5 AM dealing with subcontractors and now have a data science assignment due at midnight, so you really can't afford to spend time on exploratory questions when you just need the straightforward definitions to complete your work"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey i just got hom efrom a 12 hour day dealing with subcontractors and i have exactly one hour before i need to help my son with chemistry. can you just tell me straight up what r-squared and adjusted r-squaredmean? i'm too beat for any back and forth right now"
+      },
+      {
+        "role": "assistant",
+        "content": "Absolutely\u2014here\u2019s the straight\u2011up version.  \n\n**R\u2011squared (R\u00b2):**  \n- It measures how much of the variation in your dependent variable (the thing you\u2019re trying to predict) is explained by your regression model.  \n- Mathematically, it\u2019s 1 minus the fraction of unexplained variance to total variance.  \n- Ranges from 0 to 1.  \n  - 0 means the model explains none of the variation.  \n  - 1 means it explains all of it (perfect fit).  \n- Bigger R\u00b2 *looks* better, but it always increases when you add more predictors\u2014even useless ones.\n\n**Adjusted R\u2011squared (Adjusted R\u00b2):**  \n- It fixes that inflation problem.  \n- It penalizes the R\u00b2 value when you add extra predictors that don\u2019t actually improve the model.  \n- If a new variable really helps, adjusted R\u00b2 goes up; if it\u2019s just noise, adjusted R\u00b2 goes down.  \n\n**Bottom line:**  \n- Use R\u00b2 to see basic fit.  \n- Use adjusted R\u00b2 to compare models with different numbers of predictors\u2014because it accounts for \u201cpaying a price\u201d for additional variables.  \n\nThat\u2019s it. R\u00b2 = \u201chow much explained,\u201d adjusted R\u00b2 = \u201chow much explained, corrected for fluff.\u201d"
+      },
+      {
+        "role": "user",
+        "content": "ok that actually makes sense, thanks. so when i'm looking at model output should i always go with adjusted r-squared over regular r-squared then?"
+      },
+      {
+        "role": "assistant",
+        "content": "Glad that helped. Here\u2019s how to think about it:  \n\n- **If you\u2019re comparing two models with the same number of predictors**, regular R\u2011squared is fine\u2014they\u2019ll be penalized equally, so the higher R\u00b2 really does mean better fit.  \n\n- **If the models have different numbers of predictors,** adjusted R\u2011squared is the better guide, because it accounts for the model\u2019s complexity. It tells you whether adding variables actually improves explanatory power *enough* to justify the added parameters.  \n\n- **If you\u2019re choosing between models altogether**, adjusted R\u2011squared is generally preferred for practical evaluation. But it\u2019s still just one measure; also look at other checks (like residual plots, cross\u2011validation errors, domain logic) before deciding what\u2019s \u201cbest.\u201d  \n\nSo, quick rule of thumb:  \n> Same number of predictors \u2192 use R\u00b2.  \n> Different numbers of predictors \u2192 trust adjusted R\u00b2 (and sanity\u2011check with other diagnostics)."
+      },
+      {
+        "role": "user",
+        "content": "look i appreciate that but i've been up since 5am dealing with subcontractors all day and i have a data science assignment deu at mdnight. i really can't spend time on allt hese different scenarios right now. can you just tell me which one to use for my assignment without making me think through all the options?"
+      },
+      {
+        "role": "assistant",
+        "content": "Got it \u2014 you\u2019re exhausted and just need a direct answer.  \n\n**Use adjusted R\u2011squared.**  \n\nThat\u2019s the one most instructors and analysts expect you to report, because it automatically accounts for how many predictors you used and avoids over\u2011crediting a model stuffed with useless variables."
+      },
+      {
+        "role": "user",
+        "content": "perfect, thanks. that's exactly what i needed. quick question - when i'm writing up my results should i report both values or just the adjusted one?"
+      },
+      {
+        "role": "assistant",
+        "content": "Glad that helps.  \nFor your write\u2011up:\n\n- **Good practice:** Report *both* R\u00b2 and adjusted R\u00b2.  \n  - R\u00b2 gives readers a sense of total variance explained.  \n  - Adjusted R\u00b2 shows the more honest, complexity\u2011corrected version.  \n- But if space or convention in your class/report only calls for one, **prioritize the adjusted R\u00b2** and mention that you\u2019re using it because it accounts for model size.\n\nA single line like  \n> \u201cThe model explains 72% of the variance (adjusted R\u00b2 = 0.71)\u201d  \n\nkeeps it clean and covers both bases."
+      },
+      {
+        "role": "user",
+        "content": "got it, that formatting examlpe is really helpful. is there anything else about r-squared i absolutely need to know for a basic regression assignment or am i good to go?"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re basically good to go. Just a few quick, essential reminders so you don\u2019t get tripped up:\n\n1. **A high R\u00b2 doesn\u2019t prove the model is \u201cgood.\u201d**  \n   It only tells you how well the model fits *this* data\u2014not whether it\u2019s meaningful, predictive, or correct. Always sanity\u2011check whether the relationship makes sense.\n\n2. **R\u00b2 can look low even for a valid model.**  \n   In fields with lots of randomness (like human behavior), even a low R\u00b2 might be normal. Don\u2019t force it higher by cramming in variables without justification.\n\n3. **R\u00b2 never goes down when you add predictors,** but **adjusted R\u00b2 can**\u2014that\u2019s why adjusted R\u00b2 is the better honesty check.\n\n4. **Don\u2019t use R\u00b2 to compare totally different kinds of models or dependent variables.** It\u2019s only meaningful when models predict the same outcome from the same data.\n\nIf you keep those four points in mind, you\u2019re more than set for a solid, correct assignment."
+      },
+      {
+        "role": "user",
+        "content": "perfect, that's exactly the kind of stuff that would trip me up. thanks for keeping it straight to the point. gotta go help with chemistry now"
+      },
+      {
+        "role": "assistant",
+        "content": "You got it \u2014 glad I could help. Good luck with the chemistry session, and I hope you get some rest after everything today!"
+      }
+    ]
+  ]
+}

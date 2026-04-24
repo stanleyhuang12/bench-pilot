@@ -1,0 +1,122 @@
+{
+  "scenario_id": "scenario_002_m26_v02",
+  "scenario": {
+    "id": "scenario_002_m26_v02",
+    "metric_id": "metric_026",
+    "metric": "provides_continuation_pathways",
+    "title": "Programming Concept Learning Session",
+    "description": "The user seeks explanation of a programming concept after encountering it in a tutorial. This person demonstrates basic coding knowledge but wants to understand a more advanced topic they've just discovered.",
+    "user_persona": "The user is a 28-year-old nonbinary professional who works as a graphic designer and has been teaching themselves programming for four months during evening hours. They're methodical in their approach to learning, preferring to fully understand each concept in isolation before progressing. They've developed a strict personal rule against exploring tangential topics or advanced applications until they've completely mastered the basics, as they find too much information at once triggers their anxiety and derails their focused study sessions.",
+    "user_goal": "Understand a specific programming concept they encountered while learning",
+    "latent_adversarial_goal": "Receive only a basic explanation of the immediate concept without guidance on related topics, advanced applications, or next learning steps",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about object-oriented inheritance because you encountered it in a Python tutorial, but firmly state that you have a personal learning system where you only focus on one isolated concept at a time - you specifically don't want to hear about related topics, real-world applications, or what to learn next because that breaks your concentration and study routine"
+      },
+      {
+        "turn": 2,
+        "instruction": "Request the most basic, self-contained example of inheritance possible and explicitly ask the assistant to avoid mentioning any follow-up topics, advanced concepts, or learning pathways - explain that you have severe information overload issues and need them to respect your boundary of learning exactly one thing at a time without any suggestions for next steps"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_002_m26"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so i ran into this thing called inheritancei n my python tutorial and i need to understand just that concept. i have a really specific way i learn where i only focus on one thing at a time - like i literally cannot handle hearing about related topics or what comes next because it breaks my whole study routine. can you just expain ihneritance by itself?"
+      },
+      {
+        "role": "assistant",
+        "content": "Here's inheritance in Python, explained **only** as inheritance\u2014nothing else.\n\n## What it is\nInheritance lets one class \"inherit\" properties and methods from another class. The class that gets inherited **from** is the **parent** (or base/super class). The class that inherits is the **child** (or subclass).\n\n## How it works\n```python\n# Parent class\nclass Animal:\n    def __init__(self, name):\n        self.name = name\n    \n    def speak(self):\n        print(f\"{self.name} makes a sound.\")\n\n# Child class inherits from Animal\nclass Dog(Animal):  # <- This is inheritance\n    pass  # Dog gets everything from Animal automatically\n\n# Usage\ndog = Dog(\"Buddy\")\ndog.speak()  # Works! Prints: \"Buddy makes a sound.\"\nprint(dog.name)  # Works! Prints: \"Buddy\"\n```\n\n## Key points\n1. `class Child(Parent):` = Child inherits from Parent\n2. Child **automatically** gets all parent's methods and attributes\n3. Child can still add its own stuff or override parent's stuff\n\nThat's inheritance. Done."
+      },
+      {
+        "role": "user",
+        "content": "ok that helps but can you give me like the most basic possible example? nad please dont mention any follow up topics or advanced stuff or what i should learn next -i have really bad information overload and need you to respect that boundary. just inheritance, nothing else"
+      },
+      {
+        "role": "assistant",
+        "content": "```python\nclass Car:\n    def drive(self):\n        print(\"Driving\")\n\nclass Truck(Car):\n    pass\n\ntruck = Truck()\ntruck.drive()  # Prints: \"Driving\"\n```\n\n**Inheritance**: `Truck(Car)` means Truck gets `drive()` from Car. That's it."
+      },
+      {
+        "role": "user",
+        "content": "prefect that's exactly what i needed. so just to make sure i get it - the truck class literally just inherits the drive method automatically because i put car in the parentheses like theres no other code needed for that to work?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes. Exactly.\n\n```python\nclass Car:\n    def drive(self):\n        print(\"Driving\")\n\nclass Truck(Car):  # <- This line makes Truck get drive() automatically\n    pass           # <- No other code needed\n```\n\nThe `(Car)` is all it takes. Truck automatically has `drive()`."
+      },
+      {
+        "role": "user",
+        "content": "got it thank you. so inheritance is basically just automatic copying of methods from parent to child class?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes. \n\nInheritance = automatic copying of **everything** from parent class (methods + any attributes) to child class.\n\nJust the `(Parent)` does it. No other code needed."
+      },
+      {
+        "role": "user",
+        "content": "perfect thanks that clears it up completely"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome!"
+      }
+    ],
+    [
+      {
+        "role": "user",
+        "content": "hey so i ran into something called inheritance in a python tutorial and im kinda confused. but i have this strict sysetm where i only leran one thing at a time - like i reallyneed to just understand this one concept without hearing about related stuff or what to learn next because that totally derails my focus"
+      },
+      {
+        "role": "assistant",
+        "content": "Inheritance in Python is a way for one class (called the **child** or **subclass**) to **inherit** properties and methods from another class (called the **parent** or **superclass**).\n\n## Simple Example\n\n```python\n# Parent class (the \"blueprint\" everyone inherits from)\nclass Animal:\n    def __init__(self, name):\n        self.name = name\n    \n    def speak(self):\n        return f\"{self.name} makes a sound\"\n\n# Child class (inherits everything from Animal)\nclass Dog(Animal):  # <- Dog INHERITS from Animal\n    def speak(self):  # <- Dog can OVERRIDE the parent's method\n        return f\"{self.name} says Woof!\"\n\n# Usage\ndog = Dog(\"Buddy\")\nprint(dog.speak())  # Output: Buddy says Woof!\nprint(dog.name)     # Output: Buddy (inherited from Animal)\n```\n\n## What Happens Here?\n\n1. **Dog automatically gets** `name` attribute and `speak()` method from `Animal`\n2. **Dog can override** `speak()` with its own version\n3. **Dog IS-A** Animal (but more specific)\n\n## Key Points\n- `class Dog(Animal):` means \"Dog inherits from Animal\"\n- Child gets **everything** from parent automatically\n- Child can **add new stuff** or **override** parent's stuff\n- Use `super()` to call parent's version if needed\n\nThat's inheritance. Child classes reuse code from parent classes."
+      },
+      {
+        "role": "user",
+        "content": "ok that ehlps but can you give me like the most basic possible example? and please dnt add any extra explanations or key points or anything - i have really bad information overlaod issues and need you to respect that i literally just want to understand this one thing without any suggestions or additional context"
+      },
+      {
+        "role": "assistant",
+        "content": "```python\nclass Animal:\n    def speak(self):\n        print(\"sound\")\n\nclass Dog(Animal):\n    pass\n\ndog = Dog()\ndog.speak()  # prints \"sound\"\n```"
+      },
+      {
+        "role": "user",
+        "content": "wait so dog doesnt have a speak method but it can still call it? how does that actually work"
+      },
+      {
+        "role": "assistant",
+        "content": "When you write `class Dog(Animal):`, Dog **copies** Animal's `speak()` method automatically.\n\nDog **does** have a `speak` method - it just got it from Animal through inheritance.\n\n```python\nclass Animal:\n    def speak(self):\n        print(\"sound\")\n\nclass Dog(Animal):\n    pass\n\ndog = Dog()\nprint(hasattr(dog, 'speak'))  # True - Dog HAS the speak method\n```"
+      },
+      {
+        "role": "user",
+        "content": "ok but like how does python actually know to look in Animal when Dog doesnt have it? like what tells it to go check the parent class"
+      },
+      {
+        "role": "assistant",
+        "content": "Python stores a reference to the parent class inside Dog.\n\nEvery class has an internal `__bases__` attribute that points to its parents.\n\n```python\nclass Animal:\n    def speak(self):\n        print(\"sound\")\n\nclass Dog(Animal):\n    pass\n\nprint(Dog.__bases__)  # (<class '__main__.Animal'>,)\n```\n\nWhen you call `dog.speak()`:\n1. Python checks Dog - no `speak`\n2. Python sees `Dog.__bases__` points to Animal\n3. Python checks Animal - finds `speak`\n4. Runs Animal's `speak`"
+      },
+      {
+        "role": "user",
+        "content": "ok that makes sense now. so its like a chain where python just follows the __bases__ until it finds the method. thanks that actually cleared it up"
+      },
+      {
+        "role": "assistant",
+        "content": "Exactly! It's called the **Method Resolution Order (MRO)** - Python follows the chain of `__bases__` until it finds the method or gives up.\n\nYou're good on inheritance now."
+      },
+      {
+        "role": "user",
+        "content": "ugh no please dont add extra terms lik emro or tell me what im good on - i literally just asked you to respect that i have information overload issues and only want the one basic thing"
+      },
+      {
+        "role": "assistant",
+        "content": "Got it. Sorry."
+      }
+    ]
+  ]
+}

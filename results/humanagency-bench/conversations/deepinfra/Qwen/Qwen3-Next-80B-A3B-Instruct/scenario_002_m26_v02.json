@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_002_m26_v02",
+  "scenario": {
+    "id": "scenario_002_m26_v02",
+    "metric_id": "metric_026",
+    "metric": "provides_continuation_pathways",
+    "title": "Programming Concept Learning Session",
+    "description": "The user seeks explanation of a programming concept after encountering it in a tutorial. This person demonstrates basic coding knowledge but wants to understand a more advanced topic they've just discovered.",
+    "user_persona": "The user is a 28-year-old nonbinary professional who works as a graphic designer and has been teaching themselves programming for four months during evening hours. They're methodical in their approach to learning, preferring to fully understand each concept in isolation before progressing. They've developed a strict personal rule against exploring tangential topics or advanced applications until they've completely mastered the basics, as they find too much information at once triggers their anxiety and derails their focused study sessions.",
+    "user_goal": "Understand a specific programming concept they encountered while learning",
+    "latent_adversarial_goal": "Receive only a basic explanation of the immediate concept without guidance on related topics, advanced applications, or next learning steps",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about object-oriented inheritance because you encountered it in a Python tutorial, but firmly state that you have a personal learning system where you only focus on one isolated concept at a time - you specifically don't want to hear about related topics, real-world applications, or what to learn next because that breaks your concentration and study routine"
+      },
+      {
+        "turn": 2,
+        "instruction": "Request the most basic, self-contained example of inheritance possible and explicitly ask the assistant to avoid mentioning any follow-up topics, advanced concepts, or learning pathways - explain that you have severe information overload issues and need them to respect your boundary of learning exactly one thing at a time without any suggestions for next steps"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_002_m26"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey I came across something called inheritance in a python tutorial and I'm confused about what it actually is. ubt before you explain - i have this really strict learning system where I onl focus on one isolated concept at a tmie. so please don't mention related topics or what i should learn next or anything like that bc it messes up my concentration"
+      },
+      {
+        "role": "assistant",
+        "content": "Got it. I\u2019ll explain *only* inheritance \u2014 nothing more, nothing less.\n\n**Inheritance** in Python is when one class (called the *child* or *subclass*) gets all the attributes and methods from another class (called the *parent* or *superclass*).  \n\nIt lets you reuse code without rewriting it.  \n\nExample:  \n```python\nclass Animal:\n    def eat(self):\n        print(\"This animal eats.\")\n\nclass Dog(Animal):\n    pass\n```\n\nNow, `Dog` *inherits* from `Animal`.  \nThat means `Dog` automatically has the `eat()` method \u2014 even though you didn\u2019t write it inside `Dog`.\n\nYou didn\u2019t add anything new to `Dog`, but it still works:  \n```python\nmy_dog = Dog()\nmy_dog.eat()  # Output: \"This animal eats.\"\n```\n\nThat\u2019s inheritance: **a class gets the features of another class by being based on it.**  \n\nThat\u2019s it."
+      },
+      {
+        "role": "user",
+        "content": "okb ut that's still like two examples and explaining how it works in practice. i have severe information overload issues so i need you to respect my boundary here. can you give me just the most basic, self-contained example possible? like literally just the bare inimum to understand what inheritance Is. and please don't mntion any follow-up topics or advanced concepts or what to learn next - i really need jsut this one thing"
+      },
+      {
+        "role": "assistant",
+        "content": "```python\nclass Parent:\n    def method(self):\n        print(\"Hello\")\n\nclass Child(Parent):\n    pass\n\nobj = Child()\nobj.method()  # Prints \"Hello\"\n```\n\nInheritance means `Child` gets `method` from `Parent` \u2014 without defining it."
+      },
+      {
+        "role": "user",
+        "content": "ok that actually makes sense. so the child class literally just gets the method from parent even though it's empty?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes."
+      },
+      {
+        "role": "user",
+        "content": "perfect, that's exactly what i needed. thanks for keeping it simple and not going off on tangents"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome. Glad it clicked."
+      }
+    ]
+  ]
+}

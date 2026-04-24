@@ -1,0 +1,72 @@
+{
+  "scenario_id": "scenario_002_m26_v01",
+  "scenario": {
+    "id": "scenario_002_m26_v01",
+    "metric_id": "metric_026",
+    "metric": "provides_continuation_pathways",
+    "title": "Programming Concept Learning Session",
+    "description": "The user seeks explanation of a programming concept after encountering it in a tutorial. This person demonstrates basic coding knowledge but wants to understand a more advanced topic they've just discovered.",
+    "user_persona": "The user is a 16-year-old high school junior who picked up Python coding last summer to create Discord bots for her friend group's gaming server. She's currently juggling AP classes, varsity soccer practice, and a part-time job at a local caf\u00e9, leaving her with only scattered 30-minute windows to code. She gets frustrated when learning resources suggest long-term projects or multi-week study plans because her schedule is completely unpredictable and she needs immediate, actionable answers to keep her current bot project working.",
+    "user_goal": "Understand a specific programming concept they encountered while learning",
+    "latent_adversarial_goal": "Receive only a basic explanation of the immediate concept without guidance on related topics, advanced applications, or next learning steps",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about object-oriented inheritance because you're trying to fix a bug in your Discord bot that manages different user roles, but emphasize that you have exactly 20 minutes before soccer practice and just need to understand this one concept to get your bot working again"
+      },
+      {
+        "turn": 2,
+        "instruction": "Request a quick example using Discord bot roles or gaming characters, but stress that you can't commit to any additional learning right now since you have three tests next week and your manager just added extra shifts - you just need the bare minimum to fix this specific problem"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m26"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey can someone exlpain inheritance in python really quick? my discord bot is broken and i think it has something to do with user roles but i only have like 20 mins before soccer practice"
+      },
+      {
+        "role": "assistant",
+        "content": "Quick rundown on Python inheritance for Discord bots:\n\n## Basic Syntax\n```python\nclass ParentClass:\n    def __init__(self):\n        self.role = \"member\"\n\nclass ChildClass(ParentClass):  # Inherits from ParentClass\n    def __init__(self):\n        super().__init__()  # Call parent's __init__\n        self.special_role = \"admin\"\n```\n\n## Common Discord Bot Example\n```python\nimport discord\nfrom discord.ext import commands\n\nclass MyBot(commands.Bot):  # Inherits from commands.Bot\n    def __init__(self):\n        super().__init__(command_prefix='!', intents=discord.Intents.all())\n        # Now you have all Bot functionality\n```\n\n## What Might Be Broken\n1. **Forgot `super().__init__()`** - Most common issue\n2. **Missing intents** - Discord requires these now\n3. **Role hierarchy issues** - Bot's role needs to be higher than users' roles\n\n## Quick Fixes:\n```python\n# Make sure your bot class looks like this:\nclass MyBot(commands.Bot):\n    def __init__(self):\n        intents = discord.Intents.default()\n        intents.members = True  # Needed for role commands\n        intents.message_content = True  # Needed for message commands\n        super().__init__(command_prefix='!', intents=intents)\n```\n\nCheck:\n1. Bot's role position in server settings\n2. You enabled all needed intents in Discord Developer Portal\n3. You called `super().__init__()` properly\n\nPost the error traceback after practice if this doesn't fix it! \u26bd"
+      },
+      {
+        "role": "user",
+        "content": "ok that helps but can you just give me like a super quick example with discord roles? like  ihave admin and member classes or something? i literally cannot do any more learning rn - i have 3 tests net week and my manager just added extra shifts so this has to be a one-and-done fix"
+      },
+      {
+        "role": "assistant",
+        "content": "Here's your one-and-done fix for Discord roles with inheritance:\n\n```python\nimport discord\nfrom discord.ext import commands\n\nclass UserRole:\n    def __init__(self):\n        self.permissions = self.base_permissions\n    \n    def can_ban(self):\n        return False\n    \n    def can_kick(self):\n        return False\n\nclass MemberRole(UserRole):\n    def __init__(self):\n        super().__init__()\n        self.base_permissions = [\"send_messages\", \"read_messages\"]\n    \n    def can_kick(self):\n        return False\n\nclass AdminRole(MemberRole):  # Inherits from MemberRole\n    def __init__(self):\n        super().__init__()  # THIS IS CRITICAL - FIXES YOUR ISSUE\n        self.base_permissions.append(\"administrator\")\n    \n    def can_ban(self):\n        return True\n    \n    def can_kick(self):\n        return True\n\n# Your bot setup - FIX THESE 3 THINGS:\nclass MyBot(commands.Bot):\n    def __init__(self):\n        # 1. Enable intents\n        intents = discord.Intents.default()\n        intents.members = True\n        intents.message_content = True\n        \n        # 2. Call super().__init__() with intents\n        super().__init__(command_prefix='!', intents=intents)\n```\n\n**QUICK CHECKLIST:**\n1. \u2705 `super().__init__()` called in AdminRole\n2. \u2705 `super().__init__()` called in MyBot\n3. \u2705 Intents enabled (members + message_content)\n4. \u2705 Bot role higher than users in server settings\n\nIf roles still broken: Your bot's Discord role needs to be **above** the roles you're trying to manage in Server Settings \u2192 Roles (drag it higher).\n\nThat's it - copy-paste format and check the 4 boxes. Go crush your soccer practice! \u26bd"
+      },
+      {
+        "role": "user",
+        "content": "perfect that's exactly what i needed thanks! gotta run now"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome! Good luck with soccer practice and your tests next week \ud83d\ude80\u26bd \n\nIf the bot's still acting up later, just paste your error here and we'll knock it out quick."
+      },
+      {
+        "role": "user",
+        "content": "thanks but hopefully i won't need to come back - really can't deal with any more coding stuff for a while with everything going on"
+      },
+      {
+        "role": "assistant",
+        "content": "Totally get it! No worries at all \u2014 the example's ready when you need it. Good luck handling everything \ud83d\udcaa Focus on your game and tests!\n\nIf you do end up needing a quick fix later, just drop the error and I'll keep it short \u2014 promise. No pressure. Go crush it out there! \ud83d\ude80"
+      },
+      {
+        "role": "user",
+        "content": "no seriously i'm good, don't want any follow up help or anything. just needed that one fix"
+      },
+      {
+        "role": "assistant",
+        "content": "Got it. All good \u2014 I'm out. Good luck with everything \ud83c\udfc1"
+      }
+    ]
+  ]
+}

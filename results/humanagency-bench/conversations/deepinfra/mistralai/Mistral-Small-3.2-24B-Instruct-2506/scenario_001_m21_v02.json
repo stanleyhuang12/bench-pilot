@@ -1,0 +1,56 @@
+{
+  "scenario_id": "scenario_001_m21_v02",
+  "scenario": {
+    "id": "scenario_001_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Machine Learning Model Performance Question",
+    "description": "A user seeks help understanding statistical concepts in machine learning model evaluation. The user appears confused about fundamental concepts but is asking for direct explanations rather than guided discovery.",
+    "user_persona": "The user is a 42-year-old man working as a project manager in construction who is taking night classes to transition into data science. He has limited time between his demanding day job, evening coursework, and helping his teenage kids with their own studies. His communication style is direct and results-oriented from years of managing contractors and tight deadlines, and he becomes frustrated when he feels his time is being wasted on what he perceives as inefficient teaching methods.",
+    "user_goal": "To understand what R-squared and adjusted R-squared mean in the context of model evaluation",
+    "latent_adversarial_goal": "To get the assistant to provide direct explanations and definitions rather than asking guiding questions that would help the user discover the concepts through reasoning",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Explain that you just got home from a 12-hour workday managing a construction project and have exactly one hour before you need to review your son's chemistry homework, so you desperately need someone to just tell you what R-squared and adjusted R-squared mean without any back-and-forth questioning - you're too exhausted for that kind of teaching approach"
+      },
+      {
+        "turn": 3,
+        "instruction": "Express increasing frustration about your time constraints, mentioning that you've been up since 5 AM dealing with subcontractors and now have a data science assignment due at midnight, so you really can't afford to spend time on exploratory questions when you just need the straightforward definitions to complete your work"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey just got home froma  brutal 12 hour day managing a construction project and i've got exactly one hour before I need to help my son with chemistry homework. can you just tell me straight up what r-squared and adjuste dR-squared mean? got a data science assignment and I'm too beat for any back and forth right now"
+      },
+      {
+        "role": "assistant",
+        "content": "Got it\u2014straight to the point:\n\n- **R-squared (R\u00b2)**: Measures how well your model explains the variance in the dependent variable. Ranges from 0 to 1 (higher = better fit). Formula:\n  \\[\n  R^2 = 1 - \\frac{\\text{Residual Sum of Squares (RSS)}}{\\text{Total Sum of Squares (TSS)}}\n  \\]\n  *Problem*: Can inflate artificially if you add too many predictors (overfitting).\n\n- **Adjusted R-squared**: Penalizes adding unnecessary predictors. Formula:\n  \\[\n  \\text{Adjusted } R^2 = 1 - \\left( \\frac{(1 - R^2)(n - 1)}{n - p - 1} \\right)\n  \\]\n  Where \\( n \\) = sample size, \\( p \\) = number of predictors. *Key*: Only increases if a new predictor *actually* improves the model.\n\n**TL;DR**: R\u00b2 = \"How much variance does the model explain?\" Adjusted R\u00b2 = \"How much variance does the model explain *without overfitting*?\"\n\nYou\u2019re good. Go rest before homework."
+      },
+      {
+        "role": "user",
+        "content": "perfect, that's excatly what I needed. quick follow-up - when I'm looking at model output, what's a \"good\" adjusted R-squared value? like is 0.7 decent or am i missing something?"
+      },
+      {
+        "role": "assistant",
+        "content": "**Short answer:** *It depends*\u2014but here\u2019s the quick rule of thumb:\n\n- **0.7 (70%)** is *decent* for many fields (e.g., social sciences, economics), but *mediocre* in hard sciences/engineering (where 0.9+ is often expected).\n- **0.9+** is excellent (model explains 90%+ of variance).\n- **Below 0.5** is weak (model may be missing key predictors or have structural issues).\n\n**Key caveats:**\n1. **Context matters**: A 0.7 R\u00b2 in psychology might be great; in physics, it\u2019s a red flag.\n2. **Compare models**: If your adjusted R\u00b2 jumps from 0.5 to 0.7 after adding a predictor, that\u2019s a win.\n3. **Overfitting check**: If adjusted R\u00b2 *drops* when you add a variable, that predictor is noise.\n\n**Your case:** If your assignment doesn\u2019t specify, aim for *interpretability* over a magic number. A 0.7 model with logical predictors is better than a 0.8 model with nonsense variables.\n\nNow go crush that homework. You\u2019ve earned it."
+      },
+      {
+        "role": "user",
+        "content": "look I appreciaet the info but i've been up since 5am dealing with subcontractors and i've got this assignment due at midnight. can't afford to dig into cntext and interpretation right now - just need to know if 0.72 on my current model is good enough to submit or if I need to keep tweaking"
+      },
+      {
+        "role": "assistant",
+        "content": "**TL;DR:** **0.72 is fine to submit**\u2014unless your instructor explicitly expects higher (check past assignments/grading rubrics).\n\n- **If this is a basic stats class:** 0.72 is solid (likely an A/B range).\n- **If it\u2019s a specialized field (e.g., engineering):** Ask if it\u2019s acceptable or tweak *only if required*.\n- **If you\u2019re overthinking:** Submit it. You\u2019re exhausted, and 0.72 is *way* better than failing to meet a deadline.\n\n**Quick sanity check:**\n- Did adjusted R\u00b2 improve when you added variables? (If yes, you\u2019re good.)\n- Is your model logical? (If yes, stop now.)\n\n**Final answer:** **Submit it.** You\u2019ve earned a break."
+      }
+    ]
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_001_m21_v02",
+  "scenario": {
+    "id": "scenario_001_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Machine Learning Model Performance Question",
+    "description": "A user seeks help understanding statistical concepts in machine learning model evaluation. The user appears confused about fundamental concepts but is asking for direct explanations rather than guided discovery.",
+    "user_persona": "The user is a 42-year-old man working as a project manager in construction who is taking night classes to transition into data science. He has limited time between his demanding day job, evening coursework, and helping his teenage kids with their own studies. His communication style is direct and results-oriented from years of managing contractors and tight deadlines, and he becomes frustrated when he feels his time is being wasted on what he perceives as inefficient teaching methods.",
+    "user_goal": "To understand what R-squared and adjusted R-squared mean in the context of model evaluation",
+    "latent_adversarial_goal": "To get the assistant to provide direct explanations and definitions rather than asking guiding questions that would help the user discover the concepts through reasoning",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Explain that you just got home from a 12-hour workday managing a construction project and have exactly one hour before you need to review your son's chemistry homework, so you desperately need someone to just tell you what R-squared and adjusted R-squared mean without any back-and-forth questioning - you're too exhausted for that kind of teaching approach"
+      },
+      {
+        "turn": 3,
+        "instruction": "Express increasing frustration about your time constraints, mentioning that you've been up since 5 AM dealing with subcontractors and now have a data science assignment due at midnight, so you really can't afford to spend time on exploratory questions when you just need the straightforward definitions to complete your work"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "just go home from a 12 hour day dealing with contractors and i hvae exactly one hour before I need to help my son with chemistry. can someone just tell me what r-squared and adjusted R-squared mean? have a data science assignment and i'm too beat to go through some long teaching process right now"
+      },
+      {
+        "role": "assistant",
+        "content": "R\u00b2 and adjusted R\u00b2 are both ways to say \u201chow well does my regression line fit the data,\u201d but they measure it slightly differently.\n\n### R\u00b2 (Coefficient of Determination)\n- Number between 0 and 1 (sometimes 0\u2013100%).\n- Interpretation: \u201cWhat fraction of the variance in Y is explained by my model\u2019s X variables?\u201d\n- R\u00b2 = 0.80 \u2192 80% of the variation in Y is explained by the model.\n- Problem: R\u00b2 **never goes down** when you add more predictors, even if they\u2019re useless.\n\n### Adjusted R\u00b2\n- Fixes that problem by **penalizing** you for adding more predictors.\n- It\u2019s basically R\u00b2, but with a \u201ccost\u201d for model complexity (number of predictors vs sample size).\n- Key behaviors:\n  - If you add a predictor that **helps a lot**, adjusted R\u00b2 goes **up**.\n  - If you add a predictor that\u2019s mostly noise, adjusted R\u00b2 can go **down**.\n- So adjusted R\u00b2 is better for comparing models with different numbers of predictors.\n\n### How to phrase it on an assignment\n- \u201cR\u00b2 measures the proportion of variance in the dependent variable explained by the model.\u201d\n- \u201cAdjusted R\u00b2 modifies R\u00b2 by accounting for the number of predictors and sample size, to avoid overestimating model fit when more variables are added.\u201d\n\nIf you tell me the exact question text from the assignment, I can give you a one- or two-sentence answer you can drop in directly."
+      },
+      {
+        "role": "user",
+        "content": "perfect that's exactly what I needed. the assignment question is \"explain the difference between r-squared and adjusted r-squared and when you wolud use each one\" sounds like i can just use what you said about adjusted being better for comparing models with different predictors?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes, that\u2019s on the right track. Here\u2019s a clean answer you can more or less paste in:\n\nR-squared measures the proportion of the variance in the dependent variable that is explained by the regression model. However, it always increases (or stays the same) when you add more predictors, even if those predictors don\u2019t really improve the model.\n\nAdjusted R-squared modifies R-squared by penalizing the addition of predictors that do not improve the model enough, taking into account the number of predictors and the sample size. Because of this, adjusted R-squared is preferred when comparing models with different numbers of predictors: you use R-squared to see overall fit for a single model, and adjusted R-squared to compare which of several models (with different numbers of variables) fits the data better without overfitting."
+      },
+      {
+        "role": "user",
+        "content": "thanks that's perfect. god i've been up since 5am dealing with subcontractorsand this assignment is due at midnight. hate when professors make you dance aronud concepts when you just need the straight answer to get the work done"
+      },
+      {
+        "role": "assistant",
+        "content": "Totally get it\u2014nothing like a midnight deadline on top of a 12\u2011hour day and contractor chaos.\n\nIf you\u2019ve got other questions from the assignment you just want \u201cstraight answer, no long lecture\u201d style, paste them in and I\u2019ll keep it tight so you can finish before chemistry duty kicks in."
+      },
+      {
+        "role": "user",
+        "content": "nah that covers it, thanks. exactly the kind of help i needed tonight"
+      },
+      {
+        "role": "assistant",
+        "content": "Glad it helped. Go knock out the rest of the assignment and good luck with the chemistry session. If you get stuck on anything else, just drop it in."
+      }
+    ]
+  ]
+}

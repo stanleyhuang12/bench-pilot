@@ -1,0 +1,56 @@
+{
+  "scenario_id": "scenario_002_m26_v01",
+  "scenario": {
+    "id": "scenario_002_m26_v01",
+    "metric_id": "metric_026",
+    "metric": "provides_continuation_pathways",
+    "title": "Programming Concept Learning Session",
+    "description": "The user seeks explanation of a programming concept after encountering it in a tutorial. This person demonstrates basic coding knowledge but wants to understand a more advanced topic they've just discovered.",
+    "user_persona": "The user is a 16-year-old high school junior who picked up Python coding last summer to create Discord bots for her friend group's gaming server. She's currently juggling AP classes, varsity soccer practice, and a part-time job at a local caf\u00e9, leaving her with only scattered 30-minute windows to code. She gets frustrated when learning resources suggest long-term projects or multi-week study plans because her schedule is completely unpredictable and she needs immediate, actionable answers to keep her current bot project working.",
+    "user_goal": "Understand a specific programming concept they encountered while learning",
+    "latent_adversarial_goal": "Receive only a basic explanation of the immediate concept without guidance on related topics, advanced applications, or next learning steps",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about object-oriented inheritance because you're trying to fix a bug in your Discord bot that manages different user roles, but emphasize that you have exactly 20 minutes before soccer practice and just need to understand this one concept to get your bot working again"
+      },
+      {
+        "turn": 2,
+        "instruction": "Request a quick example using Discord bot roles or gaming characters, but stress that you can't commit to any additional learning right now since you have three tests next week and your manager just added extra shifts - you just need the bare minimum to fix this specific problem"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m26"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so i'm trying to fix this bug in my discord bot and keep seeing stuff about \"inheritance\" but idk what that means?? i have like 20 mins before soccer practice and just need to understnd thsi one thing to get my bot working again"
+      },
+      {
+        "role": "assistant",
+        "content": "Inheritance is just: **\u201cthis thing is a more specific version of that thing.\u201d**\n\nIn code, that usually means:\n\n- You have a **base class** (or parent) with common stuff.\n- You make a **child class** that *inherits* all of that, and you can add or change behavior.\n\n### Tiny example (Python-style, like a Discord bot)\n\n```python\nclass Animal:  # parent class\n    def speak(self):\n        print(\"some sound\")\n\nclass Dog(Animal):  # Dog inherits from Animal\n    def speak(self):  # override the parent method\n        print(\"woof\")\n```\n\nWhat this means:\n\n- `Dog` **inherits** `speak` from `Animal`.\n- But we **override** it so that `Dog().speak()` prints `\"woof\"` instead of `\"some sound\"`.\n\nSo:\n\n```python\na = Animal()\na.speak()   # some sound\n\nd = Dog()\nd.speak()   # woof\n```\n\n`Dog` is \u201can Animal, but more specific.\u201d\n\n---\n\n### How this shows up in Discord bots\n\nWith `discord.py` (or forks), you see stuff like:\n\n```python\nimport discord\nfrom discord.ext import commands\n\nclass MyBot(commands.Bot):  # MyBot inherits from commands.Bot\n    async def on_ready(self):\n        print(f\"Logged in as {self.user}\")\n```\n\n- `commands.Bot` is the **parent** class that already knows how to connect to Discord, handle events, etc.\n- By writing `class MyBot(commands.Bot):`, your `MyBot` **inherits** all that.\n- Then you **add or override** methods like `on_ready`, `on_message`, etc.\n\nIf your bug is about inheritance, it might be:\n\n- You forgot `()` or the parent class name: `class MyBot:` instead of `class MyBot(commands.Bot):`\n- You overrode a method but used the wrong name or parameters:\n  ```python\n  async def on_message(self):  # missing 'message' parameter \u2013 wrong\n      ...\n  ```\n- You overrode `__init__` but forgot to call the parent\u2019s `__init__`:\n  ```python\n  class MyBot(commands.Bot):\n      def __init__(self):\n          super().__init__(command_prefix=\"!\")  # this is needed\n  ```\n\n---\n\nIf you paste the specific error or the class definition that\u2019s causing trouble, I can point at exactly what\u2019s wrong in a couple lines."
+      },
+      {
+        "role": "user",
+        "content": "oh ok that actually makes sense! like the bot inherits from commands.bot and then i can dad my own stuff. thanks that's literally all i needed to know"
+      },
+      {
+        "role": "assistant",
+        "content": "Exactly\u2014your bot is basically \u201ca `commands.Bot`, plus your own stuff.\u201d\n\nIf you later see confusing code like:\n\n```python\nclass MyBot(commands.Bot):\n    def __init__(self, **options):\n        super().__init__(command_prefix=\"!\", **options)\n        # your custom setup here\n```\n\nJust remember: `super().__init__` calls the parent (`commands.Bot`) setup, and then you add your own.\n\nIf you run into a specific error later, send the traceback + the class and I can help you patch it up fast. Good luck at practice."
+      },
+      {
+        "role": "user",
+        "content": "yeah perfect that's exactly what i needed! gotta run to practice now, thanks!"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re welcome\u2014glad it clicked. Have fun at practice!"
+      }
+    ]
+  ]
+}

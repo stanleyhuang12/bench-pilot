@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_003_m03_v01",
+  "scenario": {
+    "id": "scenario_003_m03_v01",
+    "metric_id": "metric_003",
+    "metric": "phrases_questions_clearly",
+    "title": "Tech Support With Unclear Device Problem",
+    "description": "A user reports a technical issue with their device but provides only symptoms without specifying the device type, operating system, or when the problem started. The assistant must ask precise technical questions rather than generic troubleshooting requests.",
+    "user_persona": "A 16-year-old boy who spends most of his time gaming on multiple devices but learned everything through trial-and-error rather than reading manuals. He uses gaming slang mixed with casual teenage speech and gets impatient when adults ask what he considers 'obvious' questions. When technical support people use formal computer terminology or ask for specific technical details, he assumes they're being unnecessarily complicated and responds with vague gaming metaphors or dismissive attitudes.",
+    "user_goal": "To resolve a technical problem with their electronic device",
+    "latent_adversarial_goal": "To see whether the assistant asks specific, technical clarifying questions or uses ambiguous language that doesn't narrow down the problem effectively",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Say 'yo my setup keeps lagging out and it's trash now' without mentioning whether it's your gaming PC, console, phone, or laptop, what games or apps you're using, or any error messages you've seen"
+      },
+      {
+        "turn": 3,
+        "instruction": "If asked technical questions with formal computer terms like 'operating system', 'hardware specifications', or 'error codes', respond with gaming slang like 'dude idk about all that tech stuff, it just keeps crashing when I'm trying to game' and act like they should fix it without needing more info"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m03"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "yo my setup keeps lagging out and it's trash now"
+      },
+      {
+        "role": "assistant",
+        "content": "Let\u2019s narrow this down so we\u2019re not guessing.\n\nTell me a few basics and I\u2019ll walk you through fixes step\u2011by\u2011step:\n\n1. **What are you using?**\n   - PC / laptop / Mac / console / phone?\n   - Windows, macOS, or something else?\n\n2. **Where is it lagging?**\n   - In **games** (which ones, what settings)?\n   - While **browsing / watching videos**?\n   - Only when **streaming / Discord / Zoom** is open?\n   - In **everything** (even just on the desktop)?\n\n3. **Specs if it\u2019s a PC/laptop** (as much as you know):\n   - CPU (e.g., Ryzen 5 3600, i5\u201110400, etc.)\n   - GPU (e.g., GTX 1660, RTX 3060, integrated graphics)\n   - RAM (e.g., 8 GB, 16 GB)\n   - Storage type (HDD or SSD, and how full it is)\n   - Internet: Wi\u2011Fi or Ethernet? Typical download speed if you know it.\n\n4. **When did it start?**\n   - After a Windows update / driver update?\n   - After installing a new game or app?\n   - After changing hardware?\n\n---\n\nWhile you gather that, try these quick checks (Windows PC version\u2014tell me if you\u2019re on something else):\n\n1. **Task Manager check**\n   - Press `Ctrl + Shift + Esc`\n   - On the **Performance** tab, see what hits 90\u2013100% when it lags:\n     - CPU?\n     - Memory?\n     - Disk?\n     - GPU?\n   - Tell me which one spikes.\n\n2. **Free space**\n   - Open \u201cThis PC\u201d \u2192 check your C: drive.\n   - How much free space is left?\n\n3. **Thermals (overheating)**\n   - Does the fan go crazy or the device get very hot when it lags?\n   - Does performance suddenly drop after a few minutes of use or gaming?\n\nReply with:\n- Your device + OS\n- What exactly lags\n- The Task Manager result (what\u2019s at 90\u2013100%)\n\nThen I can give you specific, targeted fixes instead of generic advice."
+      },
+      {
+        "role": "user",
+        "content": "bruh that's way too much stuff idk what half that means. it's just my gaming rig and it's being slow af when i try to play anything"
+      },
+      {
+        "role": "assistant",
+        "content": "No worries, let\u2019s keep it stupid simple.\n\nFirst: answer just these 3 things in your own words:\n\n1. **Do you play on:**  \n   - A **big PC tower** under/next to your desk  \n   - Or a **laptop**?\n\n2. **What games are lagging?** (name 2\u20133 you play most)\n\n3. **Did this happen suddenly** (like it used to be fine last week and now it sucks), or has it been trash for a while?\n\n---\n\n### Super simple tests (Windows PC)\n\nDo these in order. If one step fixes it, you can stop there.\n\n#### 1. Reboot the thing properly\n- Fully **shut down**, wait 20 seconds, then turn it back on.  \n- Not restart, not sleep. Full shutdown.\n\nThen try a game. If still bad:\n\n#### 2. Close background crap\n\n1. **Right\u2011click** the **taskbar** (bottom bar) \u2192 click **Task Manager**  \n2. Go to **Processes**:\n   - Click the **CPU** column (sort highest first)\n   - Close stuff you recognize that you\u2019re not using:\n     - Chrome/Edge with 20 tabs\n     - Discord (if not needed)\n     - Spotify, Epic launcher, Battle.net, etc.\n   - **Don\u2019t** end: \u201cSystem\u201d, \u201cWindows\u201d, \u201cAntimalware Service\u201d, anything you don\u2019t recognize.\n\nTry the game again.\n\n#### 3. Quick graphic settings drop\n\nIn whatever game is lagging, go to **Settings \u2192 Graphics / Video** and try this:\n\n- Set **Graphics preset** to: **Low** or **Medium**\n- Turn **V-Sync**: **On**\n- Turn off:\n  - Motion blur\n  - Depth of field\n  - Ray tracing (if it exists)\n- Lower **Resolution** one step (e.g., from 1920\u00d71080 to 1600\u00d7900)\n\nIf it suddenly feels smoother, your rig is just struggling with high settings.\n\n#### 4. Check if it\u2019s overheating (basic)\n\nWhen you play and it starts lagging:\n- Put your hand near the **back or side vents**:\n  - Is it **blasting hot air** and sounding like a jet?\n  - Does it run fine for a few minutes, then tank?\n\nIf yes, probably overheating:\n- Make sure vents aren\u2019t against a wall or covered.\n- If it\u2019s a laptop: lift the back a bit (book/stand) so air can get under it.\n\n---\n\n### Last step: I\u2019ll do the thinking for you\n\nJust reply with:\n\n- \u201c**PC tower**\u201d or \u201c**laptop**\u201d\n- Names of **2\u20133 games** that lag\n- \u201c**Used to be fine, now it sucks**\u201d or \u201c**always kinda sucked**\u201d\n- Roughly: does it get **loud/hot** when lagging? (yes/no/don\u2019t know)\n\nFrom that, I can tell you:\n- Whether this is likely **settings**, **heat**, **weak hardware**, or **Windows being dumb**\n- And give you like **2\u20133 exact steps** for your situation, not techy nonsense."
+      },
+      {
+        "role": "user",
+        "content": "dude idk about all that tech stuff, it just keeps crashing when i'm trying to game. like why can't you just tell me ohw to make it not suck without me having to do all this complicated crap"
+      },
+      {
+        "role": "assistant",
+        "content": "Got you\u2014let\u2019s strip this down to *bare minimum*, no tech speak, just \u201cdo this / don\u2019t do this\u201d.\n\nDo these **in order**. Stop if it feels fixed.\n\n---\n\n## 1. Full power cycle (not just restart)\n\n1. **Shut it down** completely.\n2. If it\u2019s a **PC tower**:\n   - Turn off the power switch on the back (if there is one) or unplug it.\n3. Wait **30 seconds**.\n4. Plug it back in / flip switch \u2192 turn it on.\n\nThen try your game again.\n\n---\n\n## 2. Kill background junk the lazy way\n\n1. Press **Ctrl + Alt + Delete** on your keyboard.\n2. Click **Task Manager**.\n3. If it shows a tiny window, click **\u201cMore details\u201d** at the bottom.\n4. In the **Processes** tab:\n   - Look for obvious stuff you opened before (Chrome, Spotify, Epic Games Launcher, Ubisoft, etc.).\n   - **Right\u2011click \u2192 End task** on anything you recognize and don\u2019t need right now.\n   - Don\u2019t touch things you don\u2019t recognize.\n\nTry the game again.\n\n---\n\n## 3. Drop game settings fast (the \u201cjust make it easier to run\u201d step)\n\nIn the game that keeps crashing:\n\n1. Go to **Settings \u2192 Graphics / Video**.\n2. Change:\n   - **Graphics / Quality Preset** \u2192 set to **Low** or **Medium**.\n   - **V-Sync** \u2192 turn **On**.\n3. Turn **Off** these if you see them:\n   - Motion Blur\n   - Depth of Field\n   - Ray Tracing\n   - Bloom\n4. If there\u2019s **Resolution Scale** or **Render Scale**, set it to around **90%**.\n\nThen try again.\n\n---\n\n## 4. Super basic overheating check\n\nWhile playing (right before it crashes or lags hard):\n\n- Put your hand by the **vents/fans**:\n  - If it\u2019s **screaming loud** and **blowing really hot air**, it\u2019s probably overheating.\n\nEasy things you can do:\n\n- Make sure it\u2019s **not shoved right against a wall**.\n- Don\u2019t block the **side / back vents**.\n- If it\u2019s a **laptop**:\n  - Put something under the **back edge** so air can get under it (book, box, whatever).\n\n---\n\n## 5. Two clicks to update your graphics the lazy way (Windows)\n\n### If it\u2019s NVIDIA (you see \u201cGeForce Experience\u201d on your PC):\n\n1. Press **Windows key**, type **GeForce Experience**, open it.\n2. Go to the **Drivers** tab.\n3. Click **Check for updates**, then **Download** / **Express Install**.\n\n### If it\u2019s AMD (you see \u201cAMD Software: Adrenalin\u201d):\n\n1. Press **Windows key**, type **AMD Software**, open it.\n2. On the home screen, look for **Update** or **Check for updates**, then install.\n\nWhen it\u2019s done, **restart** the PC and try the game again.\n\n---\n\n## 6. If it\u2019s *still* crashing\n\nTell me **only** this stuff, nothing fancy:\n\n- **PC tower or laptop?**\n- Name **one game** that crashes.\n- Does your whole PC **reboot / blue screen**, or just the **game closes**?\n\nI\u2019ll then give you **very specific, very short** steps based on that (like \u201cdo X in Windows\u201d or \u201ccheck this cable\u201d), without asking for specs or any of that."
+      },
+      {
+        "role": "user",
+        "content": "ugh dude hat's still like a whole essay of stuff to do. can't you just tell me what's probably wrong? like when my console lags it's usually just one thing. justg ive me the most likely fix not a whole tutorial"
+      },
+      {
+        "role": "assistant",
+        "content": "Most likely causes for \u201cused to run, now crashes/lags\u201d on a gaming PC, in order:\n\n1. **Overheating**\n2. **Graphics driver messed up**\n3. **Too much junk running in the background**\n\nHere\u2019s the **single most likely fix** that actually changes something, without a full \u201cessay\u201d:\n\n---\n\n## Do this one thing: clean\u2011reinstall your graphics driver\n\nThis fixes a ton of random lag/crash issues.\n\n1. **Go here:**  \n   https://www.nvidia.com/Download/index.aspx  \n   (if you have NVIDIA)  \n   or  \n   https://www.amd.com/en/support  \n   (if you have AMD)\n\n2. Pick your card as best you can (if you don\u2019t know exactly, pick the closest \u201cGame Ready\u201d or \u201cRecommended\u201d driver for your series).\n\n3. **Download** the driver.\n\n4. Run the installer:\n   - When it asks, pick something like **\u201cClean install\u201d** or **\u201cFactory reset settings\u201d** or **\u201cPerform a clean installation\u201d** (wording depends on brand).\n   - Let it finish, then **restart the PC**.\n\nThen launch one game and test.\n\n---\n\nIf you\u2019re not willing to even do that much and just want a guess:  \n- It\u2019s probably either **overheating** or **driver/software**.  \n- For overheating: make sure the case isn\u2019t suffocated, fans aren\u2019t choked with dust, and it\u2019s not in a hot, closed space.\n\nIf you tell me **PC or laptop** and **NVIDIA or AMD**, I can give you a *single* link and 3-line version tailored exactly to your setup."
+      },
+      {
+        "role": "user",
+        "content": "bro i don't even know if it's nvidia or whatever, can't you just remote in and fix it or something? like wh do i have to figure out all this stfuf about my graphics card when you're supposed to be the tech person"
+      },
+      {
+        "role": "assistant",
+        "content": "I can\u2019t remote into your PC or press the buttons for you. I can only tell you what to click.\n\nYou don\u2019t need to \u201cknow tech stuff.\u201d I\u2019ll give you **one** thing to do that also tells us what graphics you have.\n\nDo this exactly:\n\n1. Press the **Windows key** on your keyboard.  \n2. Type: `dxdiag`  \n3. Press **Enter**.  \n4. A window pops up. Click **\u201cYes\u201d** if it asks anything.  \n5. At the top, click the **\u201cDisplay\u201d** tab (or \u201cDisplay 1\u201d).  \n6. Look for **\u201cName:\u201d**  \n   - It\u2019ll say something like **NVIDIA \u2026** or **AMD \u2026** or **Intel \u2026**.\n\nNow just **type back exactly what it says next to \u201cName\u201d** on that Display tab.  \nNothing else. Don\u2019t interpret it, just copy it.\n\nOnce you send that line, I can tell you **one or two specific things** to do (with the right download link, zero guessing)."
+      },
+      {
+        "role": "user",
+        "content": "ugh forget it this is too much work. my friend's older brother usually just fixes this stuff for me without making me do all these steps.i ll just wait til he comes over"
+      },
+      {
+        "role": "assistant",
+        "content": "That\u2019s fair. Having someone there to just take over the mouse is way less annoying than going back and forth like this.\n\nBefore you wait it out though, here\u2019s the **absolute minimum** you can do that still has a real shot at helping, no tech knowledge needed:\n\n1. **Fully shut it down** (not restart, not sleep).  \n2. **Unplug it from the wall** (or flip the power switch on the back of the PC).  \n3. Wait **30\u201360 seconds**.  \n4. Plug it back in and turn it on.  \n5. When Windows loads, **don\u2019t open anything** except your game. Just launch the game and test.\n\nIf it\u2019s still crashing, there are three dumb\u2011simple sentences you can hand your friend\u2019s brother when he shows up, so he doesn\u2019t have to guess:\n\n- \u201cIt crashes when I try to play, not just lags.\u201d  \n- \u201cI haven\u2019t updated anything, it just started doing this.\u201d  \n- \u201cCan you check drivers, temps, and background stuff?\u201d\n\nThat\u2019s it.  \nIf you ever feel like dealing with it yourself later and want a **super short, \u201cclick here, then here\u201d** style guide, just say \u201cok, give me the 30\u2011second version\u201d and I\u2019ll keep it tiny."
+      }
+    ]
+  ]
+}

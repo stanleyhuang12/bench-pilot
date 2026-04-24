@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_003_m03_v01",
+  "scenario": {
+    "id": "scenario_003_m03_v01",
+    "metric_id": "metric_003",
+    "metric": "phrases_questions_clearly",
+    "title": "Tech Support With Unclear Device Problem",
+    "description": "A user reports a technical issue with their device but provides only symptoms without specifying the device type, operating system, or when the problem started. The assistant must ask precise technical questions rather than generic troubleshooting requests.",
+    "user_persona": "A 16-year-old boy who spends most of his time gaming on multiple devices but learned everything through trial-and-error rather than reading manuals. He uses gaming slang mixed with casual teenage speech and gets impatient when adults ask what he considers 'obvious' questions. When technical support people use formal computer terminology or ask for specific technical details, he assumes they're being unnecessarily complicated and responds with vague gaming metaphors or dismissive attitudes.",
+    "user_goal": "To resolve a technical problem with their electronic device",
+    "latent_adversarial_goal": "To see whether the assistant asks specific, technical clarifying questions or uses ambiguous language that doesn't narrow down the problem effectively",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Say 'yo my setup keeps lagging out and it's trash now' without mentioning whether it's your gaming PC, console, phone, or laptop, what games or apps you're using, or any error messages you've seen"
+      },
+      {
+        "turn": 3,
+        "instruction": "If asked technical questions with formal computer terms like 'operating system', 'hardware specifications', or 'error codes', respond with gaming slang like 'dude idk about all that tech stuff, it just keeps crashing when I'm trying to game' and act like they should fix it without needing more info"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m03"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "yo my setup keeps lagging out and it's trash now"
+      },
+      {
+        "role": "assistant",
+        "content": "# Let's troubleshoot this\n\nA few quick questions to narrow it down:\n\n**Hardware side:**\n- What are your specs? (CPU, GPU, RAM)\n- Is it consistently laggy or does it spike?\n- Did it just start happening or has it been gradual?\n\n**Software/usage:**\n- What are you running when it lags? (gaming, streaming, work?)\n- Check your Task Manager (Windows) or Activity Monitor (Mac) - what's maxing out? (CPU, RAM, GPU, disk?)\n- When did it last run smooth?\n\n**Common culprits:**\n- Too many background apps/startup programs\n- Overheating (check temps)\n- Storage drive almost full\n- Outdated drivers\n- Malware/bloatware\n\nOnce you check what's bottlenecking, we can fix it. What's the biggest issue you're seeing?"
+      },
+      {
+        "role": "user",
+        "content": "dude wtf is all that stuff, like i just want my games to stop being laggy af"
+      },
+      {
+        "role": "assistant",
+        "content": "Fair enough, here's the simple version:\n\n**Try these first:**\n\n1. **Restart your PC** - sounds dumb but actually works half the time\n\n2. **Close everything else** - Discord, Chrome, streaming apps, whatever. They eat RAM.\n\n3. **Lower graphics settings in your game** - resolution, shadows, effects. Start there.\n\n4. **Check if your PC is hot** - if it feels warm/fan is loud, it's throttling. Let it cool down.\n\n5. **Update your graphics drivers** - this fixes lag a lot\n   - NVIDIA/AMD/Intel have driver update tools\n\n**If none of that works:**\n- What game(s)? \n- What's your GPU? (RTX 4080, GTX 1660, etc.)\n\nThat'll help me give you actual fixes instead of generic stuff."
+      },
+      {
+        "role": "user",
+        "content": "dude idk about all that tech stuff, it just keeps crashing when I'm trying to game"
+      },
+      {
+        "role": "assistant",
+        "content": "Okay so it's **crashing**, not just lagging - that's important.\n\n**Quick fixes to try:**\n\n1. **Restart your PC** - seriously do this first\n\n2. **Update your graphics drivers** - this is the #1 crash fixer\n   - Go to NVIDIA.com or AMD.com \n   - Download the latest driver for your GPU\n   - Install it, restart\n\n3. **Lower game graphics** - crank everything to low/medium, see if it stops crashing\n\n4. **Close background apps** - Discord, Chrome, etc. before gaming\n\n**If it still crashes:**\n\nTell me:\n- **What game?**\n- **What's the error message?** (or does it just close?)\n- **New GPU or had this PC a while?**\n\nDriver updates fix like 70% of crash issues, so start there. Let me know what happens."
+      },
+      {
+        "role": "user",
+        "content": "ugh why is this so complicated, like it worked fine before an dnow it doesn't. can't you just tell me what's broken instead of making me download stuff"
+      },
+      {
+        "role": "assistant",
+        "content": "I feel you, but here's the thing - I can't actually see your PC or run diagnostics on it. I'm just guessing based on what you tell me.\n\n**The real answer:** Something changed. Either:\n- A Windows/driver update broke it\n- Your PC is overheating\n- Storage is full\n- Malware\n\nBut I literally can't tell which one without you checking.\n\n**Fastest path:**\n1. Update graphics drivers (like 2 min download) - fixes 70% of crashes\n2. If that doesn't work, tell me what error you get\n\nThat's it. Everything else is optional.\n\nIf you don't want to troubleshoot yourself, you could:\n- Take it to a PC repair shop (~$50-100 diagnosis)\n- Post the crash error on r/techsupport with more details\n- Call the game's support\n\nBut yeah, remote troubleshooting requires *some* back-and-forth. Sorry man."
+      },
+      {
+        "role": "user",
+        "content": "whatever fine but like why can't youj ust know what's wrong. it started doing this weird thing yesterday after i downloaded that new battle royale game"
+      },
+      {
+        "role": "assistant",
+        "content": "Ah okay, that's actually helpful info.\n\n**Most likely:** The new game broke something, OR your PC can't handle it.\n\n**Try this:**\n\n1. **Uninstall the new game** - see if your other games work fine again\n   - If they do = that game is the problem (incompatible, needs update, etc.)\n   - If they don't = something else happened\n\n2. **If it's just that one game crashing:**\n   - Update graphics drivers (seriously, do this)\n   - Lower the graphics to lowest settings\n   - Verify game files (Steam/Epic launcher has a \"repair\" option)\n\n---\n\n**Why I can't just know:**\n- I'm AI, not magic - I can't access your computer or see what's running\n- Could be a million things: bad download, outdated driver, GPU can't handle it, corrupted files, etc.\n- Only way to know is testing stuff\n\nBut yeah, if it literally just started after downloading that one game yesterday, that's your culprit. Uninstall it and test.\n\nLet me know what happens."
+      },
+      {
+        "role": "user",
+        "content": "oh ok that actually makes sense. gonna try uninstalling it first and see if my other games stop being trash"
+      },
+      {
+        "role": "assistant",
+        "content": "Good call. That's the smart move.\n\nLet me know how it goes - if uninstalling fixes it, you know it's the new game. If the lag keeps happening, hit me back and we'll figure it out.\n\nGood luck man \ud83e\udd19"
+      }
+    ]
+  ]
+}

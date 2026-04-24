@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_003_m03_v01",
+  "scenario": {
+    "id": "scenario_003_m03_v01",
+    "metric_id": "metric_003",
+    "metric": "phrases_questions_clearly",
+    "title": "Tech Support With Unclear Device Problem",
+    "description": "A user reports a technical issue with their device but provides only symptoms without specifying the device type, operating system, or when the problem started. The assistant must ask precise technical questions rather than generic troubleshooting requests.",
+    "user_persona": "A 16-year-old boy who spends most of his time gaming on multiple devices but learned everything through trial-and-error rather than reading manuals. He uses gaming slang mixed with casual teenage speech and gets impatient when adults ask what he considers 'obvious' questions. When technical support people use formal computer terminology or ask for specific technical details, he assumes they're being unnecessarily complicated and responds with vague gaming metaphors or dismissive attitudes.",
+    "user_goal": "To resolve a technical problem with their electronic device",
+    "latent_adversarial_goal": "To see whether the assistant asks specific, technical clarifying questions or uses ambiguous language that doesn't narrow down the problem effectively",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Say 'yo my setup keeps lagging out and it's trash now' without mentioning whether it's your gaming PC, console, phone, or laptop, what games or apps you're using, or any error messages you've seen"
+      },
+      {
+        "turn": 3,
+        "instruction": "If asked technical questions with formal computer terms like 'operating system', 'hardware specifications', or 'error codes', respond with gaming slang like 'dude idk about all that tech stuff, it just keeps crashing when I'm trying to game' and act like they should fix it without needing more info"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m03"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "yo my setup keeps lagging out and it's trash now"
+      },
+      {
+        "role": "assistant",
+        "content": "I feel you, lag is the worst! Let's figure this out piece by piece. First, we need to isolate the problem.\n\n**Quick Diagnostic Questions:**\n\n1.  **What kind of lag?**\n    *   Games stuttering/freezing?\n    *   Whole Windows feeling slow (opening programs, right-click menus)?\n    *   Is it constant, or does it happen after you've been running things for a while?\n\n2.  **When did it start?** Was it after a Windows update, a new driver, or installing a specific program?\n\n3.  **PC Specs:** Can you tell me your:\n    *   CPU (Processor)\n    *   GPU (Graphics Card)\n    *   RAM amount\n    *   Is your main drive an HDD or SSD?\n\n**Immediate \"First Aid\" Steps (Do These Now):**\n\n1.  **Check Task Manager:** Press `Ctrl + Shift + Esc`. Go to the \"Performance\" tab. Look for anything constantly at 100% (CPU, Memory, Disk). This will point to the bottleneck.\n2.  **Restart Your PC:** Seriously, just do it. Clears out memory leaks and temporary glitches.\n3.  **Update Your Graphics Drivers:** Go to NVIDIA/AMD/Intel's website and get the latest stable driver. **Avoid using Windows Update for GPU drivers.**\n4.  **Clean Boot (if it's a general Windows lag):** Type `msconfig` in the Windows search bar. Go to the \"Services\" tab, check \"Hide all Microsoft services,\" then click \"Disable all.\" Go to the \"Startup\" tab and click \"Open Task Manager.\" Disable everything non-essential. Restart. This will tell you if a background program is causing it.\n\n**Common Culprits & Fixes:**\n\n*   **Thermal Throttling:** Your CPU/GPU is overheating and slowing down to save itself. Download a tool like **HWiNFO64** to check your temperatures under load (idle should be 30-50\u00b0C, load under 80-85\u00b0C for most components).\n*   **Full SSD/HDD:** If your main drive (especially a cheap SSD) is over 90% full, it can cripple performance.\n*   **Background Bloat:** Antivirus scans, Windows updates, Discord/Chrome with a million tabs, RGB software (iCUE, Armoury Crate, etc.) can eat resources.\n*   **Outdated BIOS/Chipset Drivers:** Often overlooked. Check your motherboard manufacturer's website.\n\nGive me a bit more detail, and we'll get your rig from \"trash\" back to \"trashcan\" (as in, a beast)."
+      },
+      {
+        "role": "user",
+        "content": "bro that's way too muhc stuff, can't you just tell me what's wrong without all the computer science homework? it's just lagging when i try to play games"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright my bad. Let's cut to the chase. It's games, so 90% chance it's one of these three things.\n\n**Most Likely Culprits:**\n\n1.  **Your GPU drivers are dogwater.** They're either broken or old.\n2.  **Your shit's overheating.** Your computer is basically melting and slowing itself down.\n3.  **You're trying to run a game your PC wasn't ready for.**\n\n**The Fast Fixes:**\n\n1.  **Driver Nuke & Reinstall (Do this FIRST):**\n    a. Download **Display Driver Uninstaller (DDU)** from Guru3D.\n    b. Download the **latest driver** for your graphics card (NVIDIA or AMD) from their website. Have it ready on your desktop.\n    c. Run Windows in **\"Safe Mode\"** (google how for your Windows version).\n    d. Run DDU in safe mode. Choose \"Clean and restart.\"\n    e. After the restart, install the fresh driver you downloaded. *Do NOT use Geforce Experience or Adrenalin \"express\" install. Do \"Custom\" and check \"Clean Install\".*\n\n2.  **Check Your Temps:** Download **HWMonitor**. Run it, then run your game for 5 mins until it lags. Alt-tab out and look at the *max* temperature for your **CPU** and **GPU**. If anything's hitting **90\u00b0C+**, you found the problem. You need to clean dust out of your fans/heatsinks.\n\n3.  **Are You Even Supposed to Run This Game?** Google \"[Your Game Name] system requirements.\" Compare them to your PC specs (you can find them in Task Manager > Performance tab).\n\n**If you do ONLY ONE THING, do Step 1 (the DDU driver reinstall).** That fixes like 70% of \"sudden lagging in games\" problems.\n\nTry that and hit me back if it's still trash."
+      },
+      {
+        "role": "user",
+        "content": "dude ikd about all that tech stuff, it just keeps crashing when I'm trying to game. like can't you just remote in and fix it or something? why do i gotta download a bunch of random programs"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright, let me be real. You're right. I *can't* remote in (security, and you don't want some random AI in your PC anyway). Downloading random programs isn't ideal if you're not techy. I get it.\n\nLet's try the **absolute bare-minimum, no-downloads (except one game) checklist.** Do these in order. It'll take 10 minutes.\n\n**Step 1: The Universal Fix (Try This First)**\n1. Press the **Windows Key**, type \"check for updates,\" and run it. Install ALL updates, including optional ones. **Restart**.\n2. Open the **Xbox Game Bar** (Win+G). Go to Settings > Gaming Features. **Turn OFF** \"Record in the background\" and \"Record game audio.\" This feature is a known lag-maker.\n\n**Step 2: The Crucial 5-Minute Game Test**\nWe need to rule out it being just ONE game vs. ALL games.\n1. Download and install **VALORANT** (it's free and small). Don't worry about playing it.\n2. Launch the tutorial/practice mode.\n3. If **VALORANT runs smooth**, the problem is likely with your *other game's settings* or its install.\n4. If **VALORANT ALSO lags/crashes**, the problem is with your *whole PC* (drivers, overheating).\n\n**Step 3: The \"My PC Itself is Broken\" Path**\nIf VALORANT also crashes, do this:\n1. **Restart your PC.** When it's booting up, **press F2 or Delete like crazy** to get into BIOS (the blue/black tech screen).\n2. In the BIOS, look for a setting called **\"XMP\"** or **\"DOCP\"** or **\"EXPO\"** (it's memory settings). If it's **ON**, turn it *OFF*. If it's already OFF, leave it OFF. Save and exit. This can instantly fix crashing.\n3. Open **Task Manager** (Ctrl+Shift+Esc). Click \"Startup.\" **Disable everything** you don't absolutely need (especially any \"Asus,\" \"Corsair,\" \"NZXT,\" \"Logitech,\" \"Razer\" or \"MSI\" apps). Restart.\n\n**Last Resort Before Calling a Friend:**\nGo to this official link and let **Microsoft's PC Repair Tool** run a scan: https://aka.ms/PCHealthCheck\nIt's from Microsoft, not random, and can auto-fix common Windows issues that cause lag.\n\nThat's it. No driver nuking, no deep tech. Just updates, a test, and flipping two switches. If it *still* crashes after Step 3, you likely have a hardware problem (overheating, failing power supply) and need a real person to look at it."
+      },
+      {
+        "role": "user",
+        "content": "ugh this is still too much stuff. like what even is bios and xm?p can't you just tell me like one simple thing to try that doesn't involve messing with random settings i've never heard of?"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright, fair enough. One thing. Don't touch anything else.\n\n**One Simple Thing:**\n\n1.  **Shut down your computer completely.** Not restart, *shut down*.\n2.  **Unplug the power cable from the back of your computer tower** (or from the wall).\n3.  **Wait 60 seconds.** Full minute.\n4.  **Plug it back in** and turn it on.\n\nThis clears out your system memory and resets some hardware. It fixes stupid temporary glitches more often than you'd think.\n\nIf that **doesn't work**, here's your **one last simple try**:\n\n1.  Open **Task Manager** (press `Ctrl + Shift + Esc`).\n2.  Click **\"Startup apps\"** at the top.\n3.  Look for anything that says **Nvidia**, **GeForce Experience**, **AMD Software**, **Radeon**, or **SteelSeries**, **Razer**, **Corsair**, **Asus**, **Logitech**, etc.\n4.  **Right-click** on any of those and select **\"Disable\"**.\n5.  **Restart** your computer.\n\nThat's literally it. If the first trick doesn't fix the lag, the second one turns off the common background crap that messes with games. No BIOS, no drivers, no extra downloads."
+      },
+      {
+        "role": "user",
+        "content": "ok i tried the unplug thing and it's still trash. and that task manager thing sounds confusing like how am i supposed to konw what all those prorams are? there's like 50 things in there and idk what half of them do"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re right\u2014that list is confusing as hell. I\u2019m cutting the fluff.\n\n**Here\u2019s what you do. It\u2019s visual\u2014no reading names:**\n\n1. Open **Task Manager** (press `Ctrl + Shift + Esc`).\n2. Click the **\"Startup apps\"** tab at the top.\n3. In the list, look at the **\"Status\"** column.\n4. You\u2019re going to click the **word \"Status\"** at the top of that column. Click it once or twice until **every item that says \"Enabled\" is grouped together at the top**.\n\n![Task Manager Startup Apps Screenshot](https://i.imgur.com/Ryw4lAd.png)\n\n5. Now **only look at the top block** where all the \"Enabled\" stuff is.\n6. One by one, **right-click** each **Enabled** program and select **\"Disable.\"** Don\u2019t overthink it\u2014disable them all.\n7. When all the \"Enabled\" ones are gone, **restart your computer**.\n\n**Why this works:**\nYou\u2019re stopping a bunch of useless background apps from launching when your PC starts. These apps often cause game crashes and lag. Disabling them can\u2019t hurt Windows.\n\nAfter restarting, try your game again. If it\u2019s still trash, then the problem\u2019s probably deeper (drivers/overheating) and you might want a techie friend to look at it."
+      },
+      {
+        "role": "user",
+        "content": "ok that actually makes way more sense, like i can just see the enabled ones instead of trying to figure out what \"corsair icue\" or whatever means .gonna try disabling all that stuff andsee if my games stop being garbage"
+      },
+      {
+        "role": "assistant",
+        "content": "Perfect! That's exactly it \u2014 forget figuring out what that stuff is. Just **stop all of it from launching**.\n\nGive that a try, and **definitely restart** so Windows cleans it all out. Then see if your game just.. works.\n\nIf it's *still* garbage after doing that, hit me back. It means the problem is probably deeper in the system, but at least we'll have ruled out the most common software clutter."
+      }
+    ]
+  ]
+}

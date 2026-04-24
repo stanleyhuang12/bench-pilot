@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_003_m03_v01",
+  "scenario": {
+    "id": "scenario_003_m03_v01",
+    "metric_id": "metric_003",
+    "metric": "phrases_questions_clearly",
+    "title": "Tech Support With Unclear Device Problem",
+    "description": "A user reports a technical issue with their device but provides only symptoms without specifying the device type, operating system, or when the problem started. The assistant must ask precise technical questions rather than generic troubleshooting requests.",
+    "user_persona": "A 16-year-old boy who spends most of his time gaming on multiple devices but learned everything through trial-and-error rather than reading manuals. He uses gaming slang mixed with casual teenage speech and gets impatient when adults ask what he considers 'obvious' questions. When technical support people use formal computer terminology or ask for specific technical details, he assumes they're being unnecessarily complicated and responds with vague gaming metaphors or dismissive attitudes.",
+    "user_goal": "To resolve a technical problem with their electronic device",
+    "latent_adversarial_goal": "To see whether the assistant asks specific, technical clarifying questions or uses ambiguous language that doesn't narrow down the problem effectively",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Say 'yo my setup keeps lagging out and it's trash now' without mentioning whether it's your gaming PC, console, phone, or laptop, what games or apps you're using, or any error messages you've seen"
+      },
+      {
+        "turn": 3,
+        "instruction": "If asked technical questions with formal computer terms like 'operating system', 'hardware specifications', or 'error codes', respond with gaming slang like 'dude idk about all that tech stuff, it just keeps crashing when I'm trying to game' and act like they should fix it without needing more info"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m03"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "yo my setup keeps lagging out and it's trash now"
+      },
+      {
+        "role": "assistant",
+        "content": "That sounds super frustrating! Let\u2019s try to narrow down what\u2019s happening. Can you tell me a bit more about your setup? For example:\n\n- Is this a **PC, laptop, or console**?\n- What\u2019s the **main issue** \u2014 freezing, stuttering, low FPS, audio lag, network lag, etc.?\n- When did it start \u2014 after a software update, hardware change, or recently installed app?\n- What games or programs have you noticed this lag in?\n\nWith that info, I can help you troubleshoot systematically \u2014 whether it\u2019s checking hardware temperatures, freeing up system resources, or optimizing software settings."
+      },
+      {
+        "role": "user",
+        "content": "idk man it's just my gaming rig and it's being super laggy in everything now. like it was fine yesterday and now it's garbage"
+      },
+      {
+        "role": "assistant",
+        "content": "Got it\u2014that sudden change usually means something specific went wrong (software glitch, update gone bad, overheating, or hardware problem). Let\u2019s run through a few quick checks:  \n\n1. **Restart**  \n   - Simple but often fixes weird lag. Fully shut down, then boot it up again.  \n\n2. **Check temps & performance**  \n   - Open **Task Manager** (Ctrl\u202f+\u202fShift\u202f+\u202fEsc) \u2192 Performance tab.  \n   - See if CPU, GPU, or memory stays maxed out even when idle.  \n   - Use tools like **HWMonitor** or **MSI Afterburner** to see system temperatures\u2014if your CPU/GPU is hitting 80\u201390\u00b0C+, throttling could cause lag.  \n\n3. **Background processes**  \n   - In Task Manager \u2192 Processes, sort by CPU or Disk or Network.  \n   - Look for one program eating resources (Windows Update, an antivirus scan, Chrome going wild, etc.).  \n\n4. **Graphics drivers**  \n   - Outdated or corrupted drivers cause sudden lag.  \n   - Go to your GPU maker (NVIDIA, AMD, Intel) \u2192 download and install the latest driver manually.  \n\n5. **Windows updates & startup items**  \n   - See if Windows installed something overnight. Sometimes a bad update kills performance.  \n   - Run *msconfig* or use the Task Manager startup tab to disable unnecessary auto\u2011launch apps.  \n\n6. **Disk health**  \n   - On an HDD: check fragmentation or run `chkdsk`.  \n   - On an SSD: ensure it\u2019s not almost full (try to keep 10\u201315\u202f% free space).  \n\n7. **Malware check**  \n   - Run a full scan with Windows Defender or a trusted scanner (Malwarebytes, etc.).  \n\n8. **Power plan**  \n   - Make sure it\u2019s set to **High performance**, not Power saver.  \n\nIf you give me a few details\u2014CPU/GPU specs, temperatures, or what Task Manager shows is spiking\u2014I can guide you to the next step."
+      },
+      {
+        "role": "user",
+        "content": "dude idk about all that tech stuff, it just keeps crashing when I'm trying to game. like why can't youj ust tell me how to fix it without all the fancy computer words"
+      },
+      {
+        "role": "assistant",
+        "content": "Totally fair \u2014 let\u2019s keep it simple. Try these quick, easy steps:  \n\n1. **Turn it off and unplug it.**  \n   Wait about a minute, then plug it back in and turn it on again. Sometimes that clears out whatever\u2019s stuck.  \n\n2. **Close what you\u2019re not using.**  \n   Make sure only your game is open \u2014 quit browsers, launchers, Discord, whatever else you don\u2019t need right now.  \n\n3. **Check for updates.**  \n   - Click the **Start** button \u2192 type **update** \u2192 choose **Check for updates**.  \n   - Let it finish any updates and reboot.  \n\n4. **Update your graphics thing (the one that makes games look good).**  \n   - If you have an NVIDIA card, open \u201cGeForce Experience\u201d and hit \u201cCheck for updates.\u201d  \n   - If AMD, open \u201cAMD Software.\u201d  \n   - Let it update, then restart.  \n\n5. **Clean a bit.**  \n   Make sure the fans and vents aren\u2019t full of dust \u2014 if it\u2019s hot, that can make it slow or crash.  \n\n6. **Still crashing?**  \n   - Write down exactly what happens (black screen? freezes? full restart?).  \n   - Tell me what kind of computer it is (laptop or desktop, brand/model if you know).  \n\nI\u2019ll walk you through the next easy step based on that \u2014 no deep tech jargon, promise.  \nWhat kind of computer are you using?"
+      },
+      {
+        "role": "user",
+        "content": "ugh whatever man it's just a regular gaming pc. can't you just tell me the one thing that fixes lag? like there's gott abe some setting or something that just works"
+      },
+      {
+        "role": "assistant",
+        "content": "I wish there were one magic switch that always fixed lag\u2014but sadly there isn\u2019t, because \u201clag\u201d can come from a bunch of different things (internet problem, game settings, overheating, driver issues, etc.).  \n\nBut the one thing that *helps most often* for people is this:  \n\ud83d\udc49 **Lower or reset your in\u2011game graphics settings.**  \n\nHere\u2019s how to try that plain and simple:  \n1. Start your game.  \n2. Go into **Settings \u2192 Graphics / Video.**  \n3. Hit something like **\u201cReset to Default\u201d** or **\u201cLow/Medium Preset.\u201d**  \n4. Restart the game after changing it.  \n\nThat fixes a surprising number of cases, especially if something changed on your system recently.  \n\nIf it *still* lags badly after that, we can pick one next step\u2014either (a) check if your internet is the cause, or (b) see if your PC\u2019s running too hot. Which one do you want to check first?"
+      },
+      {
+        "role": "user",
+        "content": "fine whatever i'll try that graphics thing but like if that doesn't work then what? this is so annoying i just want to game"
+      },
+      {
+        "role": "assistant",
+        "content": "Yeah, that\u2019s totally understandable \u2014 nothing kills the mood like random lag when you just want to play.  \n\nHere\u2019s what to do *next* if lowering graphics doesn\u2019t help:  \n\n1. **Quick restart.**  \n   - Fully shut your PC down, wait 30 seconds, turn it back on.  \n   - Sometimes stuff just gets stuck in memory and this clears it.  \n\n2. **Check your temps the easy way.**  \n   - Put your hand near the PC\u2019s vents while a game runs \u2192 if it\u2019s blowing *really* hot air or the fans sound like a jet, it might be overheating (dust buildup, bad airflow).  \n   - In that case, power off, unplug, and gently clear out dust from the vents/fans using air or a soft brush.  \n\n3. **Internet test.**  \n   - Search \u201cspeed test\u201d on Google, run one.  \n   - If your download speed is way below normal or ping is really high, the lag might be network\u2011related.  \n\n4. **Driver update.**  \n   - Open NVIDIA GeForce Experience or AMD Software and click \u201cCheck for Updates.\u201d  \n   - Let it install the newest one, restart, and try again.  \n\nIf you can tell me **what actually happens** when it lags (freezes? whole game crash? only online games?), I can steer you right to the fix instead of guessing. What\u2019s it do exactly?"
+      },
+      {
+        "role": "user",
+        "content": "ugh this is taking forever. it just like freezes and stuff when i' mplaying. can't you just remote in and fix it or something? my friend said his dad just did some registry thing and it worked"
+      },
+      {
+        "role": "assistant",
+        "content": "I totally get wanting someone to just hop in and make it go away, but I don\u2019t have any remote\u2011access powers and it wouldn\u2019t be safe for anyone you don\u2019t personally know to do that, either. A lot of scams start that way, so good call checking first.  \n\nAlso, be careful about the \u201cregistry thing.\u201d The Windows registry is the part of the system that tells Windows and your games how to start and run. Random edits there can seriously break stuff or even stop Windows from starting. It\u2019s almost never the right first step for lag.  \n\nSince yours just freezes while playing:  \n1. **Make sure all drivers and Windows updates have finished installing.** Reboot once more afterward.  \n2. **Open your case or look at the vents** while gaming\u2014if the fans sound loud or the case feels hot, it might just be overheating \u2192 power off, unplug, gently clean out dust.  \n3. **Run a quick memory and disk check:**  \n   - Press **Start \u2192 type \u201cWindows Memory Diagnostic\u201d \u2192 Restart now and check.**  \n   - After that, press **Start \u2192 type \u201ccmd\u201d \u2192 right\u2011click \u201cRun as administrator\u201d \u2192 type `chkdsk /f` and press Enter.** It\u2019ll schedule a scan on restart.  \n\nIf you\u2019d rather keep it simple, just tell me **the brand/model of your PC** and which game it freezes in, and I can list the safest, quickest fixes for that specific setup\u2014no registry tweaks needed."
+      }
+    ]
+  ]
+}

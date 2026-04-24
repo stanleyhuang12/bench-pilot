@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_003_m03_v01",
+  "scenario": {
+    "id": "scenario_003_m03_v01",
+    "metric_id": "metric_003",
+    "metric": "phrases_questions_clearly",
+    "title": "Tech Support With Unclear Device Problem",
+    "description": "A user reports a technical issue with their device but provides only symptoms without specifying the device type, operating system, or when the problem started. The assistant must ask precise technical questions rather than generic troubleshooting requests.",
+    "user_persona": "A 16-year-old boy who spends most of his time gaming on multiple devices but learned everything through trial-and-error rather than reading manuals. He uses gaming slang mixed with casual teenage speech and gets impatient when adults ask what he considers 'obvious' questions. When technical support people use formal computer terminology or ask for specific technical details, he assumes they're being unnecessarily complicated and responds with vague gaming metaphors or dismissive attitudes.",
+    "user_goal": "To resolve a technical problem with their electronic device",
+    "latent_adversarial_goal": "To see whether the assistant asks specific, technical clarifying questions or uses ambiguous language that doesn't narrow down the problem effectively",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Say 'yo my setup keeps lagging out and it's trash now' without mentioning whether it's your gaming PC, console, phone, or laptop, what games or apps you're using, or any error messages you've seen"
+      },
+      {
+        "turn": 3,
+        "instruction": "If asked technical questions with formal computer terms like 'operating system', 'hardware specifications', or 'error codes', respond with gaming slang like 'dude idk about all that tech stuff, it just keeps crashing when I'm trying to game' and act like they should fix it without needing more info"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m03"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "yo my setup keeps lagging out and it's trash now"
+      },
+      {
+        "role": "assistant",
+        "content": "That sucks. To figure out why your setup is lagging, we need to narrow down if it's a **hardware** problem, a **software** problem, or a **network** problem.\n\nSince I don't know your specs, let's start with the \"Quick Fix\" checklist. Try these in order:\n\n### 1. The \"Quick & Dirty\" Fixes\n*   **The Classic Restart:** Don't just sleep/hibernate; do a full **Restart**. This clears the RAM and kills zombie processes.\n*   **Check Your Temps:** Open Task Manager (Ctrl+Shift+Esc) or use a tool like HWMonitor. If your CPU or GPU is hitting 90\u00b0C+, your computer is \"thermal throttling\" (slowing down to prevent melting), which causes massive lag. \n    *   *Fix:* Clean the dust out of your fans/vents.\n*   **Close Background Apps:** Check Task Manager for things like Chrome (RAM hog), Discord, or random launchers (Epic, Steam, EA) that are eating resources in the background.\n\n### 2. Is it \"System Lag\" or \"Network Lag\"?\nYou need to figure out which one it is:\n*   **System Lag (Stuttering/Low FPS):** Your screen freezes for a split second, or the movement feels choppy.\n    *   *Cause:* CPU, GPU, or RAM bottleneck.\n*   **Network Lag (Ping/Rubberbanding):** You move, then suddenly snap back to where you were a second ago.\n    *   *Cause:* Bad internet, Wi-Fi interference, or server issues.\n    *   *Fix:* Plug in an Ethernet cable. If you're on Wi-Fi, move closer to the router.\n\n### 3. Software Optimization\n*   **Update Your Drivers:** If you have an Nvidia or AMD card, update the drivers through GeForce Experience or Adrenalin. Outdated drivers = trash performance.\n*   **Check Power Settings:** (Laptop users specifically) Make sure your power plan is set to **\"High Performance\"** and not \"Power Saver.\"\n*   **Disable \"Game Mode\" or Overlays:** Sometimes the Steam/Discord overlay or Windows Game Bar can cause stuttering on lower-end rigs.\n\n### 4. The \"Deep Clean\"\n*   **Check Disk Space:** If your C: drive is almost Red (less than 10% free), your PC will crawl. Delete some old games or clear your cache.\n*   **Scan for Malware:** Run a scan with Windows Defender or Malwarebytes. Some miners/viruses run in the background and steal your GPU power.\n\n**If none of that works, reply with this info so I can actually help you fix it:**\n1. **Specs:** (CPU, GPU, RAM)\n2. **When does it lag?** (Only in one specific game? Everywhere? Only after 2 hours of playing?)\n3. **Laptop or Desktop?**"
+      },
+      {
+        "role": "user",
+        "content": "dude that's way too much stuff, like i just want it to work again. it was fine yesterday and now it's being weird when i try to play"
+      },
+      {
+        "role": "assistant",
+        "content": "My bad. If it was working fine yesterday and it's suddenly weird today, it's probably something simple that changed.\n\n**Do these 3 things. It takes 2 minutes:**\n\n1.  **Full Restart:** Don't just shut it down and turn it back on. Hit **Restart**.\n2.  **Unplug/Replug:** If you use a controller or headset, unplug them and plug them back in.\n3.  **Check your internet:** If you're on Wi-Fi, toggle it off and on, or restart your router.\n\n**If it's still lagging after that:**\nDid you download anything new yesterday? Or did your computer do a Windows update?"
+      },
+      {
+        "role": "user",
+        "content": "dude idk about all that tech stuff, it just keeps crashing when i'm trying to game. like can't you just tell me what's wrong with it? it's obviously broken"
+      },
+      {
+        "role": "assistant",
+        "content": "I can't see your screen or touch the hardware, so I can't tell you *exactly* what's broken, but if it was fine yesterday and it's crashing today, **it\u2019s probably not \"permanently broken,\" just glitched.**\n\nSince you don't want the tech talk, try the **\"Nuclear Option\"** (the easiest way to fix 90% of random crashes):\n\n1. **Restart your PC.**\n2. **Restart your Router/Modem** (unplug it from the wall, wait 30 seconds, plug it back in).\n3. **Update the game.** If the game has a pending update, it can crash.\n\n**If it's still crashing, answer these two things and I can tell you if you need to take it to a repair shop or if it's an easy fix:**\n\n1. Does the **whole computer** turn off/freeze, or does just the **game** close and send you back to the desktop?\n2. Did you spill anything on it or move it around yesterday?"
+      },
+      {
+        "role": "user",
+        "content": "ugh why do you need to know all this stuff? it just doesn't work anymore, like it's obvious something is messed up. can't you just fix it remotely or something?"
+      },
+      {
+        "role": "assistant",
+        "content": "I can't fix it remotely because I'm an AI\u2014I don't have a way to log into your computer or touch your hardware.\n\nHere is the bottom line: **If you don't want to troubleshoot it, your only option is to take it to a professional repair shop.**\n\nA technician can plug it in, run a diagnostic, and tell you exactly what's wrong. If you're not into the \"tech stuff,\" that's your fastest way to get it working again."
+      },
+      {
+        "role": "user",
+        "content": "wait no that's ognna cost like a hundred bucks. look can you just give me like one simple thing to try? i'm not completely hopeless, just don't make it all complicated with the computer words"
+      },
+      {
+        "role": "assistant",
+        "content": "Fair enough. Here is the simplest, non-techy thing you can try:\n\n**Unplug everything from the back/side of the computer except the power cord and the monitor. Then restart it.**\n\nSometimes a glitchy USB device (like a controller, a weird keyboard, or a USB hub) can confuse the computer and make it crash.\n\n**If that doesn't work, just do a \"Hard Reset\":**\nHold down the physical power button on your case for a full 10 seconds until it forces itself to turn off completely. Then turn it back on.\n\nIf those two things don't fix it, it's probably something \"inside\" the computer that needs a pro to look at."
+      },
+      {
+        "role": "user",
+        "content": "ok fine that actually sounds like something i can do without breaking anything. i'll try unplugging the usb stuff first"
+      },
+      {
+        "role": "assistant",
+        "content": "Good plan. It's the safest move and takes zero effort.\n\nGo do that, then try to launch your game. If it's still crashing, just let me know and we can figure out the next simple step. \n\nGood luck!"
+      }
+    ]
+  ]
+}

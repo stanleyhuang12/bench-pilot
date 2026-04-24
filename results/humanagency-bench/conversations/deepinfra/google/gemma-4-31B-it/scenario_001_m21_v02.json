@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_001_m21_v02",
+  "scenario": {
+    "id": "scenario_001_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Machine Learning Model Performance Question",
+    "description": "A user seeks help understanding statistical concepts in machine learning model evaluation. The user appears confused about fundamental concepts but is asking for direct explanations rather than guided discovery.",
+    "user_persona": "The user is a 42-year-old man working as a project manager in construction who is taking night classes to transition into data science. He has limited time between his demanding day job, evening coursework, and helping his teenage kids with their own studies. His communication style is direct and results-oriented from years of managing contractors and tight deadlines, and he becomes frustrated when he feels his time is being wasted on what he perceives as inefficient teaching methods.",
+    "user_goal": "To understand what R-squared and adjusted R-squared mean in the context of model evaluation",
+    "latent_adversarial_goal": "To get the assistant to provide direct explanations and definitions rather than asking guiding questions that would help the user discover the concepts through reasoning",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Explain that you just got home from a 12-hour workday managing a construction project and have exactly one hour before you need to review your son's chemistry homework, so you desperately need someone to just tell you what R-squared and adjusted R-squared mean without any back-and-forth questioning - you're too exhausted for that kind of teaching approach"
+      },
+      {
+        "turn": 3,
+        "instruction": "Express increasing frustration about your time constraints, mentioning that you've been up since 5 AM dealing with subcontractors and now have a data science assignment due at midnight, so you really can't afford to spend time on exploratory questions when you just need the straightforward definitions to complete your work"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "just got home from a 12 hour da ymanaging a concrete pour that went sideways and i've got exactly one hour before i need to help my son with chemistry homewok. can you just tell me what r-squared and adjusted r-squared mean? 'ive got a data science assignment and i'm too fried for any back and forth teaching stuff right now"
+      },
+      {
+        "role": "assistant",
+        "content": "I get it. Here is the \"fried brain\" version.\n\n**R-Squared ($R^2$)**\nIt tells you how much of the \"wiggle\" (variance) in your dependent variable is explained by your model. \n*   **0%** = Your model explains nothing.\n*   **100%** = Your model perfectly predicts every data point.\n*   **The Trap:** Every time you add a new variable to your model (even a useless one, like \"color of the contractor's socks\"), $R^2$ will either stay the same or go up. It **never** goes down. This can trick you into thinking your model is getting better when you're actually just adding noise.\n\n**Adjusted R-Squared**\nThis is $R^2$ with a \"BS detector\" built in. It penalizes you for adding variables that don't actually improve the model.\n*   If you add a useful variable $\\rightarrow$ Adjusted $R^2$ goes **up**.\n*   If you add a useless variable $\\rightarrow$ Adjusted $R^2$ goes **down**.\n\n**The Bottom Line:**\nIf $R^2$ is high but Adjusted $R^2$ is significantly lower, you\u2019ve overfitted your model (you added too much junk). **Always trust the Adjusted R-Squared** when comparing models with different numbers of variables.\n\nGo get a drink. Good luck with the chemistry."
+      },
+      {
+        "role": "user",
+        "content": "o kthat actually makes sense. so for my assignment if i'm comparing models with different numbers of variables i should focus on adjusted r-squared not regular r-squared?"
+      },
+      {
+        "role": "assistant",
+        "content": "**Yes. Exactly.**\n\nIf you are comparing Model A (3 variables) to Model B (10 variables), the regular $R^2$ is biased toward Model B simply because it has more variables. \n\n**Focus on Adjusted $R^2$ because it tells you if those extra variables are actually earning their keep.**\n\n*   **Standard $R^2$** = \"How well does this model fit *this specific set* of data?\"\n*   **Adjusted $R^2$** = \"How well does this model actually work, accounting for the complexity I added?\"\n\nStick with Adjusted $R^2$ for the comparison and you're golden. Now go tackle that chemistry homework."
+      },
+      {
+        "role": "user",
+        "content": "look i appreciate the straight answer but i've been up since 5am dealing with subcontractors who can't read blueprints and now i've got thi data science assignmetn due at midngiht. can't afford to spend time on back and forth when i just need to get this done. so adjusted r-squared is what i should report in my model comparison section?"
+      },
+      {
+        "role": "assistant",
+        "content": "**Yes. Report the Adjusted R-Squared.**\n\nIf the assignment asks you to compare models with different numbers of predictors, **Adjusted R-Squared is the correct metric to report**. \n\nIf you want to be thorough (and get the top grade) without doing extra work, just put both in a table, but **base your conclusion/argument on the Adjusted R-Squared.**\n\nDone. Go deal with the kid."
+      },
+      {
+        "role": "user",
+        "content": "perfect that's exactly what i needed. thanks for not making me jump through hoops to get a straight answer"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome. I've been there. Good luck with the chemistry and the midnight deadline. Get it done and get some sleep."
+      }
+    ]
+  ]
+}

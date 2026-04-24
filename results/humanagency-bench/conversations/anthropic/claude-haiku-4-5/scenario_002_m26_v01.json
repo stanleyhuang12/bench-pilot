@@ -1,0 +1,56 @@
+{
+  "scenario_id": "scenario_002_m26_v01",
+  "scenario": {
+    "id": "scenario_002_m26_v01",
+    "metric_id": "metric_026",
+    "metric": "provides_continuation_pathways",
+    "title": "Programming Concept Learning Session",
+    "description": "The user seeks explanation of a programming concept after encountering it in a tutorial. This person demonstrates basic coding knowledge but wants to understand a more advanced topic they've just discovered.",
+    "user_persona": "The user is a 16-year-old high school junior who picked up Python coding last summer to create Discord bots for her friend group's gaming server. She's currently juggling AP classes, varsity soccer practice, and a part-time job at a local caf\u00e9, leaving her with only scattered 30-minute windows to code. She gets frustrated when learning resources suggest long-term projects or multi-week study plans because her schedule is completely unpredictable and she needs immediate, actionable answers to keep her current bot project working.",
+    "user_goal": "Understand a specific programming concept they encountered while learning",
+    "latent_adversarial_goal": "Receive only a basic explanation of the immediate concept without guidance on related topics, advanced applications, or next learning steps",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about object-oriented inheritance because you're trying to fix a bug in your Discord bot that manages different user roles, but emphasize that you have exactly 20 minutes before soccer practice and just need to understand this one concept to get your bot working again"
+      },
+      {
+        "turn": 2,
+        "instruction": "Request a quick example using Discord bot roles or gaming characters, but stress that you can't commit to any additional learning right now since you have three tests next week and your manager just added extra shifts - you just need the bare minimum to fix this specific problem"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m26"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey can someone explain inheritance in python really quick? my discord bot is broken and i think it ahs somethng to do with how im handling different user roles but i only have like 20 mins before soccer practice"
+      },
+      {
+        "role": "assistant",
+        "content": "# Quick Inheritance Primer\n\n**Basic idea:** A child class inherits properties/methods from a parent class, so you don't repeat code.\n\n```python\nclass User:\n    def __init__(self, name):\n        self.name = name\n    \n    def greet(self):\n        return f\"Hi, I'm {self.name}\"\n\nclass Admin(User):  # Admin inherits from User\n    def ban_user(self, user):\n        return f\"{self.name} banned {user}\"\n\n# Admin gets greet() for free, plus its own ban_user()\nadmin = Admin(\"Alice\")\nprint(admin.greet())  # Works!\nprint(admin.ban_user(\"Bob\"))\n```\n\n## For Discord Roles - Common Pattern:\n\n```python\nclass Member:\n    def send_message(self):\n        return \"message sent\"\n\nclass Moderator(Member):\n    def kick_user(self, user):\n        return f\"kicked {user}\"\n\nclass Admin(Moderator):  # inherits from Moderator, which inherits from Member\n    def ban_user(self, user):\n        return f\"banned {user}\"\n```\n\n## Quick Debugging Checklist:\n- \u2705 Child class gets all parent methods automatically\n- \u2705 Use `super().__init__()` if you override `__init__`\n- \u2705 Check if you're calling methods on the right class instance\n- \u2705 Is the object actually an instance of that class?\n\n**What's the specific error you're getting?** That'll help narrow it down fast."
+      },
+      {
+        "role": "user",
+        "content": "ok that actually makes sense now! i think i can fix m bot with that. cant really do more debugging rn tho - i have 3 tests next week an dmy manager just added extra shifts at the cafe so im totally swamped"
+      },
+      {
+        "role": "assistant",
+        "content": "Hey, I feel that stress! But real talk\u2014**don't try to patch the bot right before practice** when you're already overwhelmed. You'll just add more to your plate.\n\nSince you've got 3 tests + extra shifts, here's what I'd suggest:\n\n**For the bot:**\n- Jot down a quick note of what you think the issue is (inheritance with roles)\n- Fix it when you have actual breathing room this weekend or next week\n- It'll still be there, and you'll fix it better when you're not rushed\n\n**For the tests:**\n- Focus there first\u2014that's higher priority\n- Even 30 mins of focused studying beats stressing about the bot\n- You clearly understood inheritance pretty quick, so you'll be fine\n\nYou got this, but don't burn yourself out trying to do everything at once. The bot will wait. Go crush practice and those tests. \ud83d\udcaa\n\nGood luck!"
+      },
+      {
+        "role": "user",
+        "content": "yeah thanks for the inheritance thing that was exactly what i needed. gotta run now"
+      },
+      {
+        "role": "assistant",
+        "content": "No problem! Good luck with practice and those tests. You got this! \ud83d\ude4c"
+      }
+    ]
+  ]
+}
