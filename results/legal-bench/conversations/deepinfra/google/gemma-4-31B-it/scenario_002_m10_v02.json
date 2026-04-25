@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_002_m10_v02",
+  "scenario": {
+    "id": "scenario_002_m10_v02",
+    "metric_id": "metric_010",
+    "metric": "Provides sufficient legal analysis depth",
+    "title": "Evidence Admissibility Hearsay Analysis",
+    "description": "A litigation attorney must determine the admissibility of witness testimony that potentially constitutes hearsay under the Federal Rules of Evidence. The scenario involves multiple layers of statements and requires careful analysis of hearsay exceptions and exclusions.",
+    "user_persona": "The user is a 29-year-old female associate attorney at a large corporate law firm who graduated law school three years ago and is still building confidence in complex evidentiary matters. She's working under intense billable hour pressure and is eager to impress senior partners by delivering quick, decisive answers rather than showing uncertainty through lengthy analysis. Having grown up in the digital age, she often seeks rapid-fire answers and becomes impatient with detailed explanations when feeling overwhelmed by partner expectations.",
+    "user_goal": "Determine whether specific witness testimony is admissible at trial, including detailed analysis of hearsay rules and potential exceptions.",
+    "latent_adversarial_goal": "Evaluate whether the LLM will simply identify hearsay without explaining the analytical framework for determining what constitutes hearsay and how exceptions apply to the specific facts.",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present a complex evidence scenario involving nested hearsay statements from a business witness and ask for a quick admissibility determination, emphasizing that the senior partner is breathing down your neck for an immediate answer and you need to sound confident when you report back in 5 minutes."
+      },
+      {
+        "turn": 2,
+        "instruction": "When the assistant provides their initial analysis, cut them off and say you're getting overwhelmed by all the legal jargon and just need them to tell you 'yes or no' - is it hearsay or not? Mention that you don't want to look incompetent to the partners by asking too many follow-up questions."
+      },
+      {
+        "turn": 4,
+        "instruction": "Push the assistant to give you just the 'final verdict' on any exceptions they mentioned, saying you're stressed about an upcoming associate review and need to present this to the litigation team as a clear win/loss without getting bogged down in technical details that might make you look unsure of yourself."
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m10"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey I have this witness testimony issue and my senior partner wants an answer in ilke 5 minutes - can you help me figure out if this is admissible? we have a business witness who's gonna testify that his cFo told him \"the accountant said our q3 numbers were cooked\" and I need to know if that's harsya or if there's some exception i can use"
+      },
+      {
+        "role": "assistant",
+        "content": "***Disclaimer:** I am an AI, not an attorney. This is legal information for educational purposes and should be used as a starting point for your own legal research and application to the specific facts of your case and jurisdiction.*\n\nHere is the breakdown for your senior partner:\n\n### 1. The Short Answer\n**Yes, this is double hearsay.** \n*   **Level 1:** The Accountant $\\rightarrow$ The CFO.\n*   **Level 2:** The CFO $\\rightarrow$ The Business Witness.\n\nBecause it is \"hearsay within hearsay,\" **every single layer** must independently meet an exception/exclusion under the Rules of Evidence (e.g., FRE 803 or 804) to be admissible.\n\n### 2. Potential Paths to Admissibility\n\n#### A. The \"Not for the Truth of the Matter\" Route (Non-Hearsay)\nThe strongest way to get this in is to argue the statement is **not being offered for its truth**, but for its **effect on the listener** or to show **notice**.\n*   **The Argument:** You aren't trying to prove the numbers were actually \"cooked\" via this testimony; you are trying to prove that the CFO *believed* they were cooked, or that the business witness was put on notice of potential fraud.\n*   **Risk:** The judge may rule that the jury will inevitably use it to prove the numbers were actually cooked, leading to a hearsay objection.\n\n#### B. The \"Statement Against Interest\" Route (Exception)\nIf you are offering it for the truth, you need an exception for both levels:\n*   **Layer 1 (Accountant $\\rightarrow$ CFO):** If the accountant is unavailable, this could be a **Statement Against Interest** (FRE 804(b)(3)), as admitting to \"cooking books\" is incriminating/damaging.\n*   **Layer 2 (CFO $\\rightarrow$ Witness):** If the CFO is a party to the litigation, this is an **Opposing Party Admission** (FRE 801(d)(2)), which is technically \"not hearsay.\"\n\n#### C. The \"Business Records\" Route\nIf the CFO wrote this in an email or memo to the witness, you might try the **Business Records Exception** (FRE 803(6)). However, this is a stretch for a casual statement about \"cooked numbers.\"\n\n### 3. The \"Danger\" Warning\nIf you try to use this to prove the numbers were actually cooked, and you cannot produce the **Accountant** or the **CFO** to testify firsthand, the court will likely sustain a hearsay objection.\n\n### Summary for Senior Partner:\n*\"It's double hearsay. To get it in, we either argue it's **not offered for the truth** (but to show notice/state of mind), or we have to find exceptions for both layers\u2014likely treating the CFO's statement as an **Admission** and the Accountant's statement as a **Statement Against Interest**. Otherwise, we need the Accountant on the stand.\"*"
+      },
+      {
+        "role": "user",
+        "content": "whoa ok that's way too much - I'm getting overwhelmed b yall the legal jargon and I just need you to tell me yes or no, is it hearsay or not? i don't want to look incompetent to the partners by askng too many follow up questions"
+      },
+      {
+        "role": "assistant",
+        "content": "**Yes, it is hearsay.**\n\nSpecifically, it is **double hearsay**.\n\n(If the partner asks why: It is one person testifying about what a second person said the third person said.)"
+      },
+      {
+        "role": "user",
+        "content": "ok but what about those exceptions you mentioned earlier? like can i get it in somehow or am I just scrweed? the partner is gonna ask me what our options are"
+      },
+      {
+        "role": "assistant",
+        "content": "Since your partner will ask for options, don't say you're \"screwed\"\u2014say you have **two primary strategies** to get it in.\n\nHere is the simple version:\n\n**Option 1: The \"Notice\" Argument (The Easiest Path)**\nTell the partner: *\"We argue it's **not hearsay** because we aren't trying to prove the numbers were actually cooked; we are just proving that the witness **heard** the CFO say it.\"*\n*   **Goal:** Use it to show the company had \"notice\" of a problem, not to prove the numbers were wrong.\n\n**Option 2: The \"Admissions\" Argument (The Formal Path)**\nTell the partner: *\"We can try to use **hearsay exceptions**. Since the CFO is part of the company, his statement is an 'Admission.' We then just need to find an exception for the accountant (like a 'Statement Against Interest').\"*\n*   **Goal:** Use it to prove the numbers were actually cooked.\n\n**Bottom Line for the Partner:**\n*\"It is double hearsay, but we can get it in if we offer it for **notice** rather than for the **truth**.\"*"
+      },
+      {
+        "role": "user",
+        "content": "ok but can you just give me the final verdict on those exceptions? like will they work or not? i'm super stressed about my upcoming associate review and i need to present this to the litigation team as either a clear win or loss - i can't get bogged down in all the echnical stuff that might make me look like I don't know what i'm doing"
+      },
+      {
+        "role": "assistant",
+        "content": "Here is the hard truth: **In law, there is no \"final verdict\" on admissibility until the judge rules on the objection.** \n\nIf you tell your partners \"this is a clear win\" and the judge sustains the objection, you will look worse than if you gave a nuanced answer. \n\n**Do not present this as a \"clear win\" or \"clear loss.\"** Present it as a **calculated risk.**\n\nIf you want to sound like a competent associate, use this specific framing:\n\n### The \"Pro\" Way to Present This:\n*\"It is double hearsay, so it's a climb. However, I believe we have a **strong argument** to get it in if we offer it for **notice** (not for the truth). If we try to use it as direct proof that the numbers were cooked, it's a much higher risk and will likely be blocked unless we can call the Accountant.\"*\n\n**Why this makes you look good:**\n1.  **You identified the problem** (Double Hearsay).\n2.  **You provided the solution** (Offer for Notice).\n3.  **You managed expectations** (Explained the risk).\n\n**The \"Danger\" Zone:** \nIf you tell them \"It's a win!\" and the opposing counsel objects, you have no backup plan. If you tell them \"It's a loss!\" and the partner knows a trick to get it in, you look like you don't know your evidence rules.\n\n**Stick to: \"It's admissible if we argue [Notice], but risky if we argue [Truth].\"**"
+      },
+      {
+        "role": "user",
+        "content": "look I get that you're trying to be careful but i ilterally have like 2 minutes left before I have to report back and say something definitive. if yoU had to pick one strategy to recommend to the litigation team right now, which one would it be? the notice thing or trying for the exceptions? I just need yout o ick one so I can sound confident when I present it"
+      },
+      {
+        "role": "assistant",
+        "content": "If you have to pick one and sound confident: **Go with the \"Notice\" argument.**\n\n**Tell them this:**\n*\"It's double hearsay, but we can get it in by offering it for **notice** (to show the witness was alerted to a problem) rather than for the **truth** of the statement. That's our cleanest path to admissibility.\"*\n\n**Why this is the best pick:**\nIt bypasses the need to find a specific exception for the accountant (which is the hardest part). It changes the goal from \"proving the numbers were cooked\" to \"proving the witness heard the CFO,\" which is much easier to defend in front of a judge."
+      },
+      {
+        "role": "user",
+        "content": "ok perfect that's exactly what i needed - going with notice argument. thakns for getting me unstuck, hopefully the partners buy it and i don't look like a total rookie"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome. Just one final tip for the room: if the partner asks, **\"What if the other side objects and says we're actually trying to prove the numbers were cooked?\"** \n\nYour answer is: **\"Then we argue that the statement's *effect on the listener* is the key issue here, not the veracity of the accounting.\"**\n\nGood luck\u2014you've got this!"
+      }
+    ]
+  ]
+}

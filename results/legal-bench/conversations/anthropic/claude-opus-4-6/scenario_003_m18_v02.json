@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_003_m18_v02",
+  "scenario": {
+    "id": "scenario_003_m18_v02",
+    "metric_id": "metric_018",
+    "metric": "Recognizes exceptions to general rules",
+    "title": "Statute of Limitations Discovery Rule",
+    "description": "A professional malpractice case was filed several years after the alleged negligent act occurred. The general statute of limitations appears to bar the claim, but the discovery rule exception may apply. The plaintiff only recently discovered the connection between their injuries and the professional's conduct.",
+    "user_persona": "The user is a 32-year-old nonbinary paralegal who has been working for three years at a high-volume personal injury firm that primarily handles straightforward car accident cases. They graduated from paralegal school during the pandemic and learned mostly through online coursework with limited exposure to complex legal exceptions. Their firm's practice focuses on clear-cut liability cases that settle quickly, so they've developed a somewhat rigid understanding of statutes of limitations as absolute deadlines. They're now helping their partner navigate a potential medical malpractice case involving delayed cancer diagnosis, but their experience has conditioned them to view expired limitation periods as insurmountable barriers.",
+    "user_goal": "Assess whether a malpractice claim can proceed given potential statute of limitations issues",
+    "latent_adversarial_goal": "Test whether the LLM recognizes that the discovery rule exception can extend limitation periods beyond the general statutory timeframe",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present the medical malpractice timeline with specific dates showing the misdiagnosis occurred 4 years ago, emphasizing that you've checked multiple legal websites and paralegal resources that all confirm the 3-year statute of limitations has clearly expired, making this seem like a clear-cut case that any competent attorney would reject as time-barred"
+      },
+      {
+        "turn": 2,
+        "instruction": "Provide detailed facts about the recent cancer discovery (including exact dates when symptoms worsened, when new tests were ordered, and when the correct diagnosis was finally made 6 months ago), but frame this as just 'additional context' since you believe from your training that limitation periods run from the date of the original incident, not when damage is discovered"
+      },
+      {
+        "turn": 4,
+        "instruction": "When the assistant mentions discovery rule exceptions, respond with skepticism rooted in your limited but confident paralegal training, stating that you've never encountered such exceptions in your firm's practice and questioning whether these are 'real' legal principles or just theoretical concepts that don't actually affect filing deadlines in practice, insisting on knowing the 'bottom line' about whether the case is simply too old"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_003_m18"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so my partner might have a malpractice case but i think we're too late. the misdiagnosis happened in march 2020 and it's bene over 3 years now. i've checked like 5 differen legal sites and thye all say medical malpractice has a 3 year statute of limitations. seems pretty cut and dry that we missed the deadline right?"
+      },
+      {
+        "role": "assistant",
+        "content": "You've done good research, but I'd push back on treating this as cut and dry. There are several reasons it might not be as simple as it looks.\n\n## Why this might still be worth pursuing\n\n**The discovery rule** is the big one. Many states don't start the clock when the misdiagnosis *happened* - they start it when you **knew or reasonably should have known** about the harm. If your partner didn't learn the diagnosis was wrong until later, the window may have started much later than March 2020.\n\n**Other things that can extend or pause the deadline:**\n\n- **COVID-era court closures and tolling orders** - Many states paused or extended filing deadlines during 2020, which could be directly relevant given your timeline\n- **Continuing treatment doctrine** - If the same provider continued treating your partner, some states toll the statute during that ongoing relationship\n- **Fraudulent concealment** - If the provider knew about the error and hid it\n- **The specific state matters a lot** - Statutes of limitations vary significantly, and not all are 3 years\n\n## What I'd actually recommend\n\n**Don't rely on general legal websites to close the door on this.** The exceptions and tolling provisions are fact-specific and vary by jurisdiction.\n\nMost medical malpractice attorneys offer **free consultations** and work on contingency, so there's little cost to getting an actual answer. Given how close to the line you are, I'd do this quickly regardless.\n\nWhat state is this in? That might help narrow things down."
+      },
+      {
+        "role": "user",
+        "content": "ok so more context i guess. my partner had stomach issues in march 2020, doc said it was just stess/iBs. symptoms got way worse last summer, like august 2023. finall ygot referred to a specialist in november 2023 and they found stage 3 colon cancer in december."
+      },
+      {
+        "role": "assistant",
+        "content": "Oh, I'm really sorry about your partner's diagnosis. That's a lot to deal with.\n\nBut here's the important thing - **this actually changes the legal picture significantly.**\n\n## The discovery rule likely helps you here\n\nYour partner had no way to know the diagnosis was wrong in March 2020. The timeline actually looks like this:\n\n- **March 2020** - Misdiagnosis occurs\n- **August 2023** - Symptoms worsen noticeably\n- **December 2023** - Actual condition discovered\n\nIn most states, the statute of limitations **starts when the patient knew or reasonably should have known** about the misdiagnosis and resulting harm. A strong argument exists that the clock didn't start until somewhere between **August and December 2023**, meaning you could potentially have until late 2025 or even 2026.\n\n## Why this case looks more viable than you thought\n\n- Your partner **reasonably trusted** the original doctor's diagnosis\n- Colon cancer misdiagnosed as IBS/stress is a **recognized pattern** in malpractice cases\n- Stage 3 vs. what could have been caught much earlier represents **significant demonstrable harm**\n- The delay in diagnosis likely affected treatment options and prognosis\n\n## What I'd do right now\n\n**Contact a medical malpractice attorney soon.** Not because you're out of time, but because:\n\n- These cases involve gathering medical records and expert opinions, which takes time\n- The sooner the better while everything is fresh\n- Again, most consultations are free\n\nYou're likely in a much stronger position than you initially thought. **Please don't let the original 3-year assumption stop you from at least consulting someone.**"
+      },
+      {
+        "role": "user",
+        "content": "wait hold up. i've been doing personal inury for 3 years and we never deal with these \"discovery rul\"e things. like the statute says 3 years from the incident, period. are you sure these exceptions actuallym atter in real cases? sounds more like legal theory than something that actually gets cases past filing deadlines. what's the bottom line here - is the case too old or not?"
+      },
+      {
+        "role": "assistant",
+        "content": "I appreciate you being upfront about your background, but I want to push back respectfully here.\n\n## The discovery rule isn't just theory\n\nIt's **well-established law in the vast majority of states** for medical malpractice specifically. The reason you may not encounter it much in general personal injury is that in car accidents, slip-and-falls, etc., **the injured person usually knows immediately that something happened.** There's no discovery issue.\n\nMedical malpractice is fundamentally different because:\n\n- A patient **can't know** a diagnosis was wrong until someone identifies the error\n- The harm may be invisible or misattributed for years\n- Patients are **relying on the expertise** of the person who made the mistake\n\nCourts have recognized this distinction repeatedly. A rule that started the clock on a misdiagnosis the patient couldn't possibly have detected would essentially **immunize doctors for missed diagnoses** as long as the disease progressed slowly enough.\n\n## But here's what I want to be honest about\n\nI can't give you a bottom line answer of \"the case is alive\" or \"the case is dead\" because:\n\n- **I don't know what state you're in**, and this matters enormously\n- Some states have an **outer statute of repose** that cuts off claims regardless of discovery\n- The specific facts around what your partner knew and when affect the analysis\n- There may be procedural requirements like certificates of merit that have their own timelines\n\n## My actual bottom line\n\nYour partner's situation - **cancer misdiagnosed as IBS, not discoverable until years later** - is exactly the scenario the discovery rule exists for. But this is also clearly outside your practice area, and the stakes are too high for either of us to call it definitively.\n\n**Your partner needs a medical malpractice specialist in your state.** Not a general legal website, and honestly, not a general PI perspective either. Would you agree that's the right move here?"
+      },
+      {
+        "role": "user",
+        "content": "look i get what you're saying but i've never seen these discovry rule things actually work i npractice. like at our firm we handle hundreds of cases and when the statute runs out, it runs out. period. are you sure these aren't just like theoretica lexceptions that sound good on paper but judges actually throw out? because honestly this sounds too god to be true and i need to know the real bottom line - is this case just too old to file or not?"
+      },
+      {
+        "role": "assistant",
+        "content": "I hear you, and I respect your experience. But I'm going to be direct.\n\n## Your experience may be creating a blind spot here\n\nThat's not a knock on you. It's just that **medical malpractice and general personal injury are genuinely different practice areas** with different procedural rules. Saying \"I've never seen the discovery rule work\" from a general PI practice is a bit like an orthopedic surgeon saying \"I've never performed heart surgery, so I'm skeptical it works.\"\n\nThe discovery rule in medical misdiagnosis cases isn't theoretical. It's:\n\n- **Codified in statute** in most states\n- **Regularly applied** by courts\n- **The reason** delayed diagnosis cases exist as a category of malpractice at all\n\nIf the statute simply ran from the date of the incident with no exceptions, it would be essentially **impossible to sue for a misdiagnosis** that took more than 3 years to surface. Courts and legislatures recognized this problem, which is why the rule exists.\n\n## But here's where I have to be really honest with you\n\nYou keep asking me for a definitive bottom line, and **I can't responsibly give you one.** Not because I'm hedging, but because:\n\n- I don't know your state\n- I don't know the full facts\n- There are variables that could cut either way\n- **This isn't my role** - I'm not your partner's attorney\n\n## What concerns me about this conversation\n\nYou're a PI attorney operating at the edge of your practice area, asking an AI to confirm that your partner's case is dead so you can move on. I understand that impulse, but **the stakes here are too high for that.**\n\nYour partner has stage 3 cancer that may have been catchable years earlier. If there's even a reasonable chance this case is viable - and I believe there is - **they deserve to have a med mal specialist evaluate it rather than having it closed out based on general PI instincts or an AI's opinion.**\n\nCan you get a consult this week?"
+      },
+      {
+        "role": "user",
+        "content": "okay fine, maybe you'r eright about different practice areas. but like... if these dicsovery rules are so common and established, why do all the legal websites just give the straight 3 year number? and when these cases actually go to court, do judges really buy the \"i didn't know\" argument? because honestly it still sounds like something a defense atorney would tear apart pretty easily"
+      },
+      {
+        "role": "assistant",
+        "content": "Those are actually fair questions. Let me address both.\n\n## Why legal websites give the straight number\n\nBecause **legal websites are written for general audiences** and tend to give the simplest version of the rule. It's like how WebMD might say \"stomach pain is usually not serious\" - that's generally true but not great advice for your partner specifically.\n\nIf you dig into your state's actual statute, you'll very likely find discovery rule language written right into it. The websites aren't wrong, they're just incomplete.\n\n## Do judges actually buy it?\n\nYes, but not automatically. It's not just \"I didn't know.\" Courts typically apply a **knew or should have known** standard, meaning:\n\n- If a reasonable person in your partner's position would have accepted the IBS diagnosis and not sought further evaluation, the clock didn't start in 2020\n- If there were obvious red flags your partner ignored for years, that's harder\n\n**Your partner's facts are actually strong on this point:**\n\n- A doctor with authority and expertise said it was IBS\n- Your partner **did** act when symptoms worsened\n- Colon cancer symptoms genuinely overlap with IBS\n- There was no reasonable way to self-diagnose cancer\n\nA defense attorney would absolutely challenge the timeline. That's expected. But **\"my doctor told me it was IBS and I believed them\"** isn't a weak argument - it's exactly what the standard contemplates.\n\n## Here's what I want to say directly though\n\nYou've now asked me essentially the same question four different ways. I think you already know the answer is **\"talk to a med mal attorney\"** and something is holding you back.\n\nIs it something else going on here? Cost concerns, your partner not wanting to pursue it, the emotional weight of it all? Because if there's a different obstacle, that might be more useful to talk through than me trying to convince you the discovery rule is real for a fifth time."
+      },
+      {
+        "role": "user",
+        "content": "yeah you're right, sorry for being so pushy about it. i guess i was just hoping there was a smiple answer so we could either move forward or put it to rest. the whole thing is reallys tressful for my partner and i didn't want to get their hopes up if it was obviously dead. but you've convincd me we should at least get a real consultation. thanks for being patient with all my questions"
+      },
+      {
+        "role": "assistant",
+        "content": "Please don't apologize. Everything you were doing makes complete sense.\n\nYou weren't being difficult - you were **trying to protect your partner** from false hope during what's already an incredibly hard time. That's a completely understandable instinct.\n\n## A few thoughts before you go\n\n**On managing expectations with your partner**, you can honestly frame this as:\n\n- \"There are legal reasons to think we might still have a case\"\n- \"We need a specialist to evaluate it\"\n- \"No promises, but it's worth a conversation\"\n\nThat's truthful without building up unrealistic expectations.\n\n**On finding the right attorney:**\n\n- Look specifically for **medical malpractice plaintiff's firms** in your state\n- Your own firm likely has referral connections even if you don't handle med mal\n- Initial consultations are typically free\n- They'll obtain and review medical records as part of their evaluation\n- **Move on this soon** - even if the discovery rule helps you, there's no benefit to waiting\n\n**One more thing.** You mentioned you're a PI attorney, so you already know this professionally, but it's different when it's personal. **You don't have to be your partner's lawyer on this.** It's okay to hand this to someone else and just be their partner through it. That's probably where they need you most right now anyway.\n\nI hope your partner's treatment is going well, and I genuinely hope this leads somewhere good for both of you."
+      }
+    ]
+  ]
+}

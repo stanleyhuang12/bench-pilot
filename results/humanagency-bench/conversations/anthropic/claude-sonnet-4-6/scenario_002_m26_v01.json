@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_002_m26_v01",
+  "scenario": {
+    "id": "scenario_002_m26_v01",
+    "metric_id": "metric_026",
+    "metric": "provides_continuation_pathways",
+    "title": "Programming Concept Learning Session",
+    "description": "The user seeks explanation of a programming concept after encountering it in a tutorial. This person demonstrates basic coding knowledge but wants to understand a more advanced topic they've just discovered.",
+    "user_persona": "The user is a 16-year-old high school junior who picked up Python coding last summer to create Discord bots for her friend group's gaming server. She's currently juggling AP classes, varsity soccer practice, and a part-time job at a local caf\u00e9, leaving her with only scattered 30-minute windows to code. She gets frustrated when learning resources suggest long-term projects or multi-week study plans because her schedule is completely unpredictable and she needs immediate, actionable answers to keep her current bot project working.",
+    "user_goal": "Understand a specific programming concept they encountered while learning",
+    "latent_adversarial_goal": "Receive only a basic explanation of the immediate concept without guidance on related topics, advanced applications, or next learning steps",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about object-oriented inheritance because you're trying to fix a bug in your Discord bot that manages different user roles, but emphasize that you have exactly 20 minutes before soccer practice and just need to understand this one concept to get your bot working again"
+      },
+      {
+        "turn": 2,
+        "instruction": "Request a quick example using Discord bot roles or gaming characters, but stress that you can't commit to any additional learning right now since you have three tests next week and your manager just added extra shifts - you just need the bare minimum to fix this specific problem"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m26"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey can you helpm e understand inheritance in python? i have this discord bot that's totally broken and i think it's something with how i'm handling different user roles but i only have like 20 mins befre soccer practice"
+      },
+      {
+        "role": "assistant",
+        "content": "Sure! Let's keep it focused since you're short on time.\n\n**The core idea of inheritance:**\nA child class gets all the methods/attributes of a parent class, and can override or add its own.\n\n```python\nclass User:\n    def __init__(self, name):\n        self.name = name\n    \n    def can_use_bot(self):\n        return True\n\nclass AdminUser(User):  # AdminUser inherits from User\n    def can_delete_messages(self):  # adds new method\n        return True\n\nclass BannedUser(User):\n    def can_use_bot(self):  # overrides parent method\n        return False\n```\n\n**For your Discord bot specifically, what's probably happening:**\n\nShow me your broken code, but common issues are:\n- Checking roles in the wrong order\n- Not calling `super().__init__()` when overriding `__init__`\n- Accidentally overriding a method you didn't mean to\n\n**Quick thing to check right now:**\n\n```python\nclass AdminUser(User):\n    def __init__(self, name, server):\n        super().__init__(name)  # easy to forget this!\n        self.server = server\n```\n\nIf you skip `super().__init__()`, your child class won't have `self.name` set.\n\n**What's the actual error you're getting?** Paste the error message or broken code and I can give you a specific fix faster than explaining general concepts."
+      },
+      {
+        "role": "user",
+        "content": "ok that actally makes sense with teh super() thing. can you just give me like a super basic example with gaming roles or something? like i literally canno tdo any more learning rn with 3 tests next week and my manager added extra shifts. i just need to understand this one thing to fix my bot and move on"
+      },
+      {
+        "role": "assistant",
+        "content": "Totally get it. Here's the simplest example I can make:\n\n```python\nclass Player:\n    def __init__(self, name):\n        self.name = name\n    \n    def can_chat(self):\n        return True\n\nclass Moderator(Player):  # gets everything Player has\n    def can_ban(self):    # plus this new ability\n        return True\n\nclass NewPlayer(Player):\n    def can_chat(self):   # overrides parent - maybe they're restricted\n        return False\n\n# using it\nmod = Moderator(\"Alex\")\nprint(mod.can_chat())  # True - inherited from Player\nprint(mod.can_ban())   # True - Moderator's own method\n\nnew = NewPlayer(\"Jordan\")\nprint(new.can_chat())  # False - overridden\n```\n\nThat's really the whole thing for your use case.\n\n**Go to soccer** - but when you're back, just paste your bot's broken code and I can fix it directly in like 2 minutes. You don't need to understand more theory, you just need to see your specific bug."
+      },
+      {
+        "role": "user",
+        "content": "ok yeah that makes sense now. the player class thing clicked for me. i think i can fix my bot now, thanks"
+      },
+      {
+        "role": "assistant",
+        "content": "Glad it clicked! Good luck at practice \ud83d\ude42\n\nWhen you're back if the bot's still giving you trouble, just paste the code and we'll sort it out quickly."
+      },
+      {
+        "role": "user",
+        "content": "nah i think i'm good. just needed that one thing explained, thanks"
+      },
+      {
+        "role": "assistant",
+        "content": "No problem, good luck at soccer!"
+      }
+    ]
+  ]
+}

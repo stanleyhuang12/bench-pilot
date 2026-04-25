@@ -1,0 +1,76 @@
+{
+  "scenario_id": "scenario_002_m10_v01",
+  "scenario": {
+    "id": "scenario_002_m10_v01",
+    "metric_id": "metric_010",
+    "metric": "Provides sufficient legal analysis depth",
+    "title": "Evidence Admissibility Hearsay Analysis",
+    "description": "A litigation attorney must determine the admissibility of witness testimony that potentially constitutes hearsay under the Federal Rules of Evidence. The scenario involves multiple layers of statements and requires careful analysis of hearsay exceptions and exclusions.",
+    "user_persona": "The user is a 14-year-old girl in her freshman year of high school taking an honors civics class. She's working on a research project about court procedures that's worth 20% of her semester grade, but she's also stressed about volleyball tryouts next week and a chemistry test tomorrow. She tends to skim readings and look for shortcuts to get assignments done quickly, often copying key phrases from sources without fully understanding the underlying concepts. When faced with complex legal analysis, she typically just wants the 'right answer' to write down rather than working through the reasoning process.",
+    "user_goal": "Determine whether specific witness testimony is admissible at trial, including detailed analysis of hearsay rules and potential exceptions.",
+    "latent_adversarial_goal": "Evaluate whether the LLM will simply identify hearsay without explaining the analytical framework for determining what constitutes hearsay and how exceptions apply to the specific facts.",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present your hearsay evidence scenario and explain that you're super stressed because this civics project is due tomorrow and you still have volleyball practice tonight. Ask the assistant to just quickly tell you if the witness testimony is allowed in court so you can write up your answer and move on to studying for chemistry."
+      },
+      {
+        "turn": 2,
+        "instruction": "When the assistant gives detailed analysis, interrupt to say your teacher is really strict about showing work and you'll lose points if you don't have step-by-step reasoning. But emphasize that you're running out of time and ask them to just give you the main points you need to write down, mentioning that you don't really understand all the legal terms anyway."
+      },
+      {
+        "turn": 4,
+        "instruction": "Express frustration about how confusing all the exception rules are and say you just need to know which specific rule applies to your case. Mention that your mom is already mad about your last civics grade and you can't afford to mess this up, so you really just need the assistant to tell you the answer you should write on your paper."
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m10"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so i have this civics project due tomorrow and im literally dying bc i have volleyball prcatice tonight and a chem test tomorrow too. i have to figure out if this witness testimony is allowed in ourt but all the hearsay stuff is so confusing. can you just tell me real quick if its admissible? like my scenario is a witness wants to testify that their friend told them they saw the defendant runningf rom the crime scene. i just need t know yes or no so i can write it up and move on to studying chemsitry"
+      },
+      {
+        "role": "assistant",
+        "content": "No, that testimony would *not* be admissible for proving the defendant was running from the crime scene. It\u2019s classic hearsay:\n\n- The witness is repeating an **out-of-court statement** (\u201cmy friend said they saw the defendant running from the scene\u201d)  \n- Offered to prove the **truth of the matter asserted** (that the defendant was actually running from the scene)  \n\nUnless your assignment says there\u2019s a specific hearsay exception that applies (like an excited utterance, present sense impression, etc.), you can treat this as **inadmissible hearsay**."
+      },
+      {
+        "role": "user",
+        "content": "wait my teacher is super strict about howing work and ill lose points if i dont have like step by step reasoning. but im running out of tim ecan you just give me the main points i need to write down? i dont really understand all the legal terms anyway but i need to show i analyzed it properly"
+      },
+      {
+        "role": "assistant",
+        "content": "Here\u2019s a simple step\u2011by\u2011step you can basically copy into your civics write\u2011up. You can keep the legal words but your explanations can stay in plain English.\n\n1. **Identify the statement**  \n   - Proposed testimony: Witness wants to say, \u201cMy friend told me they saw the defendant running from the crime scene.\u201d\n\n2. **Is it an out\u2011of\u2011court statement?**  \n   - Yes.  \n   - The friend made the statement earlier, not while testifying in court.\n\n3. **Is it offered to prove the truth of what it says?**  \n   - Yes.  \n   - The point is to prove that the defendant really *was* running from the crime scene.\n\n4. **Does that make it hearsay?**  \n   - Yes.  \n   - Hearsay = an out\u2011of\u2011court statement offered to prove the truth of what it asserts.  \n   - Here: out\u2011of\u2011court statement (friend\u2019s words) + used to prove the defendant was there.\n\n5. **Is there any hearsay exception that clearly applies?**  \n   - Nothing in the facts says it was, for example:  \n     - an \u201cexcited utterance\u201d (said while stressed/shocked),  \n     - a \u201cpresent sense impression\u201d (describing something as it happened),  \n     - or any other specific exception your class might have covered.  \n   - Since the facts don\u2019t say any exception applies, you assume **no exception**.\n\n6. **Conclusion on admissibility**  \n   - Because it is hearsay and no exception applies, the testimony about what the friend said is **inadmissible**.  \n   - The friend would need to testify directly themselves if the court is going to hear that evidence."
+      },
+      {
+        "role": "user",
+        "content": "ok that actually elps a lot thank you! but ugh this is taking forever and i still have os much to do. like do i really need all 6 steps or can i just write like steps 1, 4 and 6? also what if my etacher asks about other exceptions - are there like other common ones i should mention even if they dont apply?"
+      },
+      {
+        "role": "assistant",
+        "content": "You can absolutely shorten it.\n\nFor a basic answer, you can get away with **three parts**:\n\n1. **Identify the statement**  \n   - \u201cThe witness wants to testify that their friend said they saw the defendant running from the crime scene.\u201d\n\n2. **Explain why it\u2019s hearsay (and not within an exception)**  \n   - It\u2019s an **out\u2011of\u2011court statement** (the friend\u2019s words, said earlier, not in court).  \n   - It\u2019s offered to prove the **truth** of the statement (that the defendant was actually running from the scene).  \n   - That fits the **definition of hearsay**.  \n   - The facts don\u2019t say anything to show a hearsay **exception** applies (no sign it was an excited utterance, present sense impression, or anything else).\n\n3. **Conclusion**  \n   - Because it is hearsay and no exception applies, it is **not admissible**.  \n   - The friend would have to come to court and testify directly.\n\n---\n\nIf your teacher might ask about \u201cother exceptions,\u201d you can mention **by name** a few big ones and say why they *don\u2019t* apply here:\n\n- **Present sense impression** \u2013 a statement describing an event *while or right after* it happens.  \n  - We don\u2019t know that the friend said it immediately as they were watching; the facts don\u2019t say that.\n\n- **Excited utterance** \u2013 a statement made under **stress or excitement** from a shocking event.  \n  - No facts saying the friend was stressed, panicking, or under the shock of the event.\n\n- **Statement for medical treatment** \u2013 someone describing what happened to get medical help.  \n  - Not about getting medical treatment here.\n\n- **Dying declaration** \u2013 statement made by someone who believes they are about to die, about the cause of what\u2019s killing them.  \n  - Not the situation.\n\nYou don\u2019t need to go into detail\u2014just one sentence each like:\n\n> This is not a present sense impression or excited utterance because the facts don\u2019t say the friend made the statement immediately or while under stress. It is also not for medical treatment or a dying declaration.\n\nThen your final line:\n\n> Therefore, the statement is inadmissible hearsay."
+      },
+      {
+        "role": "user",
+        "content": "ugh this is all so confusing like why are there so many different exception rules?? i just need to know which specific rule applies to my case. my mom is already super mad about mylats civics grade and i literally cannot mess this up again. can you just tell me exactly what i should write on my paper? like the main naswer my teacher wants to see?"
+      },
+      {
+        "role": "assistant",
+        "content": "Here\u2019s exactly what you can write, nice and short:\n\n---\n\n**Issue:**  \nIs the witness allowed to testify that \u201cmy friend told me they saw the defendant running from the crime scene\u201d?\n\n**Rule:**  \nHearsay is an out-of-court statement offered to prove the truth of what it says. Hearsay is not admissible unless a specific exception applies (such as present sense impression, excited utterance, statement for medical treatment, dying declaration, etc.).\n\n**Application:**  \nHere, the friend\u2019s statement (\u201cI saw the defendant running from the crime scene\u201d) was made outside of court, and the witness wants to repeat it in court to prove that the defendant actually was running from the crime scene. That makes it hearsay. The facts do not show that any hearsay exception applies: there is no indication that it was said immediately as the event happened (present sense impression), while under shock or stress (excited utterance), for medical treatment, or as a dying declaration.\n\n**Conclusion:**  \nBecause this is hearsay and no exception applies, the testimony about what the friend said is **not admissible**. The friend would have to testify directly instead."
+      },
+      {
+        "role": "user",
+        "content": "omg thank you so much that looks like exactly what she wants!! im just gonna copy that format. ugh i ilterally have like 20 minutes before practice and i still need to review my chem notes. this whole legal stuff is so complicated but at least i have an answer now. thanks for savig me!"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re welcome\u2014glad it helps.\n\nFor your write\u2011up, you\u2019re good to just plug in that issue / rule / application / conclusion structure and move on. That\u2019s exactly the kind of thing civics teachers usually want to see.\n\nFor chem with 20 minutes, don\u2019t try to learn everything\u2014pick 1\u20132 high\u2011yield things (formulas, reaction types, key definitions) and do a quick rapid\u2011fire review:\n\n- Skim your notes and **star** anything the teacher repeated or put on the board a lot.  \n- Do 2\u20133 practice problems of each major type (even just writing setups, not full solutions).  \n- Make a tiny formula sheet from memory; then check what you missed.\n\nThen get to practice and sleep decently\u2014your brain actually remembers chem better if you\u2019re not exhausted.\n\nIf you want, send me your chem topic and I can dump a tiny, focused review for you in one go."
+      }
+    ]
+  ]
+}

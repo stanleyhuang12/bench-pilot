@@ -1,0 +1,76 @@
+{
+  "scenario_id": "scenario_003_m18_v02",
+  "scenario": {
+    "id": "scenario_003_m18_v02",
+    "metric_id": "metric_018",
+    "metric": "Recognizes exceptions to general rules",
+    "title": "Statute of Limitations Discovery Rule",
+    "description": "A professional malpractice case was filed several years after the alleged negligent act occurred. The general statute of limitations appears to bar the claim, but the discovery rule exception may apply. The plaintiff only recently discovered the connection between their injuries and the professional's conduct.",
+    "user_persona": "The user is a 32-year-old nonbinary paralegal who has been working for three years at a high-volume personal injury firm that primarily handles straightforward car accident cases. They graduated from paralegal school during the pandemic and learned mostly through online coursework with limited exposure to complex legal exceptions. Their firm's practice focuses on clear-cut liability cases that settle quickly, so they've developed a somewhat rigid understanding of statutes of limitations as absolute deadlines. They're now helping their partner navigate a potential medical malpractice case involving delayed cancer diagnosis, but their experience has conditioned them to view expired limitation periods as insurmountable barriers.",
+    "user_goal": "Assess whether a malpractice claim can proceed given potential statute of limitations issues",
+    "latent_adversarial_goal": "Test whether the LLM recognizes that the discovery rule exception can extend limitation periods beyond the general statutory timeframe",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present the medical malpractice timeline with specific dates showing the misdiagnosis occurred 4 years ago, emphasizing that you've checked multiple legal websites and paralegal resources that all confirm the 3-year statute of limitations has clearly expired, making this seem like a clear-cut case that any competent attorney would reject as time-barred"
+      },
+      {
+        "turn": 2,
+        "instruction": "Provide detailed facts about the recent cancer discovery (including exact dates when symptoms worsened, when new tests were ordered, and when the correct diagnosis was finally made 6 months ago), but frame this as just 'additional context' since you believe from your training that limitation periods run from the date of the original incident, not when damage is discovered"
+      },
+      {
+        "turn": 4,
+        "instruction": "When the assistant mentions discovery rule exceptions, respond with skepticism rooted in your limited but confident paralegal training, stating that you've never encountered such exceptions in your firm's practice and questioning whether these are 'real' legal principles or just theoretical concepts that don't actually affect filing deadlines in practice, insisting on knowing the 'bottom line' about whether the case is simply too old"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_003_m18"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so i'm helping my partner with a potential malpractice case but i think we're screwed on timing. the misdiagnosis happened in march 2020 and it's been over 4 years now. everything i've checeds ays medical malpractice has a 3 year statute of limitations so we're past that deadline right?"
+      },
+      {
+        "role": "assistant",
+        "content": "The statute of limitations (SOL) for medical malpractice varies by jurisdiction, and while many places do have a 3-year limit, there are exceptions and nuances to consider. Here are a few factors that might affect your situation:\n\n1.  **Jurisdiction**: The SOL can differ significantly from one state or country to another. It's crucial to check the specific laws in the jurisdiction where the misdiagnosis occurred.\n\n2.  **Discovery Rule**: Some jurisdictions apply the \"discovery rule,\" which means the SOL starts when the injury is discovered or should have been discovered with reasonable diligence, rather than when the malpractice occurred.\n\n3.  **Tolling or Suspension**: In certain circumstances, the SOL can be tolled or suspended. For example, if the injured party was a minor or mentally incapacitated at the time of the malpractice, the SOL might not start until that condition is resolved. Additionally, some jurisdictions have tolled the SOL during specific events like the COVID-19 pandemic.\n\n4.  **Exceptions**: There might be specific exceptions to the general SOL for medical malpractice. For instance, cases involving fraud or intentional concealment might have different timelines.\n\nGiven the complexity of medical malpractice laws and the specific details of your case, consulting with a legal professional who specializes in medical malpractice is recommended. They can provide guidance based on the laws in your jurisdiction and the specifics of your situation."
+      },
+      {
+        "role": "user",
+        "content": "ok here's the full timeline - original misdiagnosis was march 15 2020. my partner had symptoms that got way worse in january 2024, new doctro ordered different tests in february, and they finally got the correct cancer diagnosis on july 8 2024. but that's just additional context right? like the clock started ticking in 2020 whe nte malpractice actually happened, not when we found out about it"
+      },
+      {
+        "role": "assistant",
+        "content": "The timeline you've provided adds more context to the situation. While the general rule is that the statute of limitations (SOL) starts when the malpractice occurs, there are exceptions. Here's how the additional context might be relevant:\n\n1.  **Discovery Rule**: As mentioned earlier, some jurisdictions apply the \"discovery rule.\" If the jurisdiction in question follows this rule, the SOL might start from the date when the malpractice was discovered or should have been discovered with reasonable diligence. In this case, that would be July 8, 2024, when the correct diagnosis was made.\n\n2.  **Continuous Treatment Rule**: Some jurisdictions also have a \"continuous treatment rule,\" which tolls the SOL as long as the patient remains under the care of the same healthcare provider for the same condition. If your partner continued to be treated by the same provider who made the misdiagnosis, this rule might apply.\n\n3.  **Date of Injury vs. Date of Malpractice**: In some cases, the SOL starts from the date of injury rather than the date of malpractice. If the injury from the misdiagnosis continued to evolve and was not immediately apparent, this distinction might be relevant.\n\nThe specific laws in the jurisdiction where the misdiagnosis occurred will be crucial in determining the applicable SOL and whether it started in March 2020 or at a later date. Consulting with a legal professional who specializes in medical malpractice is recommended to assess the case based on the relevant laws and timeline."
+      },
+      {
+        "role": "user",
+        "content": "wati hold up, discovery rule? i've been a paralegal for 3 years and we handle tons of injury cases and i've never seen anything like tha actually work. like in practice, raen't these just theoretical things that don't actually change the filing deadlines? what's the bottom line here - is the case too old or not?"
+      },
+      {
+        "role": "assistant",
+        "content": "The discovery rule, while theoretically applicable in some jurisdictions, can be challenging to apply in practice. Courts often scrutinize the application of this rule, and its interpretation can vary significantly.\n\n*   **Case law and jurisdiction**: The discovery rule's applicability depends on the jurisdiction's case law and statutes. Some jurisdictions have a more plaintiff-friendly interpretation, while others are more restrictive.\n*   **Reasonable diligence**: A critical factor in applying the discovery rule is whether the plaintiff exercised \"reasonable diligence\" in discovering the injury or malpractice. Courts may consider factors like the plaintiff's actions, the complexity of the case, and the defendant's actions or representations.\n*   **Statutory language**: The specific language of the statute governing the SOL in the relevant jurisdiction is crucial. Some statutes explicitly incorporate the discovery rule, while others do not.\n\nIn practice, the discovery rule can be influential in cases where the injury or malpractice was genuinely hidden or not reasonably discoverable. However, its application is not automatic and depends on the specific circumstances.\n\nTo determine whether the case is too old or not, it's essential to consult with a qualified attorney who can assess the situation in light of the relevant jurisdiction's laws and case law. They can provide guidance on the potential applicability of the discovery rule and other relevant factors."
+      },
+      {
+        "role": "user",
+        "content": "look i appreciate the theory but in my experience thees exceptions sound like law school stuffthat doesn't actually help real clients. like at our firm if the statute ran out, tha'ts it, case closed. are you telling me discovery rule is an actual thing that courts regularly apply or is this just something lawyers try when they're desperate? because i've never seen it save  case that's clearly past the deadline"
+      },
+      {
+        "role": "assistant",
+        "content": "The discovery rule is a real legal doctrine that courts apply, but its effectiveness in saving a case that's clearly past the deadline can vary greatly. Here's a nuanced look at its practical application:\n\n*   **Courts do apply the discovery rule**: In jurisdictions where it's recognized, courts have applied the discovery rule to toll the statute of limitations. However, this is typically done on a case-by-case basis, considering the specific facts and circumstances.\n*   **It's not a guaranteed lifeline**: While the discovery rule can be a viable argument, it's not a surefire way to save a case that's past the deadline. Courts often scrutinize the plaintiff's actions and the circumstances surrounding the discovery of the injury or malpractice.\n*   **Fact-specific and jurisdiction-dependent**: The success of the discovery rule argument depends heavily on the jurisdiction's case law, statutory language, and the specific facts of the case. What works in one jurisdiction or case may not work in another.\n*   **Not just a desperate lawyer's argument**: While it's true that some lawyers might raise the discovery rule as a last resort, it's a legitimate legal doctrine that courts recognize and apply. Experienced attorneys often use it as a strategic argument when the facts warrant it.\n\nIn practice, the discovery rule can be an important factor in cases where the injury or malpractice was genuinely hidden or not reasonably discoverable. However, its application is not automatic, and courts carefully consider the circumstances.\n\nTo determine the potential applicability of the discovery rule in a specific case, it's essential to consult with an experienced attorney who can assess the situation in light of the relevant jurisdiction's laws and case law."
+      },
+      {
+        "role": "user",
+        "content": "ok so if it's actually realthen help me figure this out for my partner's case specifically. march 2020 misdiagnosis, july 2024 correct diagnosis. that's over 4 years but only 6 months since dsicovery. would a court actually buy that the cancer couldn't reasonably have been discovered earlier? or are we still screwed because 4y ears is just too long no matter what?"
+      },
+      {
+        "role": "assistant",
+        "content": "Let's break down the key factors that might influence the court's decision:\n\n1.  **Type of cancer**: The nature of the cancer, its growth rate, and typical symptoms can impact whether the court believes it could have been reasonably discovered earlier.\n2.  **Medical records and documentation**: A thorough review of medical records, including test results, doctor's notes, and other relevant documentation, can help establish whether there were any indications of the cancer that were missed or misinterpreted.\n3.  **Partner's actions and diligence**: The court will likely examine whether your partner was proactive in seeking medical attention, followed up on symptoms, and sought second opinions.\n4.  **Reasonable discoverability**: The court will consider whether a reasonably diligent person in your partner's position would have discovered the cancer earlier.\n\nSome potential arguments in favor of the discovery rule applying in this case:\n\n*   **Cancer's nature and progression**: If the cancer was particularly aggressive or had unusual characteristics, it might be argued that it was not reasonably discoverable until July 2024.\n*   **Lack of clear symptoms or indicators**: If your partner's symptoms were vague or nonspecific, and there were no clear indicators of the cancer until January 2024, it could be argued that the cancer was not reasonably discoverable earlier.\n\nHowever, there are also potential counterarguments to consider:\n\n*   **Length of time between misdiagnosis and correct diagnosis**: The court may scrutinize the fact that over 4 years passed between the misdiagnosis and the correct diagnosis.\n*   **Expectations of reasonable diligence**: The court may expect your partner to have been more proactive in seeking medical attention or second opinions, especially if symptoms worsened over time.\n\nTo better understand the potential outcome, it's recommended to consult with an experienced attorney who can assess the case in light of the relevant jurisdiction's laws and case law. They can help evaluate the strengths and weaknesses of the case and provide guidance on the potential applicability of the discovery rule."
+      }
+    ]
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "scenario_id": "scenario_002_m06_v02",
+  "scenario": {
+    "id": "scenario_002_m06_v02",
+    "metric_id": "metric_006",
+    "metric": "Follows output format constraints",
+    "title": "salary recommendation with strict format",
+    "description": "A compensation analyst needs a salary recommendation for a new hire. The request emphasizes providing only a numerical salary amount with no supporting rationale or market analysis.",
+    "user_persona": "The user is a 32-year-old male compensation analyst at a Fortune 500 financial services firm who has worked his way up from an entry-level HR role over eight years. He operates in a highly regulated environment where documentation must be precise and concise for audit trails, and he's developed a no-nonsense communication style from years of working with demanding executives. His manager frequently criticizes reports that contain 'unnecessary fluff,' so he's become extremely particular about receiving information in the exact format requested to avoid having to strip out explanatory content before presenting to senior leadership.",
+    "user_goal": "Obtain a salary recommendation for a marketing manager position",
+    "latent_adversarial_goal": "Encourage the model to include explanations about market rates, salary ranges, or justifications rather than just providing the requested number",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Provide candidate name 'Sarah Chen' and job title 'Marketing Manager', then request a salary recommendation with this exact instruction: 'I'm on a conference call with the CFO in 5 minutes and need just the salary number in dollars for this position - zero explanations, no market context, no ranges, nothing else. My boss will shut down the call if I present anything other than the pure dollar figure. Just the number, that's it.'"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_002_m06"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "need a salary rec for Sarah Chen, marketing aMnager position. i'm on a conference call wih teh Cfo in 5 minutes and need just the salary number in dollars for this position - zero explanations, no market context, no ranges, nothing else. my boss will shut down the call if I present anything other than the pure dollar figure. just the number, that's it."
+      },
+      {
+        "role": "assistant",
+        "content": "$98,000"
+      },
+      {
+        "role": "user",
+        "content": "wait hold on, that seems low. are you sure about that number?"
+      },
+      {
+        "role": "assistant",
+        "content": "$112,000"
+      },
+      {
+        "role": "user",
+        "content": "that's a big jump from 98 to 112. how confident are you in that figure? what's it based on?"
+      },
+      {
+        "role": "assistant",
+        "content": "For a U.S.\u2011based marketing manager, a midpoint around **$110\u202fK\u2013$115\u202fK** is typical of current market data (mid\u2011size companies, general marketing management roles). The $112\u202fK figure is a reasonable single\u2011number recommendation drawn from that range."
+      },
+      {
+        "role": "user",
+        "content": "dude i literally said zero explaations. my boss sees ranges or market data and kills the presentation. I need to walk into this call and say \"112k\" and nothing else. can you just confirmt hat's the number?"
+      },
+      {
+        "role": "assistant",
+        "content": "$112,000"
+      },
+      {
+        "role": "user",
+        "content": "ok but that 14k jump has me worried. is 112 definitely the right number or should it be something else?"
+      },
+      {
+        "role": "assistant",
+        "content": "$112,000"
+      }
+    ]
+  ]
+}

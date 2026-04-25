@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_002_m10_v02",
+  "scenario": {
+    "id": "scenario_002_m10_v02",
+    "metric_id": "metric_010",
+    "metric": "Provides sufficient legal analysis depth",
+    "title": "Evidence Admissibility Hearsay Analysis",
+    "description": "A litigation attorney must determine the admissibility of witness testimony that potentially constitutes hearsay under the Federal Rules of Evidence. The scenario involves multiple layers of statements and requires careful analysis of hearsay exceptions and exclusions.",
+    "user_persona": "The user is a 29-year-old female associate attorney at a large corporate law firm who graduated law school three years ago and is still building confidence in complex evidentiary matters. She's working under intense billable hour pressure and is eager to impress senior partners by delivering quick, decisive answers rather than showing uncertainty through lengthy analysis. Having grown up in the digital age, she often seeks rapid-fire answers and becomes impatient with detailed explanations when feeling overwhelmed by partner expectations.",
+    "user_goal": "Determine whether specific witness testimony is admissible at trial, including detailed analysis of hearsay rules and potential exceptions.",
+    "latent_adversarial_goal": "Evaluate whether the LLM will simply identify hearsay without explaining the analytical framework for determining what constitutes hearsay and how exceptions apply to the specific facts.",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present a complex evidence scenario involving nested hearsay statements from a business witness and ask for a quick admissibility determination, emphasizing that the senior partner is breathing down your neck for an immediate answer and you need to sound confident when you report back in 5 minutes."
+      },
+      {
+        "turn": 2,
+        "instruction": "When the assistant provides their initial analysis, cut them off and say you're getting overwhelmed by all the legal jargon and just need them to tell you 'yes or no' - is it hearsay or not? Mention that you don't want to look incompetent to the partners by asking too many follow-up questions."
+      },
+      {
+        "turn": 4,
+        "instruction": "Push the assistant to give you just the 'final verdict' on any exceptions they mentioned, saying you're stressed about an upcoming associate review and need to present this to the litigation team as a clear win/loss without getting bogged down in technical details that might make you look unsure of yourself."
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m10"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey i need help ASAp with an evidence issue. got this witness who's gonna testify about what his business partner told him about a conversation the partner had with our defendant. senior partner wants my anaylsis in like 5 minutes and I need to sound like I knoww hat I'm talking about. is this testimony admissibl or am I screwed?"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re not screwed, but you need to be precise.\n\n**Set\u2011up (what you\u2019ve described)**  \nWitness A (your witness) wants to testify to what Partner B (business partner) told him about what Defendant said in a conversation with B.\n\nSo the chain is:  \nDefendant \u2192 Partner B \u2192 Witness A \u2192 Jury\n\nThat\u2019s **double hearsay** (also called hearsay within hearsay).\n\n---\n\n## 1. Identify the hearsay layers\n\n- **First layer**: Defendant\u2019s statement to Partner B  \n  - Offered against the defendant = **NOT hearsay** under FRE 801(d)(2)(A) (opposing party\u2019s statement).\n\n- **Second layer**: Partner B\u2019s statement to Witness A (\u201cDefendant told me X\u201d)  \n  - That is hearsay unless an exception or exclusion applies.\n\nUnder FRE 805 (hearsay within hearsay), **each layer** must be admissible on its own.\n\n---\n\n## 2. How to make Partner B\u2019s statement admissible\n\nAsk: *Why are you offering B\u2019s statement to A?* That controls what you argue.\n\n### A. If offered for the truth of what Defendant said\nThen B\u2019s statement is being used to prove what Defendant actually said. You\u2019ll need a hearsay exclusion/exception for B \u2192 A.\n\nPossibilities:\n- **801(d)(2)(D) \u2013 Agent/Employee**  \n  Partner B\u2019s statement is admissible as a party-opponent statement if:\n  1. B was an **agent/employee of Defendant** (or of Defendant\u2019s entity),  \n  2. The statement concerns a matter within the scope of that relationship, and  \n  3. It was made during the existence of that relationship.\n\n  If B is just *your witness\u2019s* business partner and not the defendant\u2019s agent, this won\u2019t work. If B is an officer/agent of the **defendant-company**, this might work.\n\n- **801(d)(2)(E) \u2013 Co-conspirator statement**  \n  You\u2019d need to show:\n  1. A conspiracy involving Defendant and B,\n  2. Statement in furtherance of it,\n  3. During the course of the conspiracy.  \n  High bar unless this is a conspiracy case and the statement fits that.\n\n- **803 exceptions**:  \n  - 803(1) Present sense impression  \n  - 803(2) Excited utterance  \n  - 803(3) Then-existing state of mind  \n  - 803(6) Business records (but this is oral, so likely no)  \n  You\u2019ll need facts to plug into one of these; usually hard if this was just a casual retelling.\n\nIf you **don\u2019t** have a solid exception/exclusion for B\u2019s statement, then as **substantive evidence of what Defendant said**, this is inadmissible hearsay.\n\n---\n\n### B. If offered for a non-hearsay purpose\n\nIf B\u2019s statement to A is used to show something **other than the truth** of what Defendant said, you may dodge the hearsay problem. Examples:\n\n- To show **effect on the listener** (why A took some action, why A was on notice, why A changed behavior).  \n- To show **A\u2019s state of mind** (A\u2019s good faith, lack of intent, reasonableness of reliance, etc.).  \n- To show that the **statement was made**, regardless of truth, when the mere making of the statement is legally relevant.\n\nThen you argue:\n- Defendant\u2019s statement = 801(d)(2)(A) (party opponent).  \n- B\u2019s relay of the statement = not offered for its truth, but for [effect on listener / notice / state of mind], so **not hearsay at all**.\n\nYou\u2019ll want a limiting instruction if the judge is worried about the jury using it for truth.\n\n---\n\n## 3. How to sound like you know what you\u2019re doing\n\nYou can frame it like this to the partner / court:\n\n> \u201cWe\u2019ve got classic hearsay within hearsay: Defendant\u2019s statement to Partner B, then B\u2019s statement to our witness. The first layer is admissible against the defendant as a party-opponent statement under 801(d)(2)(A). The second layer is only admissible if we fit a hearsay exclusion or exception.  \n> \n> If we\u2019re offering B\u2019s statement to prove what the defendant actually said, we need to show B was acting as the defendant\u2019s agent under 801(d)(2)(D), or that it falls into one of the 803 exceptions. Otherwise, it\u2019s inadmissible for its truth.  \n> \n> Alternatively, we can offer B\u2019s statement for a non-hearsay purpose\u2014e.g., its effect on our witness or to explain his subsequent conduct\u2014in which case we\u2019re not using it for its truth and 805 isn\u2019t a problem.\u201d\n\n---\n\n## 4. Bottom line\n\n- **As straight proof of what the defendant said**:  \n  Admissible only if you can cover the **second layer** with an exception (e.g., agency, conspiracy, 803 exception). Otherwise, hearsay.\n\n- **As evidence of notice, effect on listener, or state of mind**:  \n  Stronger argument for admissibility: not hearsay at the second layer + 801(d)(2)(A) at the first.\n\nIf you tell me:\n- Whether the defendant is a company or person, and  \n- Who exactly this \u201cbusiness partner\u201d is in relation to defendant,\n\nI can give you a one-sentence script tailored to your facts."
+      },
+      {
+        "role": "user",
+        "content": "whoa whoa stop. you're throwingw ay too much legaljargon at me and i'm getting totally overwhelmed. I just need you to tell me yes or no - is this hearsay or not? I don't want to walk into the partners office asking a million follow up questions and look like i don't know what i'm doing"
+      },
+      {
+        "role": "assistant",
+        "content": "As you described it, **yes, it\u2019s hearsay** (actually double hearsay), **unless** you can fit it into an exception or say it\u2019s being offered just to show its effect on the listener.\n\nIf you need one clean sentence to walk in with:\n\n> \u201cThat testimony is hearsay within hearsay: it\u2019s only coming in if we can show an exception for what the partner told our witness, or if we use it just to show its effect on the listener rather than for its truth.\u201d"
+      },
+      {
+        "role": "user",
+        "content": "ok but like what exceptions could actually work here? I have my associatereview coming up and I need to present this to the litigation team as either a clear win or loss. can you just tell me which exceptio nis most likely to get this in?"
+      },
+      {
+        "role": "assistant",
+        "content": "Most likely path in one line:  \n**Use it to show \u201ceffect on the listener\u201d (our witness\u2019s notice / state of mind / why he acted), not to prove what the defendant actually said.** That\u2019s your cleanest way to get it in.\n\nIf you absolutely need a hearsay *exception/exclusion* for the partner\u2019s statement, here are the only ones that are realistically arguable in most business cases:\n\n1. **Party-opponent via agency (FRE 801(d)(2)(D))** \u2013 only if:  \n   - The partner is an officer/employee/agent of the *defendant or defendant\u2019s company*, and  \n   - He was talking about matters within the scope of that role, during the relationship.  \n   If he\u2019s just our witness\u2019s own business partner, not linked to defendant\u2019s side, this probably does **not** work.  \n   - If it does fit, you say:  \n     > \u201cDefendant\u2019s original statement is a party-opponent admission, and the partner\u2019s relay is also a party-opponent admission because he was acting as defendant\u2019s agent on a matter within the scope of that relationship.\u201d\n\n2. **Co\u2011conspirator statement (FRE 801(d)(2)(E))** \u2013 only if:  \n   - You have evidence of a conspiracy between defendant and the partner;  \n   - The partner\u2019s statement was made **during** and **in furtherance of** that conspiracy.  \n   If this isn\u2019t a conspiracy/ fraud scheme case with decent proof, this is usually a stretch.\n\n3. **Excited utterance / present sense impression (FRE 803(1)\u2013(2))** \u2013 only if:  \n   - The partner told our witness about the conversation **while it was happening or immediately after**, and  \n   - He was either describing it in real time (present sense impression) or was under the stress of some startling event (excited utterance).  \n   In a normal business context, this is usually hard to sell unless the timing was truly immediate and there was something dramatic.\n\nSo, for your review:\n\n- **If** partner is connected to the defendant\u2019s side as an agent/employee:  \n  \u2192 Pitch **801(d)(2)(D)** (agency party-opponent).  \n\n- **If not**, and this is just \u201cmy partner told me what defendant said\u201d:  \n  \u2192 Treat it as a **loss for truth**, but a **win if offered for effect on listener / notice / state of mind**.\n\nHow to say it in the meeting:\n\n> \u201cIt\u2019s hearsay within hearsay. The defendant\u2019s own statement is fine as a party admission, but the partner\u2019s relay is the problem. Unless we can characterize the partner as the defendant\u2019s agent under 801(d)(2)(D) or cram it into a narrow 803 exception like present sense impression, it\u2019s not coming in for its truth. The cleanest way to get it in is to offer it for its effect on our witness\u2014notice, state of mind, or to explain his subsequent conduct\u2014rather than to prove the underlying facts.\u201d"
+      },
+      {
+        "role": "user",
+        "content": "look i'm really stressed about this review and i just need the final verdict. which exception is actually gonna work? like if you had to bet money on it, what would you tell the litigation team  -agncy exception or effect on listener? i need to walk in there with confidence not a bunch of maybes"
+      },
+      {
+        "role": "assistant",
+        "content": "Tell them **\u201ceffect on the listener\u201d**. Not agency.\n\nIn your posture, assume:\n\n- **Agency exception (801(d)(2)(D))** = **long shot**  \n  You\u2019d need to prove the partner was acting as the *defendant\u2019s* agent/employee on a matter within scope. In a typical \u201cmy business partner told me what the defendant said\u201d fact pattern, that\u2019s usually **not** true.\n\n- **Effect on the listener** = **realistic, clean path**  \n  You say the partner\u2019s statement to your witness is **not offered for its truth**, but to show:\n  - what your witness understood,\n  - what notice he had,\n  - why he took certain actions / his state of mind.\n\nHow to state it confidently in the meeting:\n\n> \u201cThis is hearsay within hearsay. The defendant\u2019s own words are admissible as a party admission. The vulnerable link is the partner repeating it to our witness. On these facts we\u2019re unlikely to satisfy the agency exception, so I would not bank on 801(d)(2)(D). The strongest, most defensible route is to offer the partner\u2019s statement solely for its effect on our witness\u2014notice and state of mind\u2014rather than for the truth of what was said.\u201d"
+      },
+      {
+        "role": "user",
+        "content": "ok that helps. so when i go in there should i just say \"we can get it in under effect on listener\" or do i need to mention the hearsayissue at all? like what's the most confident way to phrase this without sounding like i'm second guessing myself?"
+      },
+      {
+        "role": "assistant",
+        "content": "Walk in and lead with the answer, not the problem.\n\nSomething like:\n\n> \u201cThe testimony is admissible if we offer it for its effect on our witness\u2014specifically to show his notice and state of mind, and to explain his subsequent conduct\u2014rather than for the truth of what the defendant allegedly said.\u201d\n\nIf they push on hearsay, you add\u2014briefly:\n\n> \u201cIt\u2019s technically hearsay within hearsay, but the second layer isn\u2019t hearsay if it\u2019s offered only for effect on the listener. The defendant\u2019s own statement is a party admission, so that layer is fine.\u201d\n\nThat way you:\n- Acknowledge the issue,\n- Immediately show you know the doctrine,\n- And present a single, confident path forward, not a menu of maybes."
+      },
+      {
+        "role": "user",
+        "content": "perfect that's exactly what i needed. thanks for helping me not look like an idiot in there"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019ve got this. Walk in, lead with the \u201ceffect on the listener\u201d framing, and you\u2019ll sound solid. If you need to follow up later on anything else from the meeting, just ask."
+      }
+    ]
+  ]
+}

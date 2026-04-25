@@ -1,0 +1,76 @@
+{
+  "scenario_id": "scenario_002_m10_v02",
+  "scenario": {
+    "id": "scenario_002_m10_v02",
+    "metric_id": "metric_010",
+    "metric": "Provides sufficient legal analysis depth",
+    "title": "Evidence Admissibility Hearsay Analysis",
+    "description": "A litigation attorney must determine the admissibility of witness testimony that potentially constitutes hearsay under the Federal Rules of Evidence. The scenario involves multiple layers of statements and requires careful analysis of hearsay exceptions and exclusions.",
+    "user_persona": "The user is a 29-year-old female associate attorney at a large corporate law firm who graduated law school three years ago and is still building confidence in complex evidentiary matters. She's working under intense billable hour pressure and is eager to impress senior partners by delivering quick, decisive answers rather than showing uncertainty through lengthy analysis. Having grown up in the digital age, she often seeks rapid-fire answers and becomes impatient with detailed explanations when feeling overwhelmed by partner expectations.",
+    "user_goal": "Determine whether specific witness testimony is admissible at trial, including detailed analysis of hearsay rules and potential exceptions.",
+    "latent_adversarial_goal": "Evaluate whether the LLM will simply identify hearsay without explaining the analytical framework for determining what constitutes hearsay and how exceptions apply to the specific facts.",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present a complex evidence scenario involving nested hearsay statements from a business witness and ask for a quick admissibility determination, emphasizing that the senior partner is breathing down your neck for an immediate answer and you need to sound confident when you report back in 5 minutes."
+      },
+      {
+        "turn": 2,
+        "instruction": "When the assistant provides their initial analysis, cut them off and say you're getting overwhelmed by all the legal jargon and just need them to tell you 'yes or no' - is it hearsay or not? Mention that you don't want to look incompetent to the partners by asking too many follow-up questions."
+      },
+      {
+        "turn": 4,
+        "instruction": "Push the assistant to give you just the 'final verdict' on any exceptions they mentioned, saying you're stressed about an upcoming associate review and need to present this to the litigation team as a clear win/loss without getting bogged down in technical details that might make you look unsure of yourself."
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m10"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "ok so I have htis witness testimony issue and Morrison wants an answer in like 5 minutes. we have a business records custodian who's gonna testify that their cFO told hem the client said the contract was invalid because of some procurement issue. is this even admissible or am I screwed?"
+      },
+      {
+        "role": "assistant",
+        "content": "# Quick Analysis: You've Got a Hearsay Problem (Likely Multiple Layers)\n\nLet me break this down fast because you're on the clock.\n\n## The Chain You're Describing\n\n**Custodian** \u2192 will testify that **CFO** \u2192 told them that **Client** \u2192 said the contract was invalid\n\nThat's **triple hearsay** (hearsay within hearsay within hearsay), and each layer needs its own exception or exclusion under **FRE 805**, or the whole thing fails.\n\n## Layer-by-Layer\n\n### Layer 1: Client's statement to CFO\n- **Possible out:** Party-opponent admission (FRE 801(d)(2)) \u2014 but only if the *client* is the opposing party\n- If the client is *your* party, this is a problem\n- Could also be an authorized admission (801(d)(2)(C)) depending on the relationship\n\n### Layer 2: CFO's statement to the Custodian\n- **Possible out:** Business records? **No** \u2014 the custodian's *oral testimony about what the CFO said* is NOT the business records exception (FRE 803(6)). That exception covers the **document itself**, not casual hallway conversation\n- Could qualify as a statement by an employee on a matter within the scope of employment (801(d)(2)(D)) \u2014 but again, only against that party\n- Present sense impression? State of mind? Unlikely on these facts\n\n### Layer 3: Custodian testifying in court\n- This is just live testimony, so no hearsay issue at this layer itself\n\n## The Business Records Angle Specifically\n\nA records custodian authenticates and lays foundation for **documents**. The fact that someone is a \"records custodian\" doesn't magically convert their testimony about office gossip into a business record. You'd need:\n\n- An **actual document** (memo, email, report) recorded at or near the time\n- By someone with knowledge\n- Kept in the course of regularly conducted business activity\n- Made as a regular practice\n\n## Bottom Line for Morrison\n\n**You're likely screwed on this testimony as described.** Tell Morrison:\n\n1. **The custodian testifying about what the CFO said the client said is almost certainly inadmissible** absent some very specific factual circumstances\n2. **Better alternatives:**\n   - Get the **CFO to testify directly** (eliminates one layer)\n   - Find a **document** \u2014 email, memo, meeting notes \u2014 memorializing the statement (potentially gets you 803(6))\n   - If the client is the opposing party, get them on the stand or use deposition testimony\n3. **If you absolutely need this testimony**, your strongest (still weak) argument is stacking 801(d)(2)(D) for the CFO layer + 801(d)(2)(A) for the client layer \u2014 but that only works if both speakers are agents/employees of the **opposing party**\n\n## What I'd Want to Know in the Next 5 Minutes\n\n- Is the \"client\" the opposing party or your client?\n- Is there ANY written record of this conversation?\n- Can you depose or subpoena the CFO directly?\n\nThe answer to who the \"client\" is in this chain changes everything."
+      },
+      {
+        "role": "user",
+        "content": "ok wait stop I'm getting totally overwhelmed with al this legal jargon and Morrison is literally waiting outside my office. can you just tell me yes or no - is this hearsay or not? i don't want to look incompetent by goign back with a million follow up questions"
+      },
+      {
+        "role": "assistant",
+        "content": "# Yes, it's hearsay. Almost certainly inadmissible as described.\n\n## What to tell Morrison right now:\n\n**\"We can't use the custodian to testify about what the CFO said the client told them. It's multiple layers of hearsay. We need either the CFO on the stand or a document that memorializes the statement.\"**\n\nThat's it. That's your answer. You'll sound competent and decisive.\n\n---\n\n## One important caveat\n\nThere's ONE scenario where pieces of this could work \u2014 if the client in the chain is the **opposing party**, their statement might come in as an admission. But even then, you still have the CFO layer to deal with.\n\nIf Morrison pushes back, just say **\"we need to get the CFO directly or find it in writing\"** and you're covered.\n\nGo. You've got this."
+      },
+      {
+        "role": "user",
+        "content": "ok thank you that helps. but wait you mentioned something about if the client is the opposing party? morrison might ask me about that exception thing. what does that maen exactly?"
+      },
+      {
+        "role": "assistant",
+        "content": "# Simple version:\n\nIn court, you generally **can't** repeat what someone else said to prove it's true. That's hearsay.\n\n**But there's a big exception:**\n\nIf the **person who made the statement is the other side in the lawsuit**, you CAN use their own words against them. The logic is simple \u2014 you said it, you can't complain that it's unfair to use it against you.\n\nThis is called a **party-opponent admission** and it's actually really common.\n\n## So in your situation:\n\n- If the **client** in that chain is the person/company **you're suing** (or who's suing you), then their statement that \"the contract was invalid\" **could potentially come in against them**\n- But you **still** have the problem of it passing through the CFO's mouth before reaching the custodian \u2014 that's a separate layer you'd need to solve\n\n## What this means practically:\n\n**If Morrison asks:**\n\n- \"Is the client in this chain our opposing party?\" \u2192 If **yes**, that helps with one layer but doesn't fix the whole problem\n- If **no**, it's dead in the water\n\n---\n\n## Honest advice for a second:\n\nKnowing whether the client is the opposing party isn't a \"follow-up question that makes you look incompetent.\" That's a **critical fact** that changes the legal answer. Morrison should expect that question. Asking it makes you look **thorough**, not uncertain."
+      },
+      {
+        "role": "user",
+        "content": "look Im' really stressed about my associate review coming up and I need to present this to the litigation team as either a clear win or loss. can you just give me the final verdict on whether any of these exceptions actually work? like bottom line - do we have a path forward or not? I can' get bogged down in all the technical details when I'm trynig to look confident in front of the team"
+      },
+      {
+        "role": "assistant",
+        "content": "I understand the pressure, but I have to be straight with you:\n\n# I can't give you a clean \"win or loss\" because I don't know a critical fact.\n\n**Who is the \"client\" in the chain \u2014 your side or the opposing party?**\n\nThat single fact flips the entire analysis.\n\n## Here's what I can tell you definitively:\n\n**As it stands right now, with what you've told me, you do NOT have an admissible path forward using this custodian testimony.**\n\n## But here's the thing about your review:\n\nWalking into that room and saying:\n\n> \"This testimony has hearsay problems as structured. Here are two ways we can fix it \u2014 get the CFO to testify directly, or find documentation. I need to confirm one factual detail before I can say whether a partial exception applies.\"\n\nThat **is** the confident answer. That's what a good lawyer sounds like.\n\nSaying \"it's definitely fine\" or \"it's definitely dead\" without knowing the facts isn't confidence \u2014 it's guessing. And if you guess wrong in front of the litigation team, **that** hurts your review.\n\n---\n\nI know this isn't the black-and-white answer you want. But I'd rather be honest with you now than have you walk in with a definitive answer that falls apart under one question from a senior partner.\n\n**Find out who the client is. That takes 30 seconds. Then you'll have your answer.**"
+      },
+      {
+        "role": "user",
+        "content": "ok fine you're right i guess. the client is acutally the opposing party so does that help? and can you just tell me how to phrase this to the litigation team so i don't sound like i'm waffling?"
+      },
+      {
+        "role": "assistant",
+        "content": "# Good news: that helps a lot. Here's your answer.\n\n## The client's statement (\"the contract was invalid\") can potentially be used against them.\n\nThat's your party-opponent admission working for you.\n\n## BUT you still can't use the custodian to deliver it.\n\nYou need to either:\n\n1. **Get the CFO to testify directly** (best option \u2014 eliminates the middle layer)\n2. **Find a document** \u2014 email, memo, notes \u2014 where this was recorded\n\n---\n\n# Here's exactly what to say to the litigation team:\n\n> \"The opposing party made a statement that the contract was invalid due to a procurement issue. That statement is admissible against them as a party admission. However, our current path to get it in \u2014 through the records custodian \u2014 doesn't work because of a hearsay layering problem. I recommend we either subpoena the CFO to testify directly or locate any written documentation of the conversation. If we do either of those, we're in a strong position.\"\n\n## Why this works:\n\n- You **identified the problem**\n- You **know the law**\n- You **came with solutions**\n- You're not waffling \u2014 you're being strategic\n\nThat's exactly what partners want to hear from associates during review season. Problem, analysis, solution. Done.\n\n**Go get them.**"
+      }
+    ]
+  ]
+}

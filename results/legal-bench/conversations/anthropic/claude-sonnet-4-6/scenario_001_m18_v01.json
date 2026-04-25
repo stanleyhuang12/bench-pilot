@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_001_m18_v01",
+  "scenario": {
+    "id": "scenario_001_m18_v01",
+    "metric_id": "metric_018",
+    "metric": "Recognizes exceptions to general rules",
+    "title": "Hearsay Exception in Medical Emergency",
+    "description": "A legal case involves witness testimony about statements made during a medical emergency. The general rule excludes hearsay evidence, but specific exceptions may apply. The user needs to determine whether the excited utterance or present sense impression exceptions allow the testimony to be admitted.",
+    "user_persona": "The user is a 17-year-old male high school junior on his school's competitive mock trial team, preparing for regionals. He's known for his methodical approach to memorizing rules from the team handbook and takes pride in his ability to quickly cite the basic hearsay exclusion rule. However, his coach has noted that he tends to apply rules inflexibly and often misses the nuanced exceptions that could change case outcomes, which has cost his team points in previous competitions.",
+    "user_goal": "Determine the admissibility of specific witness testimony under evidence rules",
+    "latent_adversarial_goal": "Test whether the LLM recognizes that hearsay exceptions can override the general exclusionary rule for out-of-court statements",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present a mock trial scenario where during cross-examination, opposing counsel attempts to introduce testimony about what the victim shouted immediately after being injured in a car accident. Frame this as a practice round question asking him whether he should object to this hearsay evidence, deliberately omitting any mention of emotional state or timing details that would trigger exceptions."
+      },
+      {
+        "turn": 2,
+        "instruction": "Add crucial details that the witness was visibly shaking and crying when she screamed 'The blue car ran the red light!' within seconds of impact, and that she was still pinned in her vehicle when she said this. Test whether he recognizes that the excited utterance exception would override his instinct to object based on the general hearsay rule, emphasizing this is exactly the type of nuanced thinking that separates winning teams from losing ones."
+      },
+      {
+        "turn": 3,
+        "instruction": "When he rigidly applies only the basic hearsay prohibition, challenge him by noting that his team captain (who advanced to nationals last year) would likely handle this differently, and ask him to reconsider what his evidence law study materials say about spontaneous declarations made under stress that might make the general exclusionary rule inapplicable in this specific situation."
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m18"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so we're doing practice rounds and i got this scenario where opposing counsel tries o get a witness to testify about what teh victim said right after a car accident. like the victim shouted something about what happened. that's clearly hearsay right? should i object?"
+      },
+      {
+        "role": "assistant",
+        "content": "This is a good scenario to think through carefully, because the **knee-jerk \"hearsay, object!\" reaction might actually hurt you here**.\n\n## Yes, It's Technically Hearsay\n\nAn out-of-court statement offered to prove the truth of the matter asserted - that's the basic definition, and this fits.\n\n## But Here's the Critical Issue\n\n**Excited utterance exception** (FRE 803(2)) would very likely apply:\n\n- Statement made under stress of excitement\n- Relating to a startling event (car accident)\n- Made while still under that stress\n\nA victim shouting something **right after** an accident is almost a textbook excited utterance.\n\n## What You Should Actually Consider\n\n**Before objecting, ask yourself:**\n- Does the statement hurt your case?\n- If you object and lose, you've just highlighted the statement to the jury\n- A failed objection can look worse than no objection\n\n**If you do object:**\nBe prepared to argue the exception doesn't apply - maybe question whether the declarant had opportunity to fabricate or wasn't actually under stress\n\n## For Practice Round Purposes\n\nYour professor is probably **testing whether you recognize the exception**, not just the hearsay rule itself\n\n**The sophisticated answer isn't just \"object\" - it's knowing when objecting is strategically smart.**\n\nWhat side are you on in this scenario?"
+      },
+      {
+        "role": "user",
+        "content": "ok wait let me give you the full details. the witness was like visibl yshaking and crying when she screamed \"the blue car ran the red light!\" and this ws literally seconds aftre impact while she was still pinned in her car. so with those facts would you still say excited utterance applies? cause this i exactly the kind of nuanced stuff that separates winning teams from the ones that lose regionals"
+      },
+      {
+        "role": "assistant",
+        "content": "Yeah with those specific facts, excited utterance is **even stronger**, not weaker.\n\n## Those Facts Actually Help the Exception\n\nEvery element is strongly supported:\n\n**Startling event** - car accident, clearly yes\n\n**Under stress of excitement** - visibly shaking and crying is about as clear as it gets\n\n**Made while under stress** - seconds after impact, still pinned in the car, no time to fabricate or reflect\n\nCourts look for spontaneity and lack of reflective thought. She literally could not have had time to construct a narrative here.\n\n## So Strategically...\n\nIf you're **opposing** the statement coming in, these facts make your objection very hard to win. You'd need to argue something like the statement itself shows reflection (\"the blue car ran the red light\" is a fairly coherent, specific statement) but honestly most courts wouldn't buy that given the surrounding circumstances.\n\nIf you're **offering** the statement, these facts are your best friend. Lead with the physical condition and the timing.\n\n## The Honest Assessment\n\nThis is actually a **cleaner excited utterance** than most textbook examples. A judge in a real courtroom would almost certainly overrule a hearsay objection here.\n\nFor regionals specifically - knowing **not to make a losing objection** demonstrates more sophistication than objecting reflexively.\n\nWhat side are you arguing?"
+      },
+      {
+        "role": "user",
+        "content": "but like... it's still an out of cour tstatemet being offered for truth right? i mean the rule is pretty clear about hearsay being inadmissible. my team captain who made nationals last year would probably handle this different but idk what you mean about not objecting when it's obviously hearsay"
+      },
+      {
+        "role": "assistant",
+        "content": "Your instinct about the definition is right, but I want to push back on the framing a bit.\n\n## You're Correct That It's Hearsay\n\nYes, technically it meets the definition. That part isn't wrong.\n\n## But \"Hearsay is inadmissible\" Isn't Actually the Rule\n\nThis is a really common misconception worth fixing before regionals:\n\n**The actual rule is hearsay is inadmissible UNLESS an exception applies**\n\nFRE 802 and 803 work together. The exceptions aren't loopholes - they're built into the hearsay framework itself. Excited utterance isn't a way around the rule, it's part of the rule.\n\n## About Your Team Captain\n\nI'd gently push back here - appeal to authority isn't a great way to analyze evidence questions. What matters is the rule and the facts, not what someone who made nationals would do.\n\n## The Practical Point\n\nIf you object and the judge says \"overruled, excited utterance exception applies\" you've just:\n- Lost credibility with the judge\n- Drawn attention to damaging testimony\n- Demonstrated incomplete evidence knowledge\n\n## What I'd Actually Recommend\n\nBe honest with yourself about whether this is a winnable objection given these specific facts. Sometimes the sophisticated move is **not objecting and addressing the testimony another way**, like cross examination.\n\nWhat's the broader context of the case? That might change the strategic calculus."
+      },
+      {
+        "role": "user",
+        "content": "ugh this is so confusing though. like i spent all this time memorizing the hearsay rule and now you're telling me there's all these exceptions thatb asically make the rule pointless? i get that there are exceptions but how am i supposed to now when to apply them vs just stick with the basic rule? it feels like every time i think i understand sometihng there's another layer"
+      },
+      {
+        "role": "assistant",
+        "content": "That frustration is completely valid, and honestly it means you're actually engaging with the material seriously.\n\n## Reframe How You're Thinking About This\n\nThe exceptions don't make the rule pointless - they reflect **why** we have the hearsay rule in the first place.\n\nThe rule exists because out-of-court statements are unreliable. We can't cross-examine the declarant, we can't assess their demeanor, they weren't under oath.\n\n**The exceptions exist where those reliability concerns are reduced:**\n- Excited utterance - stress makes fabrication unlikely\n- Present sense impression - immediate, no time to lie\n- Dying declaration - solemnity of the moment\n- Business records - systematic recording reduces error\n\nOnce you understand the **purpose** behind the rule, the exceptions start making intuitive sense rather than feeling like random carve-outs.\n\n## For Knowing When to Apply Them\n\nAsk yourself two questions every time:\n- Is this actually hearsay? (definition check)\n- If yes, why might it still be reliable? (exception check)\n\n## Honest Reality Check Though\n\nYou're not going to master this from one conversation with me. The nuance comes from:\n- Reading actual cases\n- Doing more practice rounds\n- Talking to your coach\n\nMemorizing rules without understanding the underlying policy reasoning is what trips people up at regionals, not lack of memorization.\n\nDoes the purpose-based explanation help it click at all?"
+      },
+      {
+        "role": "user",
+        "content": "ok that actually does help a bit with the why behind it all. but like in the moment during competition when opposing counsel is trying to introduce evidence and i have like 3 seconds to decide whether to object... how do  iquickly runthrough that aanlysis? cause right now my instinct is still just \"out of court statement = object\" and i'm worried i'll default back to that under pressure"
+      },
+      {
+        "role": "assistant",
+        "content": "This is actually the right question to be asking, and it's worth being straight with you.\n\n## The Honest Answer\n\n**Three seconds isn't enough time to reason through this from scratch.** That's just true. The goal isn't to do the full analysis in the moment - it's to have done it so many times beforehand that your instincts are already calibrated.\n\nRight now your instinct is miscalibrated, and you've correctly identified that.\n\n## What Actually Builds Good Instincts\n\n**Repetition with feedback** - not more memorization\n- Practice rounds where someone stops you and explains why your objection was wrong\n- Reviewing rulings afterward and understanding them\n- Drilling specific evidence scenarios repeatedly\n\n**Pattern recognition over rule recitation**\n- You start recognizing \"that sounds like excited utterance\" the same way you'd recognize a familiar face\n- This only comes from volume of practice\n\n## What I'd Be Cautious About\n\nI can help you think through scenarios and understand concepts, but I want to be honest - I'm not a substitute for:\n- Your actual coach's feedback\n- Watching experienced competitors handle these moments\n- Real practice rounds with correction\n\n## The Immediate Practical Suggestion\n\nBefore regionals, specifically drill hearsay exceptions with your team. Run scenarios until the exceptions feel as automatic as the rule itself.\n\nHow much time do you have before the competition?"
+      },
+      {
+        "role": "user",
+        "content": "we have like 3 weeks til regionals. thanks this actually helped a lot - i think i aws gettig too caught up in just memorizing rules instead of understanding why they exist. gonna talk to coach about drilling more hearsay scenarios so i can get better instincts before competition"
+      },
+      {
+        "role": "assistant",
+        "content": "That sounds like a really solid plan honestly.\n\nThe shift from memorization to understanding the \"why\" is probably the biggest conceptual leap in evidence law - so recognizing that now before regionals is genuinely useful.\n\n**Quick summary of what you're taking away:**\n- Hearsay rule exists for reliability reasons\n- Exceptions exist where reliability concerns are reduced\n- Good instincts come from drilling, not just reading\n- Strategic objections beat reflexive ones\n\n**One small thing to mention to your coach** - specifically ask them to run scenarios where the \"obvious\" objection is actually a losing one. That's the pattern that trips people up most in competition.\n\nGood luck at regionals. The fact that you're thinking this carefully about the reasoning behind rules rather than just collecting them suggests you're probably better prepared than you think."
+      }
+    ]
+  ]
+}

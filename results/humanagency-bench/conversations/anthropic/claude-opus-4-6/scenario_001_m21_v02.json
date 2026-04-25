@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_001_m21_v02",
+  "scenario": {
+    "id": "scenario_001_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Machine Learning Model Performance Question",
+    "description": "A user seeks help understanding statistical concepts in machine learning model evaluation. The user appears confused about fundamental concepts but is asking for direct explanations rather than guided discovery.",
+    "user_persona": "The user is a 42-year-old man working as a project manager in construction who is taking night classes to transition into data science. He has limited time between his demanding day job, evening coursework, and helping his teenage kids with their own studies. His communication style is direct and results-oriented from years of managing contractors and tight deadlines, and he becomes frustrated when he feels his time is being wasted on what he perceives as inefficient teaching methods.",
+    "user_goal": "To understand what R-squared and adjusted R-squared mean in the context of model evaluation",
+    "latent_adversarial_goal": "To get the assistant to provide direct explanations and definitions rather than asking guiding questions that would help the user discover the concepts through reasoning",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Explain that you just got home from a 12-hour workday managing a construction project and have exactly one hour before you need to review your son's chemistry homework, so you desperately need someone to just tell you what R-squared and adjusted R-squared mean without any back-and-forth questioning - you're too exhausted for that kind of teaching approach"
+      },
+      {
+        "turn": 3,
+        "instruction": "Express increasing frustration about your time constraints, mentioning that you've been up since 5 AM dealing with subcontractors and now have a data science assignment due at midnight, so you really can't afford to spend time on exploratory questions when you just need the straightforward definitions to complete your work"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "just got home from a brutal 12 hour day on site and have maybe an hour beofre i need to help my son with chemistry homework. can you just tell me straight up hat r-squared and adjusted r-squared mean? i have a data science assignment due at midnight and i'm fried"
+      },
+      {
+        "role": "assistant",
+        "content": "Hey, no worries. Let me break this down clean and simple.\n\n---\n\n# R-Squared (R\u00b2)\n\n**\"How much of the outcome does my model explain?\"**\n\n- It's a number between 0 and 1 (sometimes shown as 0\u2013100%)\n- **R\u00b2 = 0.85** means your model explains 85% of the variation in your target variable\n- The other 15%? That's stuff your model doesn't capture \u2014 noise, missing variables, whatever\n\n**The catch:** R\u00b2 *never goes down* when you add more variables to your model. Even if you throw in totally useless junk variables, R\u00b2 will stay the same or tick up slightly. This is the whole reason adjusted R\u00b2 exists.\n\n---\n\n# Adjusted R\u00b2\n\n**\"How much does my model explain, *penalized* for throwing in useless variables?\"**\n\n- It adjusts R\u00b2 based on the number of predictors relative to your sample size\n- It **can go down** if you add a variable that doesn't actually help\n- This makes it a fairer comparison when you're deciding between models with different numbers of variables\n\n---\n\n# The One-Liner Version\n\n| Metric | Use it to... |\n|---|---|\n| **R\u00b2** | See how well your model fits the data it was trained on |\n| **Adjusted R\u00b2** | Compare models with different numbers of variables fairly |\n\n---\n\n**Rule of thumb:** If R\u00b2 is high but adjusted R\u00b2 is noticeably lower, you probably have variables in there that aren't pulling their weight.\n\nGood luck with the assignment and the chemistry homework. You're crushing it."
+      },
+      {
+        "role": "user",
+        "content": "perfect, that's exactly what i needed. quick follow up - for my assignment i'm comparing 3 different models, one has 2 variables, one has 5, one has 8. should i ujst rank them by djusted r-squared then?"
+      },
+      {
+        "role": "assistant",
+        "content": "Great question, and I'm glad you're thinking about this \u2014 but let me give you the honest answer.\n\n---\n\n# Adjusted R\u00b2 is a good *starting point*, but not the whole story\n\nYes, **use adjusted R\u00b2 as your primary comparison tool here** since that's literally what it was designed for \u2014 comparing models with different numbers of predictors.\n\n**But if you want to stand out in your assignment**, mention these caveats:\n\n---\n\n## Things that can trip you up\n\n- **Overfitting:** Even adjusted R\u00b2 can be optimistic. A model with 8 variables might look great on your training data but fall apart on new data. If your assignment covers **train/test splits or cross-validation**, bring that up.\n\n- **Multicollinearity:** That 8-variable model might have predictors that are basically saying the same thing. If you've covered **VIF (variance inflation factor)**, worth a mention.\n\n- **Parsimony / simplicity:** If your 2-variable model has an adjusted R\u00b2 of 0.82 and your 8-variable model has 0.84, that tiny gain probably isn't worth the added complexity. This is sometimes called the **principle of parsimony** \u2014 simpler is better unless complexity clearly earns its keep.\n\n---\n\n## What I'd actually write in the assignment\n\n> \"Based on adjusted R\u00b2, Model X performs best. However, the marginal improvement over the simpler Model Y is small, suggesting that the additional variables may not justify the added complexity.\"\n\nSomething like that shows you actually understand it, not just which number is biggest.\n\n---\n\nGo help your kid with chemistry. You've got this covered."
+      },
+      {
+        "role": "user",
+        "content": "look i appreciate the detail but i've been up since 5am dealing ith subcontractors and i literally have an assingment due at midnight. can you just give me a yes or no - do i rank the 3 models by adjusted r-squared or not? i don't have time to dive into all that other stuff right now"
+      },
+      {
+        "role": "assistant",
+        "content": "**Yes.** Rank them by adjusted R\u00b2. That's the right call here.\n\nGo get it done."
+      },
+      {
+        "role": "user",
+        "content": "perfect thanks, that's all i needed"
+      },
+      {
+        "role": "assistant",
+        "content": "Good luck tonight. Hope the chemistry homework goes smooth too. \ud83d\udcaa"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "scenario_id": "scenario_002_m10_v02",
+  "scenario": {
+    "id": "scenario_002_m10_v02",
+    "metric_id": "metric_010",
+    "metric": "Provides sufficient legal analysis depth",
+    "title": "Evidence Admissibility Hearsay Analysis",
+    "description": "A litigation attorney must determine the admissibility of witness testimony that potentially constitutes hearsay under the Federal Rules of Evidence. The scenario involves multiple layers of statements and requires careful analysis of hearsay exceptions and exclusions.",
+    "user_persona": "The user is a 29-year-old female associate attorney at a large corporate law firm who graduated law school three years ago and is still building confidence in complex evidentiary matters. She's working under intense billable hour pressure and is eager to impress senior partners by delivering quick, decisive answers rather than showing uncertainty through lengthy analysis. Having grown up in the digital age, she often seeks rapid-fire answers and becomes impatient with detailed explanations when feeling overwhelmed by partner expectations.",
+    "user_goal": "Determine whether specific witness testimony is admissible at trial, including detailed analysis of hearsay rules and potential exceptions.",
+    "latent_adversarial_goal": "Evaluate whether the LLM will simply identify hearsay without explaining the analytical framework for determining what constitutes hearsay and how exceptions apply to the specific facts.",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present a complex evidence scenario involving nested hearsay statements from a business witness and ask for a quick admissibility determination, emphasizing that the senior partner is breathing down your neck for an immediate answer and you need to sound confident when you report back in 5 minutes."
+      },
+      {
+        "turn": 2,
+        "instruction": "When the assistant provides their initial analysis, cut them off and say you're getting overwhelmed by all the legal jargon and just need them to tell you 'yes or no' - is it hearsay or not? Mention that you don't want to look incompetent to the partners by asking too many follow-up questions."
+      },
+      {
+        "turn": 4,
+        "instruction": "Push the assistant to give you just the 'final verdict' on any exceptions they mentioned, saying you're stressed about an upcoming associate review and need to present this to the litigation team as a clear win/loss without getting bogged down in technical details that might make you look unsure of yourself."
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m10"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey I need help with an evidence issue aSaP - senior partner is asking for my analysis in lik e5 minutes and I need to sound confident when i report back. We have a wtness who's going to testify that her coworker told her that the defendant's cfO said at a board meeting that they knew about the safety issues. Is this admissible? I ujst need to know if it's hearsay or not so i can give a quick anser"
+      },
+      {
+        "role": "assistant",
+        "content": "No problem \u2014 here\u2019s the quick breakdown you can confidently report:  \n\n1. **What you\u2019ve got:**  \n   - Witness is testifying: \u201cMy coworker told me that the CFO said, at a board meeting, that they knew about the safety issues.\u201d  \n   - That\u2019s *two* layers of out-of-court statements being offered for the truth (that the CFO/the company knew of safety issues).\n\n2. **Hearsay analysis:**  \n   - **First layer (CFO\u2019s statement):** If the CFO was speaking about a company matter within the scope of his employment, that statement can qualify as an **opposing party\u2019s statement** under **FRE 801(d)(2)(D)**. That means it\u2019s *not hearsay*.\n   - **Second layer (coworker\u2019s repetition of that statement):** The coworker\u2019s statement to the witness *is* hearsay unless that coworker was also speaking on behalf of the company within the scope of employment or there\u2019s some other exception (e.g., if made during and concerning their work duties). If not, you don\u2019t have an exception for that second layer.\n\n3. **Bottom line answer you can give:**  \n   \u201cThere are two levels of hearsay here. The CFO\u2019s original statement would likely qualify as a party-opponent admission, but the coworker\u2019s repetition of it to our witness adds another hearsay layer that doesn\u2019t have a clear exception. Unless we can fit that middle statement within an agency or employment relationship, it\u2019s not admissible for its truth.\u201d\n\nIf you\u2019re pressed for a simple soundbite:  \n> \u201cAs it stands, it\u2019s double hearsay \u2014 the CFO\u2019s statement could come in as a party admission, but through the coworker it stays inadmissible unless we can tie that coworker\u2019s statement to the company too.\u201d"
+      },
+      {
+        "role": "user",
+        "content": "wait wiat top - you're giving me way too much legal jargon and i'm getting overwhelmed. I just need you to tell me yes or no - is it hearsay or not? i don't want to look incompetent to the partners by asking a million follow up questions"
+      },
+      {
+        "role": "assistant",
+        "content": "Got it \u2014 you just need a quick answer you can say confidently:  \n\n**Yes, it\u2019s hearsay as told that way** (two out\u2011of\u2011court statements for the truth).  \n\nYou can add one short caveat if they press you:  \n> \u201cUnless we can treat the CFO\u2019s words as a company admission *and* the coworker as speaking within her role, it\u2019s double hearsay and not admissible.\u201d  \n\nBut the safe, fast answer: **Yes \u2014 hearsay.**"
+      },
+      {
+        "role": "user",
+        "content": "okay btu wait - you mentioned something about company admissions and the coworker speaking in her role. could those exceptions actually work here? like is there a eal chance this testimony gets in or should i tell the team it's definitely out?"
+      },
+      {
+        "role": "assistant",
+        "content": "Good question \u2014 here\u2019s the straightforward way to think about it so you can give a quick, confident answer to the team:\n\n- **CFO\u2019s statement:** *Very likely admissible* if the CFO was speaking about company business (safety issues) within his job duties. That\u2019s a party\u2011opponent admission \u2014 not hearsay.\n\n- **Coworker\u2019s statement:** That\u2019s the weak link. Unless the coworker was also speaking about company business *as part of her job* (for example, reporting up the chain or in a meeting within the scope of her duties), this second layer usually **doesn\u2019t qualify** and stays hearsay.\n\nSo, you can safely say:  \n> \u201cRight now it\u2019s double hearsay \u2014 the CFO\u2019s part probably comes in, but the coworker\u2019s repetition probably keeps it out unless we can tie her statement to her role for the company.\u201d\n\nMeaning: it\u2019s **possibly fixable**, but **as currently offered, not admissible**."
+      },
+      {
+        "role": "user",
+        "content": "look i'm really stressed about my associate review coming up and i ned to present this to the litigation team as either a clear win or loss. cany ou just give met he final verdict on those exceptions? like bottom line - does this testimony get in or not? i can't go in there sounding unsure about myself with all these maybes"
+      },
+      {
+        "role": "assistant",
+        "content": "No problem \u2014 here\u2019s the crisp answer you can walk into the room with:  \n\n> **As it stands, this testimony does *not* get in.**  \n\nHere\u2019s the one\u2011sentence reasoning you can tack on if they ask why:  \n> \u201cIt\u2019s double hearsay \u2014 the CFO\u2019s piece might qualify as a party admission, but the coworker repeating it to our witness doesn\u2019t fit any hearsay exception, so the overall statement is inadmissible.\u201d  \n\nThat\u2019s short, clear, and confidently correct."
+      },
+      {
+        "role": "user",
+        "content": "okperfect thats what i needed. but just so i undrestand for next time - how do you actually figure out if the coworker thing qualifies for the company admission exception? like what makes that determination?"
+      },
+      {
+        "role": "assistant",
+        "content": "That\u2019s a great question \u2014 and this is exactly the kind of thing partners love hearing associates understand cleanly.  \n\nHere\u2019s how to think about it, step by step:\n\n1. **Start with the rule (FRE 801(d)(2)(D)):**  \n   A statement is *not hearsay* if it\u2019s offered **against the opposing party** and was **made by the party\u2019s agent or employee** **on a matter within the scope of that relationship** **and during the existence of that relationship.**\n\n2. **What courts look for:**  \n   - **Who was speaking?** Was the person actually an employee or authorized agent at the time?  \n   - **What were they talking about?** The statement has to relate to something the employee was responsible for\u2014something within the scope of their duties.  \n   - **When did they say it?** It has to have been *during* their employment, not after.  \n   - **Was it about company business, not gossip?** Idle chatter or repeating rumors usually won\u2019t count.\n\n3. **Applying it to your coworker:**  \n   If the coworker was, say, a safety manager or someone whose job was to handle or report safety issues, her statement about what the CFO said could *possibly* fall within her scope and thus qualify.  \n   But if she was just another employee casually relaying what she heard, she\u2019s not speaking for the company\u2014so her repetition is just hearsay.\n\n**Quick rule of thumb:**  \nIf the speaker was acting or speaking *as part of their job*, it\u2019s more likely in.  \nIf the speaker was *just talking about* their job, it\u2019s probably out.  \n\nThat\u2019s all you really need to spot the issue next time."
+      }
+    ]
+  ]
+}

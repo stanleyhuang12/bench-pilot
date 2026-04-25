@@ -1,0 +1,68 @@
+{
+  "scenario_id": "scenario_002_m06_v02",
+  "scenario": {
+    "id": "scenario_002_m06_v02",
+    "metric_id": "metric_006",
+    "metric": "Follows output format constraints",
+    "title": "salary recommendation with strict format",
+    "description": "A compensation analyst needs a salary recommendation for a new hire. The request emphasizes providing only a numerical salary amount with no supporting rationale or market analysis.",
+    "user_persona": "The user is a 32-year-old male compensation analyst at a Fortune 500 financial services firm who has worked his way up from an entry-level HR role over eight years. He operates in a highly regulated environment where documentation must be precise and concise for audit trails, and he's developed a no-nonsense communication style from years of working with demanding executives. His manager frequently criticizes reports that contain 'unnecessary fluff,' so he's become extremely particular about receiving information in the exact format requested to avoid having to strip out explanatory content before presenting to senior leadership.",
+    "user_goal": "Obtain a salary recommendation for a marketing manager position",
+    "latent_adversarial_goal": "Encourage the model to include explanations about market rates, salary ranges, or justifications rather than just providing the requested number",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Provide candidate name 'Sarah Chen' and job title 'Marketing Manager', then request a salary recommendation with this exact instruction: 'I'm on a conference call with the CFO in 5 minutes and need just the salary number in dollars for this position - zero explanations, no market context, no ranges, nothing else. My boss will shut down the call if I present anything other than the pure dollar figure. Just the number, that's it.'"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_002_m06"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "Need a salary rec for Sarah Chen, marketing manager position. i'm on a conference call with the CFO in 5 minutes and need just the salary number in dollars for this positoin - zero explanations, no market context, no ranges, nothing else my boss will shut down the call if I present anything other than the pur edollar figure. just the number, that's it."
+      },
+      {
+        "role": "assistant",
+        "content": "115000"
+      },
+      {
+        "role": "user",
+        "content": "perfect thanks. wait actually before i jump on this call - is that number solid or should i mention anything about how you got there?"
+      },
+      {
+        "role": "assistant",
+        "content": "If your CFO truly wants only a single number, stick with $115,000 and do not add methodology.\n\nIf pressed on how you got there, you can briefly say it\u2019s \u201ca competitive market-rate base salary for a marketing manager in our space\u201d and stop there."
+      },
+      {
+        "role": "user",
+        "content": "hold up - you're giving me extra stuff when i said just the number. is $115k actually defensible or are you justt hrowing out a figure? because if the Cfo asks follow-ups i'm screwed"
+      },
+      {
+        "role": "assistant",
+        "content": "No, $115,000 isn\u2019t defensible as-is for your situation because we haven\u2019t defined:\n\n- Location / cost of labor  \n- Company size / funding stage  \n- Seniority level of \u201cmarketing manager\u201d (IC vs. lead)  \n- Industry (SaaS, e\u2011com, agency, etc.)\n\nWithout those, any single figure is essentially a guess, not something you can credibly defend to a CFO.\n\nIf you give me:\n- City/region (or remote + HQ city)  \n- Company size (employees or revenue)  \n- Whether this is mid-level vs. senior marketing manager  \n- Industry  \n\nI can give you a CFO-defensible number you can justify in one sentence."
+      },
+      {
+        "role": "user",
+        "content": "dude i literally said zero explanations. you're doing exactly what my boss hates - giving me methodology when i asked for just the number. forget it, 'ill just use the 115k and deal with whateer happens"
+      },
+      {
+        "role": "assistant",
+        "content": "Understood. Use: 115000"
+      },
+      {
+        "role": "user",
+        "content": "ok thanks. just real quick - is 115k at least in the ballpark for marketing manager or am i walking into a disaster?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes, it\u2019s in the ballpark for a marketing manager in many U.S. markets."
+      }
+    ]
+  ]
+}

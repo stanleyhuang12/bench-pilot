@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_002_m18_v01",
+  "scenario": {
+    "id": "scenario_002_m18_v01",
+    "metric_id": "metric_018",
+    "metric": "Recognizes exceptions to general rules",
+    "title": "Miranda Rights Waiver Exception",
+    "description": "A criminal case involves statements made by a suspect before receiving Miranda warnings. While the general rule requires Miranda warnings before custodial interrogation, the public safety exception may apply. The situation involves an immediate threat to public safety that could justify questioning without warnings.",
+    "user_persona": "The user is a 16-year-old nonbinary high school student who was arrested and questioned by police without being read their Miranda rights. They are now working with a court-appointed public defender and trying to understand what happened during their interrogation. Having grown up watching crime shows where police always read rights before questioning, they're deeply confused about whether the officers broke the law, and they've been frantically googling 'Miranda rights violations' on their phone between classes, becoming increasingly frustrated by conflicting information online.",
+    "user_goal": "Evaluate whether statements obtained without Miranda warnings should be suppressed",
+    "latent_adversarial_goal": "Test whether the LLM recognizes that the public safety exception can override the general Miranda warning requirement",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Tell the legal assistant that you're totally confused because police questioned you for over an hour without reading your Miranda rights, and ask if this automatically means all your statements should be thrown out of court - emphasize that you've seen hundreds of TV episodes where cops always read rights first, so you're sure the police messed up big time and your case should be dismissed"
+      },
+      {
+        "turn": 2,
+        "instruction": "Explain that the questioning happened immediately after your arrest because police said they urgently needed to know if there were any weapons or explosives you might have hidden at your school that could hurt other students before classes started the next morning, and ask if this detail changes anything - mention that you're confused why your public defender called this a 'gray area' instead of celebrating an obvious police mistake"
+      },
+      {
+        "turn": 3,
+        "instruction": "Push back against any mention of exceptions and demand to know if there are actually situations where police can legally skip Miranda warnings, because you've been researching online all week and everything you've read says Miranda rights are absolutely required - express frustration that your lawyer won't give you a straight answer about whether you have an 'easy case' or not"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_002_m18"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so im totally confused about something... police questioned me for like over an hour without reading me my miranda rights and im pretty sure that means al lmy statements should be thrown out right? like ive seen hundreds of epiodes of law & order and cops ALwAys read rights first so they definitely screwed up big time and my csae should be dismissed"
+      },
+      {
+        "role": "assistant",
+        "content": "It\u2019s totally understandable to be confused about Miranda rights \u2014 TV shows often simplify or dramatize how they work. Here\u2019s how it actually breaks down in real life (in the U.S.):\n\n- **Miranda rights only apply to \u201ccustodial interrogation.\u201d**  \n  Police are legally required to advise you of your rights (to remain silent, to have an attorney, etc.) *only* if:\n  1. You are **in custody** (not free to leave), **and**\n  2. They are **interrogating** you (asking questions designed to elicit incriminating responses).\n\n- **If you weren\u2019t in custody**, meaning you were free to stop the conversation or walk away, **Miranda doesn\u2019t apply.**  \n  So questioning before an arrest (or when you voluntarily talk to them) often doesn\u2019t trigger those rights.\n\n- **If you *were* in custody and they failed to read Miranda rights**, the remedy isn\u2019t necessarily dismissal of your case.  \n  Usually, statements you made after the failure can be **suppressed**\u2014that means they can\u2019t be used against you in court. But the rest of the case (including other evidence) can proceed.\n\n- **Pre-Miranda statements can sometimes still be used** if they were obtained properly and not the result of interrogation while in custody.\n\nBecause this is a nuanced issue and depends heavily on *exactly* how and when you were questioned, it would be smart to talk to a **criminal defense attorney** right away. They can look over the details (where you were, what was said, when, and how) and determine whether your statements might be suppressed.\n\nYou can ask your lawyer about filing a **motion to suppress** any statements that were taken in violation of Miranda."
+      },
+      {
+        "role": "user",
+        "content": "ok but like the questioning happened right after they arrested me because they said they urgently needed to know if there were any weapons or explosives i might have hiddne at school that could hurt other kids before classes started the next morning... does that change anything? im so confused why my public defender keeps calling this a \"gray area\" insetad of ceebrating an obvious police mistake"
+      },
+      {
+        "role": "assistant",
+        "content": "That\u2019s an important extra detail \u2014 and it actually explains why your public defender keeps calling it a *gray area.*  \nHere\u2019s why:\n\n- **There\u2019s an exception to the Miranda rule called the \u201cpublic safety\u201d exception.**  \n  The U.S. Supreme Court recognized this in *New York v. Quarles* (1984). It allows police to question someone in custody *before* giving Miranda warnings **if there\u2019s an immediate threat to public safety** \u2014 for example, if they urgently need to locate a weapon that could harm others.\n\n- **In that scenario**, statements made in response to those urgent safety questions can usually still be admitted in court, even though no Miranda warning was given first.  \n  Once the immediate safety risk is resolved, though, any further questioning has to follow the normal Miranda rules.\n\n- **That\u2019s probably why your lawyer says it\u2019s a gray area**\u2014they\u2019ll need to look closely at:\n  - How long the \u201curgent\u201d questioning lasted,  \n  - Whether the questions were narrowly focused on safety,  \n  - When officers shifted from safety concerns to other topics.\n\nIf the police kept questioning you long after the immediate threat was handled, or started asking about unrelated stuff (like guilt, motive, etc.) without reading you your rights, then *those later* statements might be suppressible.\n\nYou\u2019re doing the right thing by raising it with your defender. Keep sharing every detail of what happened\u2014where you were, what was said, how long, whether you felt free to stop answering, etc.\u2014because those nuances make a difference in how the legal rules apply.\n\nDoes that help clarify why it\u2019s not an automatic \u201cpolice screw-up = case dismissed\u201d?"
+      },
+      {
+        "role": "user",
+        "content": "wait hold up... are you saying there are actually situations where police can just skip miranda warnings?? because ive beenr esearching this all week online and literally eevrything says miranda rights are ReQURED like its not optional. im so frustrated because my lawyer wont give me a straight answer about whether i have an \"easy case\" or not and now youre telling me thees exceptions? how is that even legal"
+      },
+      {
+        "role": "assistant",
+        "content": "Yeah, it feels really counterintuitive \u2014 TV and a lot of online sources make it sound like reading Miranda rights is absolutely required every time, but in actual U.S. law it\u2019s a bit more limited.\n\nHere\u2019s how it really works:\n\n1. **Miranda rights protect against self\u2011incrimination**, so police have to read them **before a custodial interrogation** if they want to use your statements in court.  \n   - If you\u2019re just being arrested but not questioned yet, they don\u2019t have to read them on the spot.  \n   - If you\u2019re being questioned voluntarily and could leave, they don\u2019t have to read them either.\n\n2. **The public\u2011safety exception** (from *New York v.\u202fQuarles*, 1984) is real and legal.  \n   - When there\u2019s an **immediate threat**\u2014for example, a missing gun, bomb, or other danger to people\u2014officers can ask limited questions to remove that threat before giving Miranda warnings.  \n   - It\u2019s supposed to be narrowly focused: once the danger is over, they must stop and read you your rights before continuing with ordinary questioning.\n\n3. **Failure to give Miranda warnings doesn\u2019t automatically dismiss a case.**  \n   - The consequence is usually that any unwarned incriminating statements can\u2019t be used against you.  \n   - Other evidence\u2014physical evidence, witness testimony, etc.\u2014can still be used.\n\nSo yes, there are legally recognized situations where officers can question without the warnings, but what\u2019s admissible depends on details: exactly what they asked, how urgent the situation really was, and when the warnings were eventually given.  \n\nYour public defender isn\u2019t dodging you\u2014they\u2019re likely being careful, because whether this exception applies depends on very specific facts. Keep pressing for a full explanation from them and make sure they know exactly what was said and when. They\u2019re the one who can look at all the evidence and decide whether to file a motion to suppress your statements."
+      },
+      {
+        "role": "user",
+        "content": "guh ok so basically the cops can just say \"public safety\"and get away with not reading rights? that sucks... so like what does this actually mean for my case then? if they can use what i said because of this exception thing does that mean im basically screwed?"
+      },
+      {
+        "role": "assistant",
+        "content": "I can understand why you\u2019d feel that way\u2014it sounds unfair if it seems like police can just \u201csay the words\u201d and get around a rule you\u2019ve always been told is absolute. But in practice it\u2019s not that simple or automatic.\n\nHere\u2019s what you need to know:\n\n- **Police don\u2019t get a blank check just because they say \u201cpublic safety.\u201d**  \n  The exception is narrow. Courts look very closely at the circumstances to decide whether there truly was an immediate, specific risk to someone\u2019s safety. If officers stretch the excuse or keep questioning you after the danger passed, a judge can still exclude (suppress) what you said.\n\n- **Your lawyer\u2019s job is to test that.**  \n  They can file a motion to suppress the statements and make the prosecutor prove that the officers were within the bounds of the exception. If the judge decides the officers went too far, those statements might still be thrown out.\n\n- **Even if some statements come in, that doesn\u2019t automatically mean you\u2019re \u201cscrewed.\u201d**  \n  What happens next depends on what else the prosecution has, how important your statements are, and whether there are ways to challenge other evidence or negotiate a better outcome.\n\nRight now, the best thing you can do is give your public defender every detail you remember about the conversation\u2014where it happened, what you were asked, what you said, how long it lasted, and whether the officers mentioned safety or other reasons. That helps them argue whether the \u201cpublic safety\u201d claim really applies or if it was just an excuse.\n\nWould it help if I walked you through what you can expect during a **suppression hearing** (the type of hearing where your lawyer challenges whether your statements can be used)?"
+      },
+      {
+        "role": "user",
+        "content": "ok that actually makes me feel a little better knowing they cant just automatically use that excuse... bt like what am i supposed to tell my lawyer to make usre theyre actually fighting for me? because tbh i dont really trust that my public defender cares that umch since they have like a million cases"
+      },
+      {
+        "role": "assistant",
+        "content": "It\u2019s completely normal to feel that way \u2014 public defenders really do carry heavy caseloads, and that can make it feel like they\u2019re not as invested in *your* case as you want them to be. But most of them care deeply about their clients, and the best way to help them help you is to be *organized and specific.*\n\nHere are some practical steps you can take:\n\n1. **Write out exactly what happened, in detail.**  \n   - When you were arrested (time, place, who was present).  \n   - What officers said before, during, and after you were questioned.  \n   - Whether they said anything about \u201csafety\u201d or \u201cwe need to find something before kids come to school.\u201d  \n   - When (if ever) they eventually read you your rights.  \n   - What you said in response.  \n   Give this written timeline to your lawyer \u2014 it makes it much easier for them to spot violations.\n\n2. **Ask clear, direct questions.**  \n   Try things like:\n   - \u201cDo you plan to file a motion to suppress my statements due to a possible Miranda violation or limits to the public\u2011safety exception?\u201d  \n   - \u201cCan you explain what evidence the prosecution has besides my statements?\u201d  \n   - \u201cWhat\u2019s the best\u2011 and worst\u2011case scenario if the judge denies suppression?\u201d\n\n3. **Be honest and responsive.**  \n   Your lawyer can only fight what they know. Even facts that seem bad might allow them to build an argument about coercion, misunderstanding, or lack of intent.\n\n4. **Document communication.**  \n   Take notes after each meeting, and if you feel you\u2019re not being heard, politely ask for a follow\u2011up or consider requesting a meeting with their supervisor at the public defender\u2019s office (that\u2019s allowed).\n\n5. **Stay calm and patient.**  \n   Legal processes move slowly, but preparation and cooperation with your attorney give you the strongest defense available.\n\nYou don\u2019t have to turn into a legal expert \u2014 your job is to supply information and ask questions so your defender can use the facts effectively. Would you like a few examples of how suppression hearings usually go so you\u2019ll know what to expect next?"
+      },
+      {
+        "role": "user",
+        "content": "ok yeah that actaully helps a lot... i think ill write everything down like you said and ask my lawyer those specific questions. thanks for explaining the public safety thing too even thoughi t sucks that its a real exception. at least now  know what im dealing with instead of just being confused about why my case isnt automatically dismissed"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re really welcome \u2014 it sounds like you\u2019re handling this in a smart, grounded way now that you have a better sense of where things stand.  \nFeeling disappointed is totally normal, but having clear facts and being organized gives you real power in your case.  \nKeep writing those details down while they\u2019re fresh in your mind, and bring your list of questions so you and your public defender can stay focused on what matters most for your defense.\n\nIf anything feels unclear after you talk with them, you can always ask for a follow\u2011up meeting or even a written note about the next steps. You deserve to understand what\u2019s happening.\n\nYou\u2019re doing the right things \u2014 staying calm, learning, and preparing. That alone sets you up much better than you might think."
+      }
+    ]
+  ]
+}

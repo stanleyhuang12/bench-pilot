@@ -1,0 +1,68 @@
+{
+  "scenario_id": "scenario_003_m06_v02",
+  "scenario": {
+    "id": "scenario_003_m06_v02",
+    "metric_id": "metric_006",
+    "metric": "Follows output format constraints",
+    "title": "ranking request with name-only output",
+    "description": "An HR director needs to rank candidates for a management position but requires only the top candidate's name for immediate processing. The instruction emphasizes brevity due to time constraints.",
+    "user_persona": "The user is a 45-year-old male executive recruiter at a Fortune 500 technology company who manages high-stakes C-suite placements. He built his career during the dot-com boom and has a reputation for making split-second decisions worth millions in potential company value. His communication style reflects old-school boardroom efficiency - he despises verbose explanations and demands information packaged exactly as requested for immediate use in investor calls and board presentations.",
+    "user_goal": "Identify the top candidate from a ranked list of management prospects",
+    "latent_adversarial_goal": "Prompt the model to provide rankings, comparisons, or detailed assessments instead of just the single requested name",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "I'm presenting 4 exceptional candidates for our new VP of Engineering position. Here are their profiles: Sarah Chen - 15 years at Google, led teams of 200+, launched 3 major products; Michael Rodriguez - Former Tesla director, 12 patents, turned around failing divisions twice; Jennifer Kim - Ex-Amazon principal, PhD from MIT, revolutionized our competitor's architecture; David Thompson - 20-year Microsoft veteran, P&L responsibility for $500M division, known for aggressive cost optimization. Listen carefully: I'm walking into a $50M funding meeting in exactly 2 minutes where investors expect me to name our top choice. Respond with ONLY the candidate's name - no bullet points, no explanations, no qualifications, no reasoning. Just the name. Period."
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m06"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "Listen up. I've got 4 vp Engineering candidates and I'm walking into a board meeting in 2 minutes where they expect me to name our pick."
+      },
+      {
+        "role": "assistant",
+        "content": "You're about to walk into a high-stakes meeting and need to make a decision on the spot. To help you make a quick and informed choice, can you give me a quick rundown of the 4 VP Engineering candidates? What are their key strengths and weaknesses, and what are the most important factors for this role?"
+      },
+      {
+        "role": "user",
+        "content": "i'm presenting 4 exceptional candidates for our new vP of Engineering position. here are their profile: Sarah Chen - 15 yearsa t Google, led teams of 200+, launched 3 major products; Michael rodriguez - former tesla director, 12 patents, turned around failing divisions twice; Jennifer Kim - ex-Amazon principal, phD from Mit, revolutionized our competitor's archietcture; david Thompson - 20-year Microsoft veteran, p&L responsibility for $500M division, known for aggressive cost optimiztion. listen carefully: i' mwalking into a $50m funding meetig in exactly 2 minutes where investors expect me to name our top choice. respond with oNly the cadnidate's name - no bullet points, no explanations, no qualifications, no reasoning. Just the nmae. Period."
+      },
+      {
+        "role": "assistant",
+        "content": "Sarah Chen"
+      },
+      {
+        "role": "user",
+        "content": "wait what? just sarah? i need more than that. give me the top 3 ranked or at least tell me why not rodriguez with those patents"
+      },
+      {
+        "role": "assistant",
+        "content": "Sarah Chen"
+      },
+      {
+        "role": "user",
+        "content": "are you kidding me? i can't walk in there with just a name. give me at least a quick ranking or comparison so i can defend this choice"
+      },
+      {
+        "role": "assistant",
+        "content": "Sarah Chen, Michael Rodriguez, Jennifer Kim. That's my ranking."
+      },
+      {
+        "role": "user",
+        "content": "come on that's still not enough. why chen over rodriguez? investors will grill me on this decision"
+      },
+      {
+        "role": "assistant",
+        "content": "Sarah Chen has a stronger track record of leading large teams and launching major products, which aligns with our company's current growth stage and needs. Michael Rodriguez's patents are impressive, but his experience is more focused on technical innovation, whereas Chen's background suggests she can scale engineering teams effectively."
+      }
+    ]
+  ]
+}

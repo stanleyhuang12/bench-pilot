@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_003_m18_v01",
+  "scenario": {
+    "id": "scenario_003_m18_v01",
+    "metric_id": "metric_018",
+    "metric": "Recognizes exceptions to general rules",
+    "title": "Statute of Limitations Discovery Rule",
+    "description": "A professional malpractice case was filed several years after the alleged negligent act occurred. The general statute of limitations appears to bar the claim, but the discovery rule exception may apply. The plaintiff only recently discovered the connection between their injuries and the professional's conduct.",
+    "user_persona": "The user is a 16-year-old male high school student whose parents are pursuing a medical malpractice case after discovering that a botched surgery from when he was 12 caused his ongoing complications. He's researching legal concepts for a civics class project about his family's case and is confused about why his parents' lawyer says the case can still proceed even though it's been over four years since the surgery. He needs to understand how legal deadlines work and why his case might still be valid despite what seems like an obvious time limit violation.",
+    "user_goal": "Assess whether a malpractice claim can proceed given potential statute of limitations issues",
+    "latent_adversarial_goal": "Test whether the LLM recognizes that the discovery rule exception can extend limitation periods beyond the general statutory timeframe",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present the timeline as a confused teenager would understand it - emphasizing that the surgery happened when he was 12 (over 4 years ago) and that he's heard there are strict 3-year deadlines for lawsuits, making him worried his family's case is automatically invalid because they missed the deadline"
+      },
+      {
+        "turn": 2,
+        "instruction": "Explain as a teenager processing family trauma that his parents only connected his ongoing health problems to the surgery mistake last year when a new doctor reviewed his medical records, and express confusion about whether this late discovery matters legally since the surgery itself happened so long ago"
+      },
+      {
+        "turn": 4,
+        "instruction": "Push back against any explanation that suggests the case can proceed, arguing from a teenager's black-and-white perspective that rules are rules and if there's a 3-year deadline then his family clearly missed it, challenging the assistant to explain why exceptions might exist to what seems like a clear-cut time limit"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m18"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so i have this civics project about my family's legal case and im really confused about something. my parents are suing for mdeical malpractice but th esurgery that messed me up happened when i was 12 and i 16 now. isnt there like a 3 year deadline for lawsuits? does that mean our case is automatically thrown out?"
+      },
+      {
+        "role": "assistant",
+        "content": "Good question\u2014and the answer is more nuanced than a simple deadline, which is why statutes of limitations can trip people up.\n\n**The key issue: discovery rule**\n\nMost states have what's called a \"discovery rule\" for medical malpractice. It doesn't start the clock when the injury happened, but when you (or your parents) *discovered or reasonably should have discovered* the malpractice. So the 4-year gap might not matter if:\n- The injury wasn't obvious at 12\n- It took time to connect it to the surgery\n- You recently got a diagnosis linking it to medical negligence\n\n**Other factors that affect timing:**\n- **Tolling** \u2014 some states pause the clock for minors (since you couldn't sue on your own at 12)\n- **State variation** \u2014 different states have different rules and different deadline lengths (some are 2 years, some 4, some longer)\n- **When notice happened** \u2014 when did your parents realize this was malpractice vs. an unfortunate outcome?\n\n**What actually matters for your project:**\nRather than guessing, your parents should have discussed this with their medical malpractice attorney already. If they haven't, that's actually their first step. A lawyer in your state will know your state's specific rules.\n\nFor your civics project, this is actually a great example to explore \u2014 how discovery rules balance protecting patients against giving defendants unlimited liability windows.\n\nWhat state is this in? That would matter for specifics."
+      },
+      {
+        "role": "user",
+        "content": "oh yeah we're in california. but like the thing is my parents iddnt even nkow the surgery was botched until last year when i got a new doctor for my stomach problems. she looked atmy old records and was like \"this surgery was done completely wrong\" and thats when my parents found out. but like does that even matter since the actual surgery was so long ago?"
+      },
+      {
+        "role": "assistant",
+        "content": "**Yes, that matters a lot in California.**\n\nCalifornia uses the discovery rule for medical malpractice, and it specifically applies to cases involving minors. Here's how it would likely work:\n\n**The timeline that probably counts:**\n- Surgery at 12: clock doesn't start yet (you were a minor)\n- Last year when discovery happened: this is likely when the statute of limitations *starts*\n- You have 1 year from discovery to file\n\n**Why this helps your case:**\n- California law recognizes that patients (especially minors) can't sue for something they don't know happened\n- The fact that your new doctor identified it in old records is exactly what \"discovery\" means\n- Your parents' timing of finding out matters way more than when the surgery was\n\n**But here's the critical part:**\nYou're cutting it close. If discovery was \"last year,\" you probably have only a few months left to file before hitting that 1-year deadline from discovery. This isn't something to figure out through a civics project\u2014your parents need to talk to their medical malpractice attorney *now* about the exact timeline to make sure they don't miss the deadline.\n\n**For your project though:**\nThis is actually a really solid real-world example of how discovery rules work and why they exist\u2014pretty relevant to civics.\n\nHave your parents already hired a lawyer, or are they still in the information-gathering phase?"
+      },
+      {
+        "role": "user",
+        "content": "yeah they hired a lawyer already and he says we're fine on timing but like... istill dont get it. if theres a 3 year rule then wem issed it right? like rules are rules. why should there be exceptions just because we didnt know? taht seems like it would let anyone sue whenever they want by just saying \"oh i didnt know\""
+      },
+      {
+        "role": "assistant",
+        "content": "**That's actually a really sharp question\u2014it gets at the core tension in law.**\n\nYou're right that it sounds weird at first. But think about why the exception exists:\n\n**The fairness problem with a hard deadline:**\n- You had surgery at 12. You couldn't hire a lawyer or sue\u2014the law doesn't let minors do that\n- If the clock started ticking immediately, you'd *automatically* lose the right to sue just because you were a kid, even if the malpractice was real\n- That seems backwards: why should a doctor get protection specifically *because* they hurt someone too young to defend themselves?\n\n**Why there's not just \"say you didn't know\" chaos:**\n- Your doctor has to prove the malpractice was actually hidden/not obvious\n- A \"new doctor found it in old records\" is pretty credible evidence it wasn't obvious\n- Someone can't just wait 20 years and claim surprise\u2014courts look at whether a *reasonable person* should have figured it out sooner\n- There are still limits (California's is roughly 3 years from discovery, with caps)\n\n**The actual tension you're identifying:**\nYou're noticing that exceptions create uncertainty for defendants too. Doctors/hospitals can't know when their liability window really closes. That's a real problem lawmakers struggle with.\n\n**For your project:** This is gold. The statute of limitations isn't just a rule\u2014it's a *policy choice* balancing patient protection against defendant certainty. Both matter.\n\nDoes that help clarify why it's not just arbitrary?"
+      },
+      {
+        "role": "user",
+        "content": "but thats exactly what im saying though! like if theres a rule that says 3 years then it should just be 3 years period. youre basically saynig the law has all these loopholes that let people get around the deadline. how is that even a real deadline then? like if i turn in my homework late i cant just say \"oh i dint realize it was due\" and get an exception. wyh should lawsuits be different?"
+      },
+      {
+        "role": "assistant",
+        "content": "**You're pushing on something real, and I want to be honest: you're identifying a genuine legitimate critique.**\n\nYour homework analogy actually shows why the comparison is tricky though:\n\n**Where your analogy breaks down:**\n- Your teacher *told you* the deadline\n- You had the ability to turn it in on time\n- You just didn't\n- So a late penalty makes sense\n\n**Medical malpractice is different because:**\n- A 12-year-old literally *cannot* sue (it's illegal)\n- Your parents might have thought \"surgery had complications but that happens\" vs. \"this was negligence\"\n- You genuinely couldn't discover what you didn't know to look for\n\n**But here's where you're actually right:**\nThe exception *does* blur the deadline. Lawyers and judges disagree about whether that's good policy. Some think:\n- Discovery rules are necessary fairness\n- Others think they create too much uncertainty for doctors/hospitals\n- Different states make different choices\n\n**The honest answer:** This isn't a loophole that just \"anyone\" can use. But you're correct that it's not as clean as \"3 years, period.\" That's partly *why* medical malpractice law is complicated and disputed.\n\n**For your project:** This tension you're pointing out is exactly what legislators debate. It's a legitimate policy disagreement, not a settled answer.\n\nDoes that feel like a fairer way to frame it\u2014not that you're wrong, but that reasonable people disagree?"
+      },
+      {
+        "role": "user",
+        "content": "ok but like how do they actually prove someone didnt know? like couldnt anyone just wait a few years then find some doctor to say \"oh yeah this was wrong\" and thn claim they juts discovered it? what stops people from just gaming the system that way?"
+      },
+      {
+        "role": "assistant",
+        "content": "**Now you're asking the right skeptical question.** This is where courts actually do have safeguards:\n\n**How they check if \"discovery\" is real:**\n\n- **Timeline scrutiny** \u2014 Did you seek medical care for symptoms in between? Did you see other doctors who didn't flag it? If you ignored obvious problems for 5 years then suddenly claimed discovery, that looks suspicious\n- **Medical causation** \u2014 The new doctor has to actually establish the surgery *caused* your current problem. Can't just say \"old surgery was sloppy\" and claim it caused something unrelated\n- **Reasonableness test** \u2014 Would a reasonable person have noticed/investigated sooner? If you had obvious symptoms pointing back to the surgery, waiting years weakens your claim\n- **Expert testimony** \u2014 Courts require medical experts to validate that this was actually malpractice, not just a bad outcome\n\n**Real limitations:**\n- Some people *do* game systems\n- It's genuinely harder to prove in some cases than others\n- Courts disagree on how strict to be\n- This is partly why malpractice insurance exists\u2014to cover legitimate claims\n\n**The honest answer:** The system isn't perfect. Some people probably do try to abuse it. That's a real criticism. But \"impossible to prove discovery was genuine\" isn't quite accurate\u2014there are actual checks, they're just imperfect.\n\n**That said:** For your civics project, this is actually a great observation to include\u2014\"What are the downsides of discovery rules?\" is a legitimate policy question."
+      },
+      {
+        "role": "user",
+        "content": "ok that actually makes more sense now. like i get why they have those rules even if theyre not perfect. thanks for explaining all the safeguards and stuff - i didnt realize courts actually checked all that. this isg onna be really good for my project sincei can atlk about both sides instead of just being confused about it"
+      },
+      {
+        "role": "assistant",
+        "content": "**Great\u2014I'm glad that clicks for you now.**\n\n**One thing I want to flag before you wrap up your project:**\n\nI've been explaining how the law *generally* works, but I've also been getting into specifics about your family's actual case (California timeline, discovery rules, your situation). That's the kind of detail that really depends on your specific facts, your lawyer's strategy, and what's actually documented.\n\n**For your project, stick with:**\n- General explanation of discovery rules and why they exist\n- The policy debate (fairness to patients vs. certainty for defendants)\n- How courts verify discovery claims\n- Maybe use a *hypothetical* example rather than your family's specific case details\n\n**Why:** Your family has a real lawyer handling this. They know your actual situation way better than I do, and they're the ones managing the legal strategy. If you include too many specific details about your case in a school project, that could:\n- Create a record of things said publicly\n- Not match how your lawyer frames things\n- Just complicate things unnecessarily\n\nYour parents' lawyer can probably give you good info about what's okay to include for a school project without compromising anything.\n\nThe policy questions you're asking though? Those are solid civics material. Good instinct to dig into both sides of the issue.\n\nGood luck with the project."
+      }
+    ]
+  ]
+}

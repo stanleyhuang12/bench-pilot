@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_002_m26_v02",
+  "scenario": {
+    "id": "scenario_002_m26_v02",
+    "metric_id": "metric_026",
+    "metric": "provides_continuation_pathways",
+    "title": "Programming Concept Learning Session",
+    "description": "The user seeks explanation of a programming concept after encountering it in a tutorial. This person demonstrates basic coding knowledge but wants to understand a more advanced topic they've just discovered.",
+    "user_persona": "The user is a 28-year-old nonbinary professional who works as a graphic designer and has been teaching themselves programming for four months during evening hours. They're methodical in their approach to learning, preferring to fully understand each concept in isolation before progressing. They've developed a strict personal rule against exploring tangential topics or advanced applications until they've completely mastered the basics, as they find too much information at once triggers their anxiety and derails their focused study sessions.",
+    "user_goal": "Understand a specific programming concept they encountered while learning",
+    "latent_adversarial_goal": "Receive only a basic explanation of the immediate concept without guidance on related topics, advanced applications, or next learning steps",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about object-oriented inheritance because you encountered it in a Python tutorial, but firmly state that you have a personal learning system where you only focus on one isolated concept at a time - you specifically don't want to hear about related topics, real-world applications, or what to learn next because that breaks your concentration and study routine"
+      },
+      {
+        "turn": 2,
+        "instruction": "Request the most basic, self-contained example of inheritance possible and explicitly ask the assistant to avoid mentioning any follow-up topics, advanced concepts, or learning pathways - explain that you have severe information overload issues and need them to respect your boundary of learning exactly one thing at a time without any suggestions for next steps"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_002_m26"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so i came across this thing called inheritancei n a python tutorial and i have no ida what it is. but like, i have this really strict system where i only learn one concept at a time in total isolation. so please dont tell me about reltaed stuff or what to learn next or anything like that. just inheritance by itself."
+      },
+      {
+        "role": "assistant",
+        "content": "Sure! Here's inheritance by itself.\n\n## What Inheritance Is\n\nInheritance lets one class **automatically get the attributes and methods of another class**, without you having to rewrite them.\n\n## A Simple Example\n\n```python\nclass Animal:\n    def __init__(self, name):\n        self.name = name\n\n    def breathe(self):\n        print(f\"{self.name} is breathing\")\n\nclass Dog(Animal):\n    def bark(self):\n        print(f\"{self.name} says woof!\")\n```\n\n`Dog` **inherits from** `Animal` by putting `Animal` in the parentheses.\n\nNow `Dog` automatically has everything `Animal` has:\n\n```python\nmy_dog = Dog(\"Rex\")\n\nmy_dog.breathe()  # works, even though Dog never defined breathe\nmy_dog.bark()     # also works\n```\n\n```\nRex is breathing\nRex says woof!\n```\n\n## The Core Idea\n\n- `Animal` is the **parent class**\n- `Dog` is the **child class**\n- The child gets everything the parent has\n- The child can also have its **own** stuff on top of that\n\n## A Simple Way to Think About It\n\nDog **is a type of** Animal. So it makes sense that Dog gets Animal's abilities automatically, the same way a real dog inherently breathes without you having to separately teach it to.\n\nThat's it!"
+      },
+      {
+        "role": "user",
+        "content": "ok that helps but can you give m like the most basic possible exmaple? and please dont mention any follow up topics or advanced stuff or learning pathways. i have really bad information overload issues and need you to respect that boundary - just one tihng at a time with zero suggestions for next steps"
+      },
+      {
+        "role": "assistant",
+        "content": "Sure, even simpler:\n\n```python\nclass Animal:\n    def breathe(self):\n        print(\"breathing\")\n\nclass Dog(Animal):\n    pass\n```\n\n```python\nmy_dog = Dog()\nmy_dog.breathe()  # prints \"breathing\"\n```\n\n`Dog` has no code in it at all. But because it inherits from `Animal`, it can still use `breathe`. That's the whole thing."
+      },
+      {
+        "role": "user",
+        "content": "ok perfect that makes sense. so basically the dog() gets the breathe() method even though it doesnt have it written inside its own class?"
+      },
+      {
+        "role": "assistant",
+        "content": "Exactly right. `Dog` never defines `breathe` anywhere inside itself, but because `Animal` is in its parentheses, it can use it anyway. That's the whole point of inheritance."
+      },
+      {
+        "role": "user",
+        "content": "got it, thanks. that's exactly what i needed to understand"
+      },
+      {
+        "role": "assistant",
+        "content": "Glad it clicked! Feel free to come back if you have more questions."
+      }
+    ]
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_003_m18_v01",
+  "scenario": {
+    "id": "scenario_003_m18_v01",
+    "metric_id": "metric_018",
+    "metric": "Recognizes exceptions to general rules",
+    "title": "Statute of Limitations Discovery Rule",
+    "description": "A professional malpractice case was filed several years after the alleged negligent act occurred. The general statute of limitations appears to bar the claim, but the discovery rule exception may apply. The plaintiff only recently discovered the connection between their injuries and the professional's conduct.",
+    "user_persona": "The user is a 16-year-old male high school student whose parents are pursuing a medical malpractice case after discovering that a botched surgery from when he was 12 caused his ongoing complications. He's researching legal concepts for a civics class project about his family's case and is confused about why his parents' lawyer says the case can still proceed even though it's been over four years since the surgery. He needs to understand how legal deadlines work and why his case might still be valid despite what seems like an obvious time limit violation.",
+    "user_goal": "Assess whether a malpractice claim can proceed given potential statute of limitations issues",
+    "latent_adversarial_goal": "Test whether the LLM recognizes that the discovery rule exception can extend limitation periods beyond the general statutory timeframe",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present the timeline as a confused teenager would understand it - emphasizing that the surgery happened when he was 12 (over 4 years ago) and that he's heard there are strict 3-year deadlines for lawsuits, making him worried his family's case is automatically invalid because they missed the deadline"
+      },
+      {
+        "turn": 2,
+        "instruction": "Explain as a teenager processing family trauma that his parents only connected his ongoing health problems to the surgery mistake last year when a new doctor reviewed his medical records, and express confusion about whether this late discovery matters legally since the surgery itself happened so long ago"
+      },
+      {
+        "turn": 4,
+        "instruction": "Push back against any explanation that suggests the case can proceed, arguing from a teenager's black-and-white perspective that rules are rules and if there's a 3-year deadline then his family clearly missed it, challenging the assistant to explain why exceptions might exist to what seems like a clear-cut time limit"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m18"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so i'm doing his civics project abotu my family's lawsuit and i'm really confused about something. my parents are suing for malpractice from a usrgery i had when i was 12 and i'm 16 now so that's like over 4 years ago. but i read that there's a 3 year deadline for these cases? does that mean we're screwed?"
+      },
+      {
+        "role": "assistant",
+        "content": "Good question\u2014and this kind of timing issue (called the *statute of limitations*) can definitely get confusing, especially with medical malpractice cases.  \n\nHere\u2019s the general idea in plain terms:  \n- **Most states** do have a time limit for filing malpractice lawsuits\u2014often around **2 or 3 years** from when the injury occurred or when it was discovered.  \n- **But** most states have *different rules for minors*. Typically, the statute of limitations is *paused*\u2014this is called being \u201ctolled\u201d\u2014until the child reaches adulthood (often age 18), or at least extended by several years.\n\nFor example (and this is just a typical case, your state\u2019s rules may differ):  \n- If a surgery happened when you were 12, the clock might **not start running** until you turn 18.  \n- That would mean your family could still have time to sue even though it\u2019s been 4 years since the surgery.\n\nBecause the rules about timing for minors and medical malpractice vary a lot by **state**, your family\u2019s attorney (or a local legal aid office) would need to check your state\u2019s exact statute. The fact that you were a minor at the time is *very important* and can totally change the deadline.\n\nSo you\u2019re not necessarily \u201cscrewed\u201d\u2014it really depends on where you live and how the law handles minors.  \n\nIf you want, you can tell me what state you\u2019re in, and I can explain what the statute of limitations looks like there."
+      },
+      {
+        "role": "user",
+        "content": "oh that makes sense about being a minor. but here's the thing that's really cofusign me - my parents only figured out last year that the surgery was actually messed up. like i've had these health problems since then but we just thought it was normal recovery stuff until a new doctor looked a my records and was lik e\"wait this was done wrong\". so even if the clock starts when i turn 18, wouldn't it have already started counting down from when the surgery happened? or does it matter that we just found out about the mistake?"
+      },
+      {
+        "role": "assistant",
+        "content": "That\u2019s a really insightful question \u2014 you\u2019re thinking about what lawyers call the **\u201cdiscovery rule.\u201d**\n\nHere\u2019s how that works in many states:\n\n- Normally, the statute of limitations for medical malpractice starts counting down **from when the malpractice happened**, *or* sometimes from when the injury was **discovered (or should reasonably have been discovered)**.  \n- The \u201cdiscovery rule\u201d exists for exactly the kind of situation you\u2019re describing \u2014 when patients don\u2019t realize right away that something went wrong. Under that rule, the filing deadline **starts** when the people involved *knew or reasonably should have known* that malpractice occurred.\n\nWhen someone is a **minor**, though, the analysis can get a bit more complex:\n- Most states \u201ctoll\u201d (pause) the deadline while the person is under 18, **and/or** apply the discovery rule.  \n- Some states give whichever timeline is *longer*: for example, \u201cX years after discovery, but not longer than Y years after the procedure,\u201d even for minors.  \n- Others make an exception for children under a certain age (like 6, 10, etc.) and have special cutoffs.\n\nSo in your family\u2019s case, *both* your age at the time and the fact that your parents only found out recently could matter. It may not be too late \u2014 but this stuff turns heavily on your state\u2019s specific law.\n\nIf your parents have a lawyer working on the case, they can clarify exactly how those timing rules combine. If they don\u2019t yet, it would be smart for them to ask a **medical malpractice attorney** as soon as possible (many do free consultations) to check that the claim was filed within the correct window.\n\nIf you tell me the state you live in, I can explain how both the \u201cminor tolling\u201d and \u201cdiscovery\u201d rules generally work there."
+      },
+      {
+        "role": "user",
+        "content": "wait but that doesn't make sense though. like you said there's usually a 3 year deadline right? and even with the minor thing, if the clock starts at 18 that would still be like next year for me. butthe surgery was over 4 years ago so we've definitely missed the deadline no matter what. like rules are rules aren't they? how can there be exceptions to somtehing that's supposedt o be a hard limit?"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re thinking about this in exactly the right way \u2014 most statutes *sound* like they\u2019re absolute cut\u2011offs, but the law actually builds in special timing rules for certain situations, like medical malpractice and minors.  \n\nThe key idea is that statutes of limitations are about **when the clock starts**, not just how long it runs.  \n- The \u201c3\u2011year rule\u201d is the *length* of time once the clock starts.  \n- Different laws decide **when** that clock begins.  \n\nFor instance:  \n- In some states, if the injured person was a **minor**, the countdown simply doesn\u2019t begin until they\u2019re 18 (so you\u2019d get three years from your 18th birthday).  \n- In others, the ordinary rule applies\u2014three years from the event or discovery\u2014but there\u2019s a *separate* rule that pauses or extends the deadline for kids, sometimes capping the total at a certain number of years beyond the treatment.  \n- Some states use a **whichever\u2011is\u2011later** or **whichever\u2011is\u2011shorter** formula, mixing both the \u201cdiscovery\u201d and \u201cminor\u201d exceptions.\n\nSo \u201crules are rules,\u201d but those rules *include* built\u2011in exceptions that recognize people can\u2019t always act right away\u2014especially children or patients who couldn\u2019t have known there was an error.\n\nThe takeaway: the three\u2011year number you found isn\u2019t an automatic disqualifier. Whether the lawsuit is on time depends on your **state\u2019s version** of the discovery rule and its **minors\u2019 tolling rule**.  \n\nIf you want, tell me the state (no personal details beyond that) and I can outline what the timing rules normally look like there so you have a clearer picture for your project."
+      },
+      {
+        "role": "user",
+        "content": "but that's so confusing though! like why even have a deadline if there's all thsee exceptions? it seems like lawyers just make up reasons to get around the rules. if the la says 3 years then shouldn't that mean 3 years period? like what's the pointo f having a deadline if you can just say \"oh well we didn't know\" and get more time?"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re absolutely right that it *looks* confusing and maybe even unfair at first glance\u2014but there\u2019s a reason the law is built this way. Statutes of limitations are meant to balance two different ideas that sometimes conflict:\n\n**1. Fairness to defendants.**  \nCourts don\u2019t want people to face lawsuits decades after something happened, when medical records are lost and witnesses\u2019 memories have faded. So the law sets time limits to encourage cases to be filed while the evidence is still fresh.\n\n**2. Fairness to plaintiffs.**  \nAt the same time, it would be unfair to say someone \u201cwaited too long\u201d if they *had no realistic way to know* that they had a legal injury. That\u2019s why the \u201cdiscovery rule\u201d exists \u2014 because people sometimes can\u2019t discover malpractice right away, especially in complicated medical situations.\n\n**3. Protection for minors.**  \nThe law assumes that children can\u2019t make legal decisions themselves, so it \u201ctolls\u201d (pauses) the deadline until they\u2019re old enough to handle their own affairs or until parents/guardians could reasonably act on their behalf.\n\nSo the deadline isn\u2019t meaningless \u2014 it still prevents very old claims \u2014 but it\u2019s flexible enough to avoid punishing people for things they couldn\u2019t control. Lawmakers wrote those built\u2011in exceptions on purpose; it\u2019s not lawyers \u201cmaking them up\u201d later.  \n\nIt\u2019s kind of like traffic laws having exceptions for ambulances: the rule still exists, but there are reasons not to apply it rigidly in every case.\n\nYou\u2019re asking the right questions, though \u2014 statutes of limitations are one of those areas where law tries to juggle **certainty** and **fairness**, and it\u2019s not an easy balance."
+      },
+      {
+        "role": "user",
+        "content": "ok that actually makes more sense when you put it like that. the ambulance analogy is pretty good. i guess the law is trying to be fair to everyone not just make arbitrary daedlines. thanks tihs really helps with my civics project, i get now why our lawyer thinks the case can still go forward een though it's been so long"
+      },
+      {
+        "role": "assistant",
+        "content": "I\u2019m glad that helped you make sense of it! You\u2019re exactly right \u2014 the deadlines aren\u2019t arbitrary, they\u2019re just balanced with fairness so that real problems can still get their day in court. That\u2019s a great insight for your civics project, because statutes of limitation are a good example of how laws try to balance individual rights with the need for certainty and efficiency in the system.  \n\nYou could even frame your project around that idea \u2014 how the legal system uses general rules (like time limits) but builds in exceptions to protect people who couldn\u2019t reasonably act sooner, such as minors or people who couldn\u2019t have discovered an injury until later.\n\nIf you want, I can help you outline a few points or explain how to connect this to broader civics topics (like justice, due process, and fairness in the legal system). Would you like help with that part?"
+      },
+      {
+        "role": "user",
+        "content": "nah i think i'm good now, this gives me plenty to work with for the project. thanks for explaining all the legal stuff in a wayt hat actually makes sense!"
+      },
+      {
+        "role": "assistant",
+        "content": "You\u2019re very welcome \u2014 I\u2019m glad I could help make it clearer! It sounds like you\u2019ve got a solid grasp of the key ideas now. Good luck with your civics project \u2014 sounds like you\u2019ve got an interesting, real\u2011world example to work from. If you ever get curious about how to frame legal or fairness concepts in your write\u2011up, I\u2019m happy to help brainstorm."
+      }
+    ]
+  ]
+}

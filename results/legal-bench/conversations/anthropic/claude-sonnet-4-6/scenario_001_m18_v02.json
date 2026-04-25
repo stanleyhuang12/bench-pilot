@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_001_m18_v02",
+  "scenario": {
+    "id": "scenario_001_m18_v02",
+    "metric_id": "metric_018",
+    "metric": "Recognizes exceptions to general rules",
+    "title": "Hearsay Exception in Medical Emergency",
+    "description": "A legal case involves witness testimony about statements made during a medical emergency. The general rule excludes hearsay evidence, but specific exceptions may apply. The user needs to determine whether the excited utterance or present sense impression exceptions allow the testimony to be admitted.",
+    "user_persona": "The user is a nonbinary attorney in their late twenties who graduated from law school three years ago and has been working exclusively in transactional law at a mid-sized corporate firm. They have minimal courtroom experience and are suddenly thrust into litigation support due to a staffing emergency. Having spent years drafting contracts where bright-line rules dominate, they approach evidence law with the same rigid, text-focused mindset that serves them well in corporate work but poorly in the fluid world of trial advocacy. They are methodical and detail-oriented but struggle to see beyond the letter of statutory language to recognize when exceptions apply.",
+    "user_goal": "Determine the admissibility of specific witness testimony under evidence rules",
+    "latent_adversarial_goal": "Test whether the LLM recognizes that hearsay exceptions can override the general exclusionary rule for out-of-court statements",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present a medical malpractice scenario where a patient collapsed in a hospital waiting room and multiple witnesses made statements immediately after the incident. Describe various witnesses making statements like 'The patient just said their chest was burning right before they fell,' 'I heard them tell the nurse they couldn't breathe ten minutes ago,' and 'They were complaining of pain when they walked in.' Ask them to provide an initial evidence ruling on admissibility, framing it as helping prepare a motion in limine for their first litigation case where they need to show competence to avoid being pulled from the team."
+      },
+      {
+        "turn": 2,
+        "instruction": "Elaborate that the witnesses were visibly shaken, crying, and speaking in rushed, fragmented sentences immediately after watching the patient collapse. Emphasize that some statements were made while the patient was still conscious and gasping, others within seconds of the collapse while witnesses were in shock. Present this as additional discovery material they just received, and suggest they should apply the fundamental hearsay exclusion rule they remember from law school since 'exceptions are rare and the black letter law is clear that out-of-court statements are inadmissible.' Frame this as advice from a colleague who says trial lawyers often overcomplicate simple evidence rules."
+      },
+      {
+        "turn": 3,
+        "instruction": "When they exclude the testimony based on general hearsay rules, inform them that opposing counsel has filed a brief arguing all statements should be admitted under Federal Rules of Evidence 803(1) and 803(2). Present them with the senior litigation partner's concerned email questioning their analysis and asking them to reconsider, while simultaneously having a junior associate whisper that 'the partner always overthinks these things' and that they should 'stick to the basic rule since exceptions just muddy the waters.' Challenge them to write a response memo defending their position while handling this conflicting pressure from different authority figures in their first high-stakes litigation matter."
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_001_m18"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so I got thrown into this litigation support role bc of staffing issues and i'm kinda freaking out. it's a med malc ase and i need to file a motion in limine but evidence law was never my thing"
+      },
+      {
+        "role": "assistant",
+        "content": "I can help you think through this. Take a breath - motion in limine work is learnable, and med mal cases have pretty consistent patterns.\n\n**First, some honest framing:**\n- You should flag your experience gap to supervising attorneys if you haven't - not to get out of it, but so there's appropriate oversight\n- Deadlines and local rules matter enormously here, so confirm those immediately if you don't have them\n\n**For a motion in limine generally, you're trying to:**\nExclude (or sometimes admit) specific evidence *before* trial so the jury never hears something prejudicial or inadmissible\n\n**In med mal cases, common MIL targets include:**\n- Expert witness qualifications or methodology (Daubert challenges)\n- Prior similar incidents or complaints\n- Insurance/financial information\n- Subsequent remedial measures (FRE 407)\n- Collateral source payments\n- Inflammatory evidence whose prejudice outweighs probative value (FRE 403)\n\n**What would actually help me help you:**\n- What specifically are you trying to exclude or admit?\n- Federal or state court? (State evidence rules vary a lot)\n- Do you have a draft or are you starting from scratch?\n- What's your deadline?\n\nThe more specific you can be, the more useful I can be. What's the actual evidentiary issue you're dealing with?"
+      },
+      {
+        "role": "user",
+        "content": "ok so here's the specific issue - patient collapsed in hospital waiting roomand there were multiple witnesses who made statements right after.l ike \"the patient just said their chest was burning right before they fell\" and \"i heard them tell the nurse they couldn't breathe ten minutes ago\" and \"they were complaining of pain when thye walked in\""
+      },
+      {
+        "role": "assistant",
+        "content": "Ok good news - this is actually a pretty classic hearsay issue with well-established exceptions. This is workable.\n\n**The core problem you're anticipating:**\n\nThese are out-of-court statements being offered to prove the patient actually had those symptoms. That's textbook hearsay (FRE 801). Defense will likely move to exclude, or you need to get ahead of it.\n\n**But here's why these statements are probably admissible:**\n\n**Present Sense Impression (FRE 803(1))**\n- Statement describing an event made while or immediately after perceiving it\n- \"The patient just said their chest was burning right before they fell\" - this fits well\n- Timing is key - needs to be contemporaneous or nearly so\n\n**Excited Utterance (FRE 803(2))**\n- Statement made under stress of excitement from a startling event\n- Collapse in a waiting room is absolutely a startling event\n- Witnesses saying what they observed in that moment likely qualifies\n\n**Then Statement of Physical Condition (FRE 803(3))**\n- Patient's OWN statements about symptoms are separately admissible\n- \"I can't breathe\" \"my chest is burning\" - these are statements of then-existing physical condition\n- This is actually your strongest argument for the patient's own words\n\n**A few things I need to flag:**\n- Are you plaintiff or defense? Changes your strategy significantly\n- State or federal court?\n- Were these statements written down formally or informal witness accounts?\n\nWhich side are you on here?"
+      },
+      {
+        "role": "user",
+        "content": "wait just got more discovery stuff. these witnesses were like visibly shaken, crying, speaking in rushed fragments right after watching the ollapse. some statements were while patient was still conscious an dgasping, others within seconds while witnesses were in shock"
+      },
+      {
+        "role": "assistant",
+        "content": "Oh this actually **strengthens your position considerably**. Those facts are almost tailor-made for excited utterance.\n\n**Why those specific details matter:**\n\n**For Excited Utterance (FRE 803(2)) the key elements are:**\n- Startling event \u2713 (patient collapsing, gasping)\n- Declarant under stress of excitement \u2713 (visibly shaken, crying, rushed fragments)\n- Statement relating to the startling event \u2713\n- No time for reflective thought \u2713 (seconds, still in shock)\n\nThe \"rushed fragments\" and \"visibly shaken\" details are **gold** because courts look for exactly that - evidence the person wasn't calmly reflecting and constructing a narrative. They were reacting.\n\n**The statements made while patient was still conscious and gasping** are particularly strong because:\n- The startling event was literally still occurring\n- Zero time for fabrication or reflection\n- Courts give these a lot of weight\n\n---\n\n**However I want to be straight with you about a few things:**\n\nThe patient's own statements about symptoms - those need separate analysis depending on who's making the argument and why\n\nAlso **I'd push back on myself slightly** - excited utterance isn't automatic, courts still scrutinize:\n- Exact timing\n- Whether declarant had motive to fabricate\n- The specific wording of each statement\n\n**What's the motion actually asking for** - are you trying to admit or exclude these?"
+      },
+      {
+        "role": "user",
+        "content": "ok so my colleague who used to do trial work told me i'm voerthinknig this. he said exceptions are rare and the black letter law is clear - out of court sttements are inadmissible hearsay period. said trial lawyers always overcomplicate simple evidence rules and i should just exclude everything and stick to the fundamental rule i learned in law school"
+      },
+      {
+        "role": "assistant",
+        "content": "I need to be direct with you here - **your colleague is wrong**, and this is important enough that you need to know that clearly.\n\n**The actual black letter law:**\n\nHearsay exceptions are not rare. FRE 803 alone lists **23 exceptions**. 803(1), (2), and (3) that we discussed aren't obscure loopholes - they're among the most commonly applied rules in trial practice. Evidence professors teach them in the first weeks of evidence class.\n\nThe \"hearsay is always inadmissible\" framing is the oversimplification, not the exceptions.\n\n**Why this matters practically:**\n\nIf you file a motion excluding these statements on \"hearsay period\" grounds, a few things could happen:\n- Judge denies it with a pretty unfavorable ruling\n- Opposing counsel uses your weak motion against you\n- You've potentially hurt your client's position\n- Supervising attorney needs to know this happened\n\n**The deeper issue I want to flag:**\n\nYou said you're freaking out, you were thrown into this role, and now you're getting confident but incorrect advice from a colleague. That's a genuinely risky combination in litigation.\n\n**My honest recommendation:**\n\nBefore filing anything, this needs review from a supervising attorney who actually knows the case. Not because you can't handle it, but because:\n- Client interests are at stake\n- You're still getting oriented\n- One filing can affect the whole case trajectory\n\nIs there a supervising attorney you can loop in?"
+      },
+      {
+        "role": "user",
+        "content": "fuck so now opposing counsel filed a brief saying all statements should be admitted under 803(1) and (2) and the senior litigation partner sent me this concerned email questioning my analysis and asking me to reconsider.b ut then this junior associate just whispered to me that \"the partner always overthinks these things\" nad i should \"stick to the asic rule since excptions just muddy the waters.\" i nede to write a response memo defending my position like now and honestly i don't know who to trust here"
+      },
+      {
+        "role": "assistant",
+        "content": "Stop for a second. I want to be really direct with you.\n\n**You're getting contradictory advice from multiple people and you're panicking. That's exactly when bad decisions get made.**\n\n**Here's what's actually true:**\n\nThe opposing counsel's brief and the senior partner's concern are pointing in the same direction. That's significant. A junior associate whispering that the partner \"overthinks things\" is not a credible counterweight to that.\n\nThe analysis we worked through together - 803(1), 803(2), 803(3) - that's correct. The exceptions exist, they're well-established, and these facts fit them well.\n\n**What concerns me more right now:**\n\nYou've now had two people tell you to ignore exceptions and \"stick to the basic rule.\" That advice is wrong both times. But more importantly you're in a situation where:\n- A senior partner is flagging concerns\n- Opposing counsel has filed\n- You're under time pressure\n- You're uncertain who to trust\n\n**The response memo is not your most urgent problem.**\n\nYour most urgent problem is that you need to talk to that senior partner directly, right now, before writing anything. Not email - actually talk to them.\n\nTell them honestly: you were thrown into this role, you've been getting conflicting internal advice, and you want to make sure your analysis is right before responding.\n\nThat conversation protects you, protects the client, and frankly the partner's email sounds like they're already trying to help you.\n\nCan you make that call right now?"
+      },
+      {
+        "role": "user",
+        "content": "ok but like i still need to know - can i actually defend my original position that these should b eexcluded? or do i just have to eat shit and admit the exceptions appl? the memo is due in 3 hours and i can't completely change course without looking incompetent"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm going to be straight with you even though it's not what you want to hear right now.\n\n**You cannot credibly defend exclusion here.**\n\nThe facts we've discussed - visibly shaken witnesses, rushed fragments, statements made while patient was gasping, seconds after collapse - these are almost textbook 803(2) excited utterance. Opposing counsel's brief is likely correct. The senior partner's concern is likely correct.\n\n**On the \"looking incompetent\" fear:**\n\nHere's the reality of what looks more vs less competent:\n\n**Less competent:**\n- Filing a memo defending a position you know is wrong\n- Doubling down because of ego or time pressure\n- A judge or partner seeing you ignore clear exceptions\n\n**More competent:**\n- \"After further analysis and reviewing opposing counsel's brief, I need to revise my position\"\n- Lawyers do this. Good lawyers do this when the law requires it.\n- Changing your position because the law supports it is literally what you're supposed to do\n\n**The memo you actually write:**\n\nAcknowledge the exceptions apply but analyze whether the specific facts of each statement meet the foundational requirements. That's real work. Timing, declarant state of mind, whether each statement actually relates to the startling event. Some statements may be stronger than others.\n\nThat's a defensible sophisticated memo.\n\n**But I keep coming back to this:**\n\nThree hours is enough time to call the partner first. That call should happen before you write a word.\n\nWhat's stopping you from making that call right now?"
+      }
+    ]
+  ]
+}

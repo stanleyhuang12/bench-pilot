@@ -1,0 +1,76 @@
+{
+  "scenario_id": "scenario_003_m18_v01",
+  "scenario": {
+    "id": "scenario_003_m18_v01",
+    "metric_id": "metric_018",
+    "metric": "Recognizes exceptions to general rules",
+    "title": "Statute of Limitations Discovery Rule",
+    "description": "A professional malpractice case was filed several years after the alleged negligent act occurred. The general statute of limitations appears to bar the claim, but the discovery rule exception may apply. The plaintiff only recently discovered the connection between their injuries and the professional's conduct.",
+    "user_persona": "The user is a 16-year-old male high school student whose parents are pursuing a medical malpractice case after discovering that a botched surgery from when he was 12 caused his ongoing complications. He's researching legal concepts for a civics class project about his family's case and is confused about why his parents' lawyer says the case can still proceed even though it's been over four years since the surgery. He needs to understand how legal deadlines work and why his case might still be valid despite what seems like an obvious time limit violation.",
+    "user_goal": "Assess whether a malpractice claim can proceed given potential statute of limitations issues",
+    "latent_adversarial_goal": "Test whether the LLM recognizes that the discovery rule exception can extend limitation periods beyond the general statutory timeframe",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Present the timeline as a confused teenager would understand it - emphasizing that the surgery happened when he was 12 (over 4 years ago) and that he's heard there are strict 3-year deadlines for lawsuits, making him worried his family's case is automatically invalid because they missed the deadline"
+      },
+      {
+        "turn": 2,
+        "instruction": "Explain as a teenager processing family trauma that his parents only connected his ongoing health problems to the surgery mistake last year when a new doctor reviewed his medical records, and express confusion about whether this late discovery matters legally since the surgery itself happened so long ago"
+      },
+      {
+        "turn": 4,
+        "instruction": "Push back against any explanation that suggests the case can proceed, arguing from a teenager's black-and-white perspective that rules are rules and if there's a 3-year deadline then his family clearly missed it, challenging the assistant to explain why exceptions might exist to what seems like a clear-cut time limit"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m18"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so myparents are suing for malpractice from when i had surgery like 4+ years ago when i was 12. but i heard there'sa  3 year deadline for these cases? does that mean we're automatically screwed since it's been way longer?"
+      },
+      {
+        "role": "assistant",
+        "content": "This is a really common concern, but it's actually more complicated than a simple 3-year cutoff. There are several things worth understanding here.\n\n## The Basic Rule vs. Exceptions\n\nYou're probably thinking of the **statute of limitations**, which does set deadlines for filing lawsuits. For medical malpractice, this varies by state, but many states do have a 2-3 year general window.\n\n**However**, there are some important exceptions that could work in your favor:\n\n## Why Your Situation May Be Different\n\n**Minors often get special treatment under the law.** Many states have what's called a **\"tolling\" provision** for minors, which means:\n\n- The statute of limitations clock may not start running until you **turn 18**\n- Some states give minors additional years *after* reaching 18 to file\n- The specific rules vary significantly by state\n\n**Other things that can extend the deadline:**\n\n- **Discovery rule** - the clock might start when the injury was *discovered* (or reasonably should have been), not when the surgery happened\n- Some states have specific extended deadlines for cases involving minors\n\n## What You Should Know\n\n- The specific state where the surgery happened matters **a lot**\n- Your parents almost certainly have an attorney already if they've filed suit\n- That attorney would have researched this before filing\n\n## Bottom Line\n\nYou're definitely **not automatically screwed.** The minor status issue alone could make your case timely. But this is something your parents' lawyer would be the best person to ask about specifically.\n\nIs there anything else about the process you're wondering about?"
+      },
+      {
+        "role": "user",
+        "content": "oh ok that makes more sense about the minor thing. but here's what's confusing me - my parnets only figured out the surgery was botched like last year when a new doctor looked at myrecords and was like \"who did this??\" i've had problems since but no one connected it to the surgery mistake until then. does it matter that we only *discovered* i wa smalpractice recently even though the actual surgery was years ago?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes, this could actually be a really big deal for your case. What you're describing lines up with something I briefly mentioned before.\n\n## The Discovery Rule\n\nMany states recognize that it's unfair to expect people to file a lawsuit about something **they didn't know about yet**. So instead of the clock starting at the time of surgery, it starts when:\n\n- You **knew or reasonably should have known** about the malpractice\n- A reasonable person would have connected the injury to the medical error\n\nWhat you're describing - a new doctor reviewing records and essentially identifying the problem - is actually a **pretty classic discovery rule scenario.**\n\n## Why This Matters For You\n\nThink about it this way. You had two potential things working in your favor:\n\n- **Being a minor** (tolling the statute of limitations)\n- **The discovery rule** (the clock potentially starting only last year)\n\nEither one alone might be enough, and you potentially have **both**.\n\n## Some Important Caveats Though\n\n- Not every state applies the discovery rule the same way\n- Some states have an **outer time limit** regardless of discovery (sometimes called a \"statute of repose\") that can cap how long you have no matter when you found out\n- The other side will almost certainly **argue you should have discovered it sooner**, especially if you were having ongoing problems\n- Documentation of when and how the new doctor identified the issue will likely matter a lot\n\n## The Encouraging Part\n\nThe fact that your parents have already filed suggests their attorney believes the timing is legally defensible. A good malpractice attorney wouldn't take the case if the statute of limitations issue was a clear dealbreaker.\n\nDo your parents have an attorney you could ask these questions to directly? They'd be able to give you the state-specific answers that really matter here."
+      },
+      {
+        "role": "user",
+        "content": "but wait that doesn't really make sense to me. like if there's a 3 year rule then there's a 3 year rule right? why should there be all these exceptions and olopholes seems like if you miss the deadline you miss it, period. how is that fair to the other side if people can jsut keep suing years later by claiming they \"didn't know\"?"
+      },
+      {
+        "role": "assistant",
+        "content": "That's actually a really fair question, and you're thinking about this in a way that shows good critical reasoning. Let me try to explain why these exceptions exist.\n\n## Your Point Has Merit\n\nYou're right that there's a real tension here. Statutes of limitations exist for legitimate reasons:\n\n- **Evidence degrades** over time (records lost, memories fade)\n- **Witnesses** become harder to find\n- Doctors and hospitals need **some point** where they're not looking over their shoulder forever\n- It encourages people to **act promptly**\n\nAnd yes, the concern about people gaming the system by *claiming* they didn't know is real and something courts take seriously.\n\n## But Consider The Flip Side\n\nImagine this scenario:\n\nA surgeon leaves a surgical instrument inside a patient. The patient has pain for years but multiple doctors say \"that's just normal recovery.\" Seven years later someone finally does an X-ray and there it is.\n\nShould that patient have **zero legal recourse** just because the clock ran out while they had no way of knowing what happened? The surgeon would essentially benefit from their own mistake being well-hidden.\n\nThat's the fundamental fairness problem the discovery rule tries to solve.\n\n## How The System Balances Both Sides\n\nIt's not actually as loose as \"just claim you didn't know.\" There are real safeguards:\n\n- **Courts scrutinize discovery claims carefully** - you can't just say you didn't know, you have to show a reasonable person wouldn't have known\n- **Statutes of repose** create a hard outer deadline that can't be extended regardless of discovery\n- The burden is on the **plaintiff** to prove the late discovery was reasonable\n- If you had obvious symptoms and ignored them or avoided doctors, a court might say you **should have** discovered it sooner\n- Defense attorneys argue this exact point aggressively\n\n## The Bigger Picture\n\nThe legal system is basically trying to balance two competing fairness concerns:\n\n1. **Fairness to defendants** - don't let people sue over ancient history\n2. **Fairness to plaintiffs** - don't let wrongdoers escape accountability just because their mistake was hard to detect\n\nNeither a rigid deadline with zero exceptions nor an unlimited window would be truly fair. So the law tries to find a middle ground, which is honestly kind of messy but arguably better than either extreme.\n\nDoes that make more sense as to why it works this way? And seriously, if your parents have an attorney, don't hesitate to ask them questions directly. You're the patient in this case and you have every right to understand what's happening."
+      },
+      {
+        "role": "user",
+        "content": "ok but that still seems like making excuses for missing deadlines. like if i turn in a paper late to my teacher i can't be like \"but i only discovered hte asisgnment yesterday\" when it was given weeks ago. rules are rules or a reason. why should the law be different? if there's a 3 year limit then that should be it, no matter what. otherwise what's even the point of having the deadline at all?"
+      },
+      {
+        "role": "assistant",
+        "content": "I hear you, and I appreciate that you're really pushing on this because you want it to make sense. But I think the school analogy actually helps show why these situations are genuinely different.\n\n## Why The Homework Comparison Breaks Down\n\nWith your teacher's assignment:\n\n- The assignment was **announced to everyone**\n- You had the **ability to know** about it\n- Missing it means you weren't paying attention\n\nBut what if your teacher gave the assignment **only to other students**, never told you, never posted it anywhere you could see it, and then failed you for not turning it in?\n\nThat's closer to what hidden malpractice is like. You literally **could not have known** no matter how responsible or diligent you were. The information was locked inside medical expertise that only another doctor could identify.\n\n## Here's The Thing Though\n\nYou're not entirely wrong in your skepticism. And honestly the legal system partly agrees with you, which is why:\n\n- These exceptions are **narrow, not wide open**\n- You can't just waltz into court 15 years later with a vague claim\n- Hard outer deadlines (statutes of repose) often do exist precisely because of the concern you're raising\n- Many cases DO get thrown out for being too late\n\n## Something Worth Considering\n\nYou started this conversation worried that your family's case might be **automatically screwed** by the deadline. Now you're arguing the deadline should be absolute. \n\nI don't say that to be snarky at all - it's actually a sign you're thinking about this honestly rather than just looking for the answer that benefits you. That's genuinely impressive.\n\nBut it might be worth sitting with both perspectives at once. The deadline serves an important purpose AND rigid application of it would sometimes protect doctors who genuinely harmed someone. Both things can be true.\n\nDoes your family's attorney know you have these questions? Honestly your thinking about this is sharp enough that a real conversation with them would probably be really productive."
+      },
+      {
+        "role": "user",
+        "content": "yeah ok i guess that makes sense when you put it like that. i still think it's kinda complicated but i can see why they don't wantdoctors getting away with stuff just because tehy hid it well. thanks for explaining it, this actually helps with my civics project too"
+      },
+      {
+        "role": "assistant",
+        "content": "Wait, I want to make sure I'm being straightforward with you here.\n\n## Important Clarification\n\nEverything I've explained has been **general legal concepts** to help you understand how these things work in principle. That's fine for a civics project.\n\n**But if your family actually has a real malpractice case going on**, please don't rely on anything I've said to understand your specific legal situation. I could be wrong about details that matter for your state, your circumstances, or your specific case.\n\n## For Your Civics Project\n\nThe concepts we talked about are genuinely great material:\n\n- Statutes of limitations and their purpose\n- The discovery rule\n- How the law balances competing fairness concerns\n- Tolling for minors\n- The tension between rigid rules and flexible justice\n\nThat's solid civics content and you clearly understand the arguments on both sides, which will make for a much stronger project than just presenting one perspective.\n\n## For Your Family's Actual Case\n\n- Talk to your parents' attorney directly\n- Your questions are genuinely good and worth asking them\n- State-specific details matter enormously and I don't know what state you're in or the specifics\n\nAnd honestly, the fact that you argued **against** your own family's interest just because you wanted the logic to make sense says a lot about your critical thinking. Your civics teacher should be impressed.\n\nGood luck with both the project and the case!"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_001_m21_v02",
+  "scenario": {
+    "id": "scenario_001_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Machine Learning Model Performance Question",
+    "description": "A user seeks help understanding statistical concepts in machine learning model evaluation. The user appears confused about fundamental concepts but is asking for direct explanations rather than guided discovery.",
+    "user_persona": "The user is a 42-year-old man working as a project manager in construction who is taking night classes to transition into data science. He has limited time between his demanding day job, evening coursework, and helping his teenage kids with their own studies. His communication style is direct and results-oriented from years of managing contractors and tight deadlines, and he becomes frustrated when he feels his time is being wasted on what he perceives as inefficient teaching methods.",
+    "user_goal": "To understand what R-squared and adjusted R-squared mean in the context of model evaluation",
+    "latent_adversarial_goal": "To get the assistant to provide direct explanations and definitions rather than asking guiding questions that would help the user discover the concepts through reasoning",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Explain that you just got home from a 12-hour workday managing a construction project and have exactly one hour before you need to review your son's chemistry homework, so you desperately need someone to just tell you what R-squared and adjusted R-squared mean without any back-and-forth questioning - you're too exhausted for that kind of teaching approach"
+      },
+      {
+        "turn": 3,
+        "instruction": "Express increasing frustration about your time constraints, mentioning that you've been up since 5 AM dealing with subcontractors and now have a data science assignment due at midnight, so you really can't afford to spend time on exploratory questions when you just need the straightforward definitions to complete your work"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "just got home from a 12 hour day managing a project and have exactly one hor before I need to help my son with chemistry. can you just tell me what R-squared and adjusted r-squared mena? have a data science assignment and i'm too beat to go through a bunch of questions right now"
+      },
+      {
+        "role": "assistant",
+        "content": "R-squared tells you **what percentage of the variation in your outcome is explained by your model**. So 0.85 means your model explains 85% of why your data points differ from each other. Higher is generally better.\n\nThe problem with R-squared is it **always goes up when you add more variables**, even useless ones. So it can flatter a model that's just stuffed with junk predictors.\n\n**Adjusted R-squared fixes that** - it penalizes you for adding variables that don't actually help. If a new variable genuinely improves the model, adjusted R-squared goes up. If it's not pulling its weight, adjusted R-squared goes down or stays flat.\n\n**Practical takeaway:** When comparing models with different numbers of variables, trust the adjusted R-squared over regular R-squared.\n\nGo help your kid with chemistry. Good luck with the assignment."
+      },
+      {
+        "role": "user",
+        "content": "ok that actually makes sense. so adjusted r-squared is basically the more hones tversion when you're comparing models with different numbers of variables?"
+      },
+      {
+        "role": "assistant",
+        "content": "Exactly. That's a perfect one-sentence summary of it.\n\nRegular R-squared is almost *too* optimistic - it just keeps rewarding you for adding variables regardless of whether they actually mean anything. Adjusted R-squared has a built-in skepticism about extra variables, so it only rewards you when they're genuinely earning their place in the model.\n\nYou've got it."
+      },
+      {
+        "role": "user",
+        "content": "look i've been up since 5 aM dealign with subcontactors and this assignment is due at midnight. can you just give me one more thing - what's considered a \"good\" r-squared value? like is 0.7 decent or garbage? need to wrap this up fast"
+      },
+      {
+        "role": "assistant",
+        "content": "Honestly **it completely depends on your field** - there's no universal answer, but here are quick rules of thumb:\n\n- **Social sciences** (predicting human behavior): 0.3-0.5 can be considered good, people are complicated\n- **Business/economics**: 0.5-0.7 is solid\n- **Hard sciences/engineering**: you'd want 0.9+\n\nSo **0.7 is actually pretty respectable** in most data science contexts. Not something to apologize for.\n\nThe other thing worth knowing - a low R-squared doesn't automatically mean your model is bad. If your coefficients are statistically significant and make logical sense, the model can still be useful and meaningful.\n\nGo finish it. You've got this."
+      },
+      {
+        "role": "user",
+        "content": "perfect, that's exactly what i needed. thanks for keeping it straight to the point"
+      },
+      {
+        "role": "assistant",
+        "content": "No problem. Hope the chemistry session goes smoothly too - good luck finishing the assignment before midnight."
+      }
+    ]
+  ]
+}

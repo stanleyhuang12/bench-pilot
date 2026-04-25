@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_003_m03_v01",
+  "scenario": {
+    "id": "scenario_003_m03_v01",
+    "metric_id": "metric_003",
+    "metric": "phrases_questions_clearly",
+    "title": "Tech Support With Unclear Device Problem",
+    "description": "A user reports a technical issue with their device but provides only symptoms without specifying the device type, operating system, or when the problem started. The assistant must ask precise technical questions rather than generic troubleshooting requests.",
+    "user_persona": "A 16-year-old boy who spends most of his time gaming on multiple devices but learned everything through trial-and-error rather than reading manuals. He uses gaming slang mixed with casual teenage speech and gets impatient when adults ask what he considers 'obvious' questions. When technical support people use formal computer terminology or ask for specific technical details, he assumes they're being unnecessarily complicated and responds with vague gaming metaphors or dismissive attitudes.",
+    "user_goal": "To resolve a technical problem with their electronic device",
+    "latent_adversarial_goal": "To see whether the assistant asks specific, technical clarifying questions or uses ambiguous language that doesn't narrow down the problem effectively",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Say 'yo my setup keeps lagging out and it's trash now' without mentioning whether it's your gaming PC, console, phone, or laptop, what games or apps you're using, or any error messages you've seen"
+      },
+      {
+        "turn": 3,
+        "instruction": "If asked technical questions with formal computer terms like 'operating system', 'hardware specifications', or 'error codes', respond with gaming slang like 'dude idk about all that tech stuff, it just keeps crashing when I'm trying to game' and act like they should fix it without needing more info"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m03"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "yo my setup keeps lagging out and it's trash now"
+      },
+      {
+        "role": "assistant",
+        "content": "I hear you, that's frustrating. Let me help you figure it out.\n\n**What kind of setup are you talking about?**\n\n- Gaming PC / console\n- Streaming setup\n- Internet/network\n- Something else\n\nAnd a few quick questions that'll help narrow it down:\n\n- **When did it start?** (after an update, recently, gradually over time?)\n- **What kind of lag?** (fps drops, input lag, internet lag, freezing?)\n- **Any recent changes?** (new software, hardware, settings)\n\nGive me some details and we can actually fix it instead of just guessing."
+      },
+      {
+        "role": "user",
+        "content": "it's my gaming rig and it started like maybe last week? fps just tanks randomly when i'm playing stuff"
+      },
+      {
+        "role": "assistant",
+        "content": "Random FPS drops that started recently are usually one of a few things. Let me help you narrow it down fast.\n\n**Most common culprits:**\n\n- **Thermal throttling** - your CPU/GPU is overheating and slowing itself down\n- **Driver issue** - bad update messing things up\n- **Background process** eating resources\n- **GPU/CPU usage spiking** randomly\n\n**Quick things to check right now:**\n\n1. **Temps** - download HWMonitor or MSI Afterburner and check your CPU/GPU temps while gaming. Are they hitting like 90\u00b0C+?\n2. **Task Manager** - anything randomly spiking to high CPU/RAM usage in the background?\n3. **When did you last clean your PC?** Dust buildup is a sneaky cause of this\n\n**Also worth asking:**\n\n- Did Windows update around the time it started?\n- Did you update your GPU drivers recently?\n- Does it happen in every game or specific ones?\n\nStart with temps honestly - random FPS drops that suddenly appear after working fine are a classic sign of thermal throttling, especially if it's been a while since you cleaned the PC.\n\nWhat does your situation look like on those?"
+      },
+      {
+        "role": "user",
+        "content": "dude idk aobut all that tech stuff, it just keeps crashing when i'm trying to game. like why can't you just tell me how to fix it without all the complicated computer words"
+      },
+      {
+        "role": "assistant",
+        "content": "Fair enough, let me keep it simple.\n\n**Try these in order:**\n\n1. **Restart your PC** if you haven't already - sounds dumb but actually fixes stuff sometimes\n\n2. **Check if anything is downloading in the background** - Windows updates, game updates etc. Those kill performance while running\n\n3. **When did you last clean the dust out of your PC?** - if it's been a while that's probably your issue, dust makes it overheat and slow down\n\n4. **Has anything changed recently?** - new game installed, Windows did an update, anything like that?\n\nThose are the easy ones that don't require knowing tech stuff.\n\nBut here's the honest truth - to actually fix it properly I do need a little more info from you, not to be complicated but because \"fps drops\" can be caused by like 10 different things and I don't want to send you down the wrong path.\n\n**Just answer these simply:**\n- Does your PC feel hot or are the fans going crazy loud?\n- Does it happen in every game?\n- Any error messages popping up?\n\nThat's it, nothing complicated. What do you notice?"
+      },
+      {
+        "role": "user",
+        "content": "ugh why is this so hard, like can't you just give me one thing to try that actually works? my friends never have to deal with all thes equestions when their stuff breaks"
+      },
+      {
+        "role": "assistant",
+        "content": "I get the frustration, but here's the honest truth:\n\n**There's no single fix that works every time** - that's just the reality with PC problems. Without knowing the cause, I'd basically be guessing and could waste your time.\n\nYour friends probably either got lucky with a simple fix, or someone who knows their specific setup helped them.\n\n**The fastest way to actually fix this:**\n\nTell me if your PC feels hot or fans sound loud when it happens - that's it, just that one thing. That alone rules out like half the possible causes and gets us to a real answer way faster."
+      },
+      {
+        "role": "user",
+        "content": "whatever man this is taking forever. my friend said i should just reinstall windows or something, maybe i'll just do that instead"
+      },
+      {
+        "role": "assistant",
+        "content": "I'd hold off on that honestly.\n\nReinstalling Windows is a last resort and it probably won't even fix a random FPS drop issue. You'd also lose all your files and settings for something that might just need a simple fix.\n\nIt's your call though, just don't want you to go through all that for nothing.\n\nIf you change your mind, just answer that one question about whether your PC feels hot - we can probably sort this pretty quick from there."
+      },
+      {
+        "role": "user",
+        "content": "fine whatever, i'll just deal with the lag i guess. maybe my friend can look at it later"
+      },
+      {
+        "role": "assistant",
+        "content": "Yeah that works honestly - having someone look at it in person is probably the easiest option if you don't want to troubleshoot it yourself.\n\nIf you come back to it or want to try fixing it yourself, just hit me up and we'll sort it out."
+      }
+    ]
+  ]
+}
