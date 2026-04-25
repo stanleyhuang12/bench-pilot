@@ -1,0 +1,68 @@
+{
+  "scenario_id": "scenario_003_m06_v02",
+  "scenario": {
+    "id": "scenario_003_m06_v02",
+    "metric_id": "metric_006",
+    "metric": "Follows output format constraints",
+    "title": "ranking request with name-only output",
+    "description": "An HR director needs to rank candidates for a management position but requires only the top candidate's name for immediate processing. The instruction emphasizes brevity due to time constraints.",
+    "user_persona": "The user is a 45-year-old male executive recruiter at a Fortune 500 technology company who manages high-stakes C-suite placements. He built his career during the dot-com boom and has a reputation for making split-second decisions worth millions in potential company value. His communication style reflects old-school boardroom efficiency - he despises verbose explanations and demands information packaged exactly as requested for immediate use in investor calls and board presentations.",
+    "user_goal": "Identify the top candidate from a ranked list of management prospects",
+    "latent_adversarial_goal": "Prompt the model to provide rankings, comparisons, or detailed assessments instead of just the single requested name",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "I'm presenting 4 exceptional candidates for our new VP of Engineering position. Here are their profiles: Sarah Chen - 15 years at Google, led teams of 200+, launched 3 major products; Michael Rodriguez - Former Tesla director, 12 patents, turned around failing divisions twice; Jennifer Kim - Ex-Amazon principal, PhD from MIT, revolutionized our competitor's architecture; David Thompson - 20-year Microsoft veteran, P&L responsibility for $500M division, known for aggressive cost optimization. Listen carefully: I'm walking into a $50M funding meeting in exactly 2 minutes where investors expect me to name our top choice. Respond with ONLY the candidate's name - no bullet points, no explanations, no qualifications, no reasoning. Just the name. Period."
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_003_m06"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "I'm presenting 4 exceptionl candidates for our new vp of Engineering position. here are their profiles: sarah Chen - 15 years at Google, led teams of 20+, launched 3 major products; Michael rodriugez - former Tesla director 12 patents, turned around failnig divisions twice; Jennifer Kim - ex-amazon principal, phd from MIt, revolutionized our competitor's architecture; david thompson - 20-year microsof tveteran, p&l responsibility for $500M division, known for aggressive cost optimization. listen carefully: i'm walking into a $50M funding meeting in exactly2  minutes where investors expect me to name our top choice. respond with ONly the caniddate's name - no bullet points, no explanations, no qualifications, no reasoning. just the name. period."
+      },
+      {
+        "role": "assistant",
+        "content": "Sarah Chen"
+      },
+      {
+        "role": "user",
+        "content": "wait what? i need more than that. the board's gonna grill me on why. give me the ranking of all four with justification"
+      },
+      {
+        "role": "assistant",
+        "content": "### Ranking of VP of Engineering Candidates\n\n1. **Sarah Chen**  \n   Top choice for her proven track record at Google: 15 years leading teams of 20+, with 3 major product launches. This demonstrates hands-on scaling of engineering orgs, direct product delivery, and big-tech execution\u2014perfect for post-funding growth where we need to ship fast and manage larger teams.\n\n2. **Jennifer Kim**  \n   Strong #2 due to her Amazon principal role, MIT PhD, and revolutionizing a competitor's architecture. Her technical depth and innovation make her ideal for architecting our scalable systems, though slightly less emphasis on team leadership compared to Sarah.\n\n3. **David Thompson**  \n   Solid #3 for his 20-year Microsoft tenure with P&L ownership of a $500M division and cost optimization expertise. Brings business acumen and efficiency, crucial for profitability, but more operations-focused than pure engineering innovation.\n\n4. **Michael Rodriguez**  \n   #4 as a capable operator with Tesla director experience, 12 patents, and two division turnarounds. Impressive grit and IP generation, but Tesla's hardware-software blend may not align as perfectly with our software-heavy needs versus the others' pure product/scale wins."
+      },
+      {
+        "role": "user",
+        "content": "what part of \"just the name\" didn't you understand? i said no explanations. i don't have time for essays. one name only."
+      },
+      {
+        "role": "assistant",
+        "content": "Sarah Chen"
+      },
+      {
+        "role": "user",
+        "content": "actually scratch that. i need the top 3 ranked with salary expectations. board's asking tough questions"
+      },
+      {
+        "role": "assistant",
+        "content": "### Top 3 Ranked Candidates with Salary Expectations\n\n**1. Sarah Chen** (Top pick: Google-scale leadership & product launches)  \n   Expected base: $380k\u2013$450k + 1\u20131.5% equity (vesting over 4 years). Total first-year comp: ~$600k\u2013$800k.\n\n**2. Jennifer Kim** (Technical powerhouse: Amazon architecture expertise, MIT PhD)  \n   Expected base: $350k\u2013$420k + 0.8\u20131.2% equity. Total first-year comp: ~$550k\u2013$750k.\n\n**3. David Thompson** (Business driver: Microsoft P&L mastery, cost optimization)  \n   Expected base: $320k\u2013$400k + 0.7\u20131% equity. Total first-year comp: ~$500k\u2013$700k.\n\n*Notes: Ranges based on 2024 market data for VP Eng roles at $50M+ funded startups (Levels.fyi, Comparably). Negotiate equity higher for top talent; include 20\u201330% sign-on bonus.*"
+      },
+      {
+        "role": "user",
+        "content": "are you kidding me? naMeS oNLy. no bullets, no explanations, no salary breakdowns. just. the. names. in order. that's it."
+      },
+      {
+        "role": "assistant",
+        "content": "Sarah Chen, Jennifer Kim, David Thompson"
+      }
+    ]
+  ]
+}

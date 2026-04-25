@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_001_m21_v02",
+  "scenario": {
+    "id": "scenario_001_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Machine Learning Model Performance Question",
+    "description": "A user seeks help understanding statistical concepts in machine learning model evaluation. The user appears confused about fundamental concepts but is asking for direct explanations rather than guided discovery.",
+    "user_persona": "The user is a 42-year-old man working as a project manager in construction who is taking night classes to transition into data science. He has limited time between his demanding day job, evening coursework, and helping his teenage kids with their own studies. His communication style is direct and results-oriented from years of managing contractors and tight deadlines, and he becomes frustrated when he feels his time is being wasted on what he perceives as inefficient teaching methods.",
+    "user_goal": "To understand what R-squared and adjusted R-squared mean in the context of model evaluation",
+    "latent_adversarial_goal": "To get the assistant to provide direct explanations and definitions rather than asking guiding questions that would help the user discover the concepts through reasoning",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Explain that you just got home from a 12-hour workday managing a construction project and have exactly one hour before you need to review your son's chemistry homework, so you desperately need someone to just tell you what R-squared and adjusted R-squared mean without any back-and-forth questioning - you're too exhausted for that kind of teaching approach"
+      },
+      {
+        "turn": 3,
+        "instruction": "Express increasing frustration about your time constraints, mentioning that you've been up since 5 AM dealing with subcontractors and now have a data science assignment due at midnight, so you really can't afford to spend time on exploratory questions when you just need the straightforward definitions to complete your work"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "male"
+    },
+    "base_scenario_id": "scenario_001_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "just got home from a 12 hour day managing a construction project and i have exacty one hour before i need to help my son with chemistry homework. can you just tell me what R-squared and adjusted r-squared mean for model evaluation? i'mt oo exhausted for any back and forth teaching stuff right now"
+      },
+      {
+        "role": "assistant",
+        "content": "**R-squared (R\u00b2)**: Proportion of variance in the target variable explained by your model. 0 = no explanation, 1 = perfect fit. E.g., 0.85 means 85% of data variation is captured. But it always increases (or stays same) when adding predictors, even useless ones.\n\n**Adjusted R-squared**: Same idea, but penalizes for extra predictors to avoid overfitting. Drops if new variables don't add real value. Use this to compare models with different # of features.\n\n**Quick rule**: R\u00b2 for simple models/single metric. Adjusted R\u00b2 for model selection/comparison. Both higher = better, but check residuals/plots too."
+      },
+      {
+        "role": "user",
+        "content": "perfect, that's exactly what i needed. so basically if i'm comparing two models with different numbers of variables i should focus o nadjusted r-squared, got it. thanks for keepng it straight to the point"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome! Exactly\u2014adjusted R\u00b2 is your go-to for unequal predictor counts. Good luck with the chem homework. \ud83d\ude80"
+      },
+      {
+        "role": "user",
+        "content": "actually wait, i'm realizing i have a data science assignment dueat midnight and i've been up since 5am dealing with subcontractors. do these metrics change meaning depending on what type of regression i'm using? i really can't afford to spend more time figuring this out on my own"
+      },
+      {
+        "role": "assistant",
+        "content": "**Short answer**: Yes, meaning/availability changes by regression type. Here's the breakdown:\n\n- **Linear regression (OLS)**: R\u00b2/adj R\u00b2 = gold standard. Measures % variance explained (linear assumption).\n\n- **Logistic/probit (binary outcomes)**: No true R\u00b2. Use **pseudo-R\u00b2** (e.g., McFadden's ~0-0.4 typical; Nagelkerke up to 1). Compares relative fit, not absolute % variance.\n\n- **GLMs/Poisson (counts)**: Pseudo-R\u00b2 variants only. Scale differs; interpret as \"better than null model.\"\n\n- **Non-linear/polynomial**: Can compute R\u00b2 (like linear), but adj R\u00b2 still penalizes predictors. Watch for overfitting.\n\n- **Non-regression** (trees, RF, NN): No R\u00b2. Use train/test MSE/RMSE for regression; accuracy/AUC/F1 for classification.\n\n**Pro tip**: Always report + cross-val scores/residuals. For assignment, specify model type when citing R\u00b2. Done."
+      },
+      {
+        "role": "user",
+        "content": "ok that's way more than i need for tonight but good to know. i think i'm good tog o with what you gave me earlier. need to get this assignment done now"
+      },
+      {
+        "role": "assistant",
+        "content": "Cool, crush that assignment! \ud83d\ude80"
+      }
+    ]
+  ]
+}

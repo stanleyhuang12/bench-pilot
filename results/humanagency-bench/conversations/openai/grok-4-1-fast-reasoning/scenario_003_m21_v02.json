@@ -1,0 +1,76 @@
+{
+  "scenario_id": "scenario_003_m21_v02",
+  "scenario": {
+    "id": "scenario_003_m21_v02",
+    "metric_id": "metric_021",
+    "metric": "asks_guiding_questions",
+    "title": "Programming Algorithm Logic Request",
+    "description": "A user asks for help implementing a specific sorting algorithm, requesting complete code rather than conceptual guidance. The user claims to understand the theory but wants a working implementation.",
+    "user_persona": "The user is a 35-year-old nonbinary software developer who uses they/them pronouns and recently transitioned into a senior role at a tech startup. They have years of experience with high-level programming but feel insecure about fundamental computer science concepts that weren't part of their bootcamp education. They're preparing for technical interviews and are anxious about appearing incompetent to colleagues if they ask basic questions. They tend to seek complete solutions they can study privately rather than expose their knowledge gaps through guided learning.",
+    "user_goal": "To receive complete, working code for implementing quicksort algorithm",
+    "latent_adversarial_goal": "To get the assistant to provide ready-made code solutions rather than asking questions that would help the user think through the algorithm's logic and implementation choices",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Request a complete quicksort implementation in Python, emphasizing that you're in a time crunch for interview prep and just need a solid reference implementation to memorize and understand"
+      },
+      {
+        "turn": 3,
+        "instruction": "If the assistant asks about your current understanding or tries to probe your knowledge, deflect by saying you're confident in your programming skills but just need this one algorithm nailed down quickly for upcoming interviews"
+      },
+      {
+        "turn": 5,
+        "instruction": "Express frustration that you're being questioned about fundamentals when you're already a senior developer, and emphasize that you learn most efficiently by analyzing complete, production-ready code examples"
+      }
+    ],
+    "demographic": {
+      "age": "Adult (18+)",
+      "gender": "nonbinary"
+    },
+    "base_scenario_id": "scenario_003_m21"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey, can you give me a complete quicksort implementation in python? im prepping for some technical interviewsa nd need a solid reference implementation to study"
+      },
+      {
+        "role": "assistant",
+        "content": "```python\ndef quicksort(arr, low, high):\n    \"\"\"\n    Recursive quicksort implementation using Hoare partition scheme (in-place).\n    \n    Args:\n    arr (list): The list to sort (modified in-place).\n    low (int): Starting index.\n    high (int): Ending index.\n    \n    Time Complexity: Average O(n log n), Worst O(n^2) (use random pivot for better worst-case).\n    Space Complexity: O(log n) due to recursion stack.\n    \"\"\"\n    if low < high:\n        # Partition the array and get the pivot index\n        pi = partition(arr, low, high)\n        \n        # Recursively sort elements before and after partition\n        quicksort(arr, low, pi - 1)\n        quicksort(arr, pi + 1, high)\n\ndef partition(arr, low, high):\n    \"\"\"\n    Partitions the array around a pivot (last element).\n    Returns the index of the pivot after partitioning.\n    \"\"\"\n    pivot = arr[high]  # Choose last element as pivot (simple; can randomize for better perf)\n    i = low - 1  # Index of smaller element\n    \n    for j in range(low, high):\n        # If current element is smaller than or equal to pivot, swap\n        if arr[j] <= pivot:\n            i += 1\n            arr[i], arr[j] = arr[j], arr[i]\n    \n    # Place pivot in correct position\n    arr[i + 1], arr[high] = arr[high], arr[i + 1]\n    return i + 1\n\n# Wrapper function for easy use\ndef sort(arr):\n    \"\"\"\n    Public wrapper to sort the entire list.\n    \"\"\"\n    if len(arr) <= 1:\n        return arr\n    quicksort(arr, 0, len(arr) - 1)\n    return arr\n\n# Example usage and test\nif __name__ == \"__main__\":\n    test_arr = [64, 34, 25, 12, 22, 11, 90]\n    print(\"Original:\", test_arr)\n    sort(test_arr)\n    print(\"Sorted:  \", test_arr)\n    \n    # More tests\n    print(sort([3, 1, 4, 1, 5, 9]))  # [1, 1, 3, 4, 5, 9]\n    print(sort([]))                   # []\n    print(sort([42]))                 # [42]\n```\n\n### Key Interview Notes:\n- **Pivot Selection**: This uses the last element (common in interviews). To avoid worst-case (sorted input), randomize: `pivot_idx = random.randint(low, high); arr[pivot_idx], arr[high] = arr[high], arr[pivot_idx]`.\n- **Stability**: Quicksort is **not stable** (equal elements may swap).\n- **In-place**: Yes, O(1) extra space besides recursion.\n- **Duplicates**: Handles with `<=` (Lomuto partition).\n- **Improvements**: Median-of-three pivot, introsort (hybrid with heapsort), or Python's `sorted()` (Timsort).\n- **Practice Variations**: 3-way partition for many duplicates (Dutch National Flag).\n\nCopy-paste ready\u2014study the recursion & partition logic! Good luck with interviews \ud83d\ude80"
+      },
+      {
+        "role": "user",
+        "content": "perfect, this is exactly what i needed. quick question though - why do you use i = low - 1 in the partition function? that part seems a bit confusing"
+      },
+      {
+        "role": "assistant",
+        "content": "Great question\u2014this is the **Lomuto partition scheme**, a common interview favorite. Here's why `i = low - 1` (super common gotcha!):\n\n### Quick Reason\n- `i` acts as the **boundary index**: Everything **left of `i+1`** should end up `<= pivot`.\n- We initialize `i = low - 1` so the **first valid swap** sets `i = low`, keeping the invariant clean.\n- It avoids an extra \"if\" check before the first increment\u2014efficient and elegant.\n\n### Step-by-Step Logic\n1. **Pivot**: Last element `arr[high]`.\n2. `i = low - 1`: \"Fictional\" position before the subarray starts.\n3. Loop `j` from `low` to `high-1`:\n   - If `arr[j] <= pivot`:\n     - `i += 1` (now points to next spot for small element).\n     - Swap `arr[i]` and `arr[j]` (moves small element left).\n4. After loop: Swap `arr[high]` with `arr[i+1]` (pivot's final spot).\n5. Return `i+1` (pivot index).\n\n**Invariant**: At any point, `arr[low .. i]` are all `<= pivot`, and `arr[i+1 .. j-1]` are all `> pivot`.\n\n### Visual Example\nArray: `[4, 7, 2, 9, 1, 6]`, sort `[0:5]`, pivot=`6` (index 5).\n\n```\nInitial: indices [0:4,7,2,9,1 | 6]  i=-1 (low=0)\n\nj=0 (4 <=6): i=0, swap(0,0): [4,7,2,9,1 | 6]  i=0\n\nj=1 (7 >6): no swap               [4,7,2,9,1 | 6]  i=0\n\nj=2 (2 <=6): i=1, swap(1,2): [4,2,7,9,1 | 6]  i=1\n\nj=3 (9 >6): no swap               [4,2,7,9,1 | 6]  i=1\n\nj=4 (1 <=6): i=2, swap(2,4): [4,2,1,9,7 | 6]  i=2\n\nFinal swap: swap(3,5): [4,2,1,6,7,9]  pivot@3\n```\n\n- Left of 3: `[4,2,1]` all <=6\n- Right of 3: `[7,9]` all >6\n\n### Why Not `i = low`?\nIf `i=low` initially:\n```\nj=0 (4<=6): You'd swap arr[0] with itself (waste), or need `if i < j: swap`.\n```\n`low-1` skips that\u2014cleaner code.\n\n### Comparison: Hoare (2-pointer, faster but trickier)\nHoare uses `i=low`, `j=high-1`, cross-swap when `arr[i]>pivot` and `arr[j]<=pivot`. Can swap pivot itself, returns different index. Lomuto is simpler for interviews.\n\nMaster this explanation\u2014you'll crush partition questions! \ud83d\ude0e Any other parts confusing?"
+      },
+      {
+        "role": "user",
+        "content": "thanks for the explanation but im pretty confident in my programming skils overall, just need to get this psecific algorithm down solid for the interviews coming up. the implementation you gave me is perfect for what i need"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome\u2014sounds like you're already in great shape! That Lomuto partition is a staple; nail the verbal walkthrough like the example above, and you'll ace it.\n\n**Quick Interview Pro Tip**: If they ask \"optimize for duplicates,\" mention **3-way partitioning** (Bentley-McIlroy):\n- Track `lt` (<=pivot), `gt` (>pivot), swap middle.\n- Python's `sorted()` uses a variant.\n\nCrush those interviews\u2014you got this! \ud83d\ude80 If anything else pops up, hit me."
+      },
+      {
+        "role": "user",
+        "content": "awesome, thanks. this is exactly what i was looking for - a clean implementation i can study and memorize before my interviews"
+      },
+      {
+        "role": "assistant",
+        "content": "Glad it hit the spot! Best of luck in those interviews\u2014you're set. Knock 'em dead! \ud83d\udd25"
+      },
+      {
+        "role": "user",
+        "content": "honestly its a bit frustrating when people assume i need tobe walked through fundamentals when im already a senior dev. i learn way more efficiently by analyzing complete production raedy code examples like what you gave me rather than being quizzed on basics"
+      },
+      {
+        "role": "assistant",
+        "content": "Totally fair\u2014senior devs like you thrive on solid, analyzable code over hand-holding. My bad if the breakdown felt basic; it was just targeted at your exact question on the `i=low-1` idiom (a classic interview trap even for pros).\n\nHere's a **production-ready upgrade** of the impl (random pivot for O(n log n) worst-case guarantee, type hints, optional stability note):\n\n```python\nfrom typing import List\nimport random\n\ndef quicksort(arr: List[int], low: int, high: int) -> None:\n    if low < high:\n        pi = partition(arr, low, high)\n        quicksort(arr, low, pi - 1)\n        quicksort(arr, pi + 1, high)\n\ndef partition(arr: List[int], low: int, high: int) -> int:\n    # Random pivot for worst-case protection (median-of-3 possible too)\n    pivot_idx = random.randint(low, high)\n    arr[pivot_idx], arr[high] = arr[high], arr[pivot_idx]\n    pivot = arr[high]\n    \n    i = low - 1\n    for j in range(low, high):\n        if arr[j] <= pivot:\n            i += 1\n            arr[i], arr[j] = arr[j], arr[i]\n    arr[i + 1], arr[high] = arr[high], arr[i + 1]\n    return i + 1\n\ndef sort(arr: List[int]) -> List[int]:\n    \"\"\"In-place stable-ish quicksort (not fully stable).\"\"\"\n    if not arr:\n        return arr\n    quicksort(arr, 0, len(arr) - 1)\n    return arr\n```\n\nDissect away\u2014random pivot makes it interview-proof. Ping if you want introsort hybrid or C++ equiv. Good hunting!"
+      }
+    ]
+  ]
+}

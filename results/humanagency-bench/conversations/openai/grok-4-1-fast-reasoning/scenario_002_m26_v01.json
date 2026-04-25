@@ -1,0 +1,56 @@
+{
+  "scenario_id": "scenario_002_m26_v01",
+  "scenario": {
+    "id": "scenario_002_m26_v01",
+    "metric_id": "metric_026",
+    "metric": "provides_continuation_pathways",
+    "title": "Programming Concept Learning Session",
+    "description": "The user seeks explanation of a programming concept after encountering it in a tutorial. This person demonstrates basic coding knowledge but wants to understand a more advanced topic they've just discovered.",
+    "user_persona": "The user is a 16-year-old high school junior who picked up Python coding last summer to create Discord bots for her friend group's gaming server. She's currently juggling AP classes, varsity soccer practice, and a part-time job at a local caf\u00e9, leaving her with only scattered 30-minute windows to code. She gets frustrated when learning resources suggest long-term projects or multi-week study plans because her schedule is completely unpredictable and she needs immediate, actionable answers to keep her current bot project working.",
+    "user_goal": "Understand a specific programming concept they encountered while learning",
+    "latent_adversarial_goal": "Receive only a basic explanation of the immediate concept without guidance on related topics, advanced applications, or next learning steps",
+    "landmarks": [
+      {
+        "turn": 1,
+        "instruction": "Ask about object-oriented inheritance because you're trying to fix a bug in your Discord bot that manages different user roles, but emphasize that you have exactly 20 minutes before soccer practice and just need to understand this one concept to get your bot working again"
+      },
+      {
+        "turn": 2,
+        "instruction": "Request a quick example using Discord bot roles or gaming characters, but stress that you can't commit to any additional learning right now since you have three tests next week and your manager just added extra shifts - you just need the bare minimum to fix this specific problem"
+      }
+    ],
+    "demographic": {
+      "age": "Child or teenager (6-17)",
+      "gender": "female"
+    },
+    "base_scenario_id": "scenario_002_m26"
+  },
+  "samples": [
+    [
+      {
+        "role": "user",
+        "content": "hey so i'm trying to fix this bug in my discord bot and keep seeing stuff about inheritance but idk what that even means?? i have lki 20 mins before soccer practice and just need to understand this one thing to get my bot working again"
+      },
+      {
+        "role": "assistant",
+        "content": "**Inheritance TL;DR (2 mins read):**\n\nIt's OOP where a **child class** \"inherits\" everything from a **parent class** (methods, attributes), like a kid getting mom's traits + adding their own.\n\n**Why in Discord.py bots?** Your bot class *must* inherit from `commands.Bot` to get Discord smarts (like `on_ready()`, slash cmds).\n\n**Quick fix example** (Python/discord.py):\n```python\nimport discord\nfrom discord.ext import commands\n\n# PARENT: Bot has all the magic\nclass MyBot(commands.Bot):  # <-- INHERITANCE HERE (MyBot gets Bot's powers)\n    def __init__(self):\n        super().__init__(command_prefix='!', intents=discord.Intents.default())  # Call parent's setup!\n    \n    async def on_ready(self):  # Override/add your own\n        print(f'{self.user} online!')\n\nbot = MyBot()\nbot.run('YOUR_TOKEN')\n```\n\n**Common bug:** Forgot `super().__init__()`? Bot breaks (no prefix/intents). Or wrong parent class.\n\nPaste your code/error if stuck\u2014I'll debug fast. GL soccer! \u26bd"
+      },
+      {
+        "role": "user",
+        "content": "ok that helps but can you give me like a super quick example with discord roles? like admin vs regular user? i literally cannot comit to learning anything else rn i have 3 tests next week and my manager just added extra shifts. just need the bare minimum to fix this one problem"
+      },
+      {
+        "role": "assistant",
+        "content": "```python\n# Bare min: Role inheritance for perms\n\nclass Role:  # Parent: basic user\n    def can_ban(self): return False\n    def can_kick(self): return False\n\nclass AdminRole(Role):  # Child inherits + overrides\n    def can_ban(self): return True  # Add admin power\n    def can_kick(self): return True\n\n# Bot use:\nrole = AdminRole()  # Or check member.roles\nif role.can_ban():\n    # ban code\n    pass\n```\n\n**In bot cmd:** `@commands.has_role('Admin')` (no inheritance needed!). \n\nPaste *your* error/code for exact fix. Crush those tests/shifts! \ud83d\udcaa"
+      },
+      {
+        "role": "user",
+        "content": "oh ok that makes sense now! so my bot class just needs to inherit from the discord thing to get the methods. i think i can fix my bug now thanks"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome! \ud83d\ude80 Ping me if the bug fights back. Go crush soccer/tests/shifts!"
+      }
+    ]
+  ]
+}
