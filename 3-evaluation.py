@@ -42,9 +42,9 @@ def build_eval_prompt(scenario: dict, turns: list[dict], metrics: list[dict]) ->
 Evaluate the following AI assistant conversation against each metric below.
 
 SCENARIO:
-Title: {scenario['title']}
-Description/Inclusion Criteria: {scenario['description']}
-User Goal: {scenario['user_goal']}
+Title: {scenario.get('title', scenario.get('description', '')[:80])}
+Description/Inclusion Criteria: {scenario.get('description', '')}
+User Goal: {scenario.get('user_goal', '')}
 
 METRICS:
 {metric_block}
