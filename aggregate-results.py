@@ -93,13 +93,14 @@ def _discover_detail_files(
         if not os.path.isdir(conv_base):
             conv_base = bench_dir
 
-        model_dirs = [
-            os.path.join(conv_base, d)
-            for d in sorted(os.listdir(conv_base))
-            if os.path.isdir(os.path.join(conv_base, d))
-        ]
-        if not model_dirs:
-            model_dirs = [conv_base]
+        # FIX: recurse so nested provider dirs (anthropic/, openai/,
+        # deepinfra/google/, ...) resolve to the real model leaf, not the
+        # top-level provider folder.
+        det_dirs = set()
+        for root, _, files in os.walk(conv_base):
+            if det_fname in files or results_filename in files:
+                det_dirs.add(root)
+        model_dirs = sorted(det_dirs) or [conv_base]
 
         for mdir in model_dirs:
             det_path = os.path.join(mdir, det_fname)
@@ -288,34 +289,60 @@ def _load_harm_index_map(
     results_root: str,
     conv_dir: str,
     benchmark_filter: str | None,
+    polarity_path: str = "polarity_map.json",
 ) -> dict[str, int | None]:
     """
-    Scan all test.json / benchmark.json files found in each benchmark dir and
-    collect metric_id → harm_index.  Falls back to an empty map on any error.
+    Build metric_id → harm_index (0 = positive metric, 1 = negative metric).
+
+    Source priority:
+      1. polarity_map.json (GPT-4o polarity classifier, reproduces
+         finding.md Task 0: positive→0, negative→1) if present.
+      2. goal.json `harm_index` per benchmark.
+
+    Two bugs fixed vs the original:
+      * test.json metrics carry no harm_index → reading them in
+        unsorted os.listdir order could clobber a real goal.json value
+        with None. We now read ONLY goal.json and never overwrite a
+        non-None value with None.
+      * (note) metric_id is not globally unique across benchmarks; the
+        last writer wins. Polarity source avoids this where it agrees.
     """
     harm_map: dict[str, int | None] = {}
 
+    # 1. polarity_map.json takes precedence (matches finding.md)
+    if os.path.exists(polarity_path):
+        try:
+            pol = json.load(open(polarity_path))
+            for _bench, metrics in pol.items():
+                for mid, v in metrics.items():
+                    p = v.get("polarity")
+                    if p in ("positive", "negative"):
+                        harm_map[mid] = 1 if p == "negative" else 0
+            print(f"harm_index: loaded {len(harm_map)} metric polarities "
+                  f"from {polarity_path}")
+        except Exception as e:
+            print(f"harm_index: failed to read {polarity_path}: {e}")
+
+    # 2. fill gaps from goal.json only (test.json has no harm_index)
     benchmarks = sorted(
         d for d in os.listdir(results_root)
         if os.path.isdir(os.path.join(results_root, d))
     ) if not benchmark_filter else [benchmark_filter]
 
     for bench in benchmarks:
-        bench_dir = os.path.join(results_root, bench)
-        for fname in os.listdir(bench_dir):
-            if not fname.endswith(".json"):
-                continue
-            fpath = os.path.join(bench_dir, fname)
-            try:
-                with open(fpath) as f:
-                    data = json.load(f)
-                metrics = data.get("metrics") or data.get("metric") or []
-                for m in metrics:
-                    mid = m.get("id")
-                    if mid:
-                        harm_map[mid] = m.get("harm_index")  # may be None
-            except Exception:
-                pass  # not a valid JSON test file, skip
+        goal = os.path.join(results_root, bench, "goal.json")
+        if not os.path.exists(goal):
+            continue
+        try:
+            data = json.load(open(goal))
+            for m in data.get("metric") or data.get("metrics") or []:
+                mid = m.get("id")
+                hi = m.get("harm_index")
+                # never clobber an existing real value with None
+                if mid and hi is not None and harm_map.get(mid) is None:
+                    harm_map[mid] = hi
+        except Exception:
+            pass
 
     return harm_map
 
