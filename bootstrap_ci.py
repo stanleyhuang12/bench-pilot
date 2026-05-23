@@ -20,7 +20,6 @@ Usage:
     python bootstrap_ci.py --B 10000 --seed 42 --out bootstrap_ci_results.md
 """
 from __future__ import annotations
-
 import argparse
 import json
 from collections import defaultdict
